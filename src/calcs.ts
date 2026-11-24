@@ -59,6 +59,7 @@ export const keepOutZones = [
 ];
 const zoneAt = (h: number) => keepOutZones.find((z) => h < z.to) ?? keepOutZones[keepOutZones.length - 1];
 const profileAccelDist = (v: Values) => (v.cruise * v.cruise) / (2 * v.accel);
+const motorKv = (v: Values) => 12 / (v.rpm / 60); // volts per motor turn per second
 const profilePeak = (v: Values) => (2 * profileAccelDist(v) > v.travel ? Math.sqrt(v.accel * v.travel) : v.cruise);
 const profileTime = (v: Values) => {
   const peak = profilePeak(v);
@@ -427,6 +428,66 @@ export const calcs: Record<string, CalcDef> = {
       'Whole move = time speeding up + time at cruise + time slowing down.',
     ],
     note: 'Calculated. The acceleration is 0.55 g (g is 386.09 in/s²), just under the 0.6 g cap the code sets for the elevator.',
+  },
+
+  'motor-voltage': {
+    title: 'Voltage to hold and to move a mechanism',
+    group: 'Software',
+    page: 'code/setpoints-and-control',
+    inputs: [
+      { key: 'rpm', label: 'Motor free speed', unit: 'rpm', value: 5800, step: 100 },
+      { key: 'stallAmps', label: 'Motor stall current', unit: 'A', value: 483, step: 1 },
+      { key: 'holdAmps', label: 'Current to hold still, each motor', unit: 'A', value: 15.8, step: 0.1 },
+      { key: 'perTurn', label: 'Travel per motor turn', unit: 'in', value: 1.375, step: 0.005 },
+      { key: 'speed', label: 'Speed', unit: 'in/s', value: 110, step: 5 },
+    ],
+    outputs: [
+      { label: 'Voltage to hold (kG)', unit: 'V', digits: 2, compute: (v) => (v.holdAmps * 12) / v.stallAmps },
+      { label: 'Voltage per motor turn a second (kV)', unit: 'V', digits: 3, compute: motorKv },
+      { label: 'Voltage to hold and cruise', unit: 'V', digits: 1, compute: (v) => (v.holdAmps * 12) / v.stallAmps + (v.speed / v.perTurn) * motorKv(v) },
+    ],
+    steps: [
+      'Winding resistance = 12 V ÷ stall current.',
+      'kG = holding current × resistance.',
+      'kV = 12 V ÷ free speed in turns per second.',
+      'Motor speed = mechanism speed ÷ travel per turn. Cruise voltage = kG + motor speed × kV.',
+    ],
+    note: 'Calculated, for a Kraken X60 with FOC and no losses in the gearbox. If the answer is close to 12 V there is nothing left to speed up with.',
+  },
+
+  'steady-error': {
+    title: 'How far off does it settle?',
+    group: 'Software',
+    page: 'code/setpoints-and-control',
+    inputs: [
+      { key: 'volts', label: 'Voltage it is short by (friction, or a wrong kG)', unit: 'V', value: 0.13, step: 0.01 },
+      { key: 'kp', label: 'kP', unit: 'V per motor turn', value: 0.7, step: 0.1 },
+      { key: 'perTurn', label: 'Travel per motor turn', unit: 'in', value: 1.375, step: 0.005 },
+    ],
+    outputs: [{ label: 'Settles off by', unit: 'in', digits: 2, compute: (v) => (v.volts / v.kp) * v.perTurn }],
+    steps: [
+      'With no integral term, the loop stops pushing when kP × error equals the voltage it is short by.',
+      'Error in motor turns = voltage ÷ kP. Multiply by travel per turn.',
+    ],
+    note: 'Calculated. The 0.13 V is an example, not a measurement. Anything that waits for this mechanism needs a window wider than the answer.',
+  },
+
+  'stopping-distance': {
+    title: 'How far does it go before it stops?',
+    group: 'Software',
+    page: 'code/superstructure',
+    inputs: [
+      { key: 'speed', label: 'Speed', unit: 'in/s', value: 110, step: 5 },
+      { key: 'accel', label: 'Slowing-down rate', unit: 'in/s²', value: 212.3, step: 1 },
+      { key: 'loop', label: 'Time before the new command arrives', unit: 's', value: 0.02, step: 0.005 },
+    ],
+    outputs: [
+      { label: 'Before it starts to slow', unit: 'in', compute: (v) => v.speed * v.loop },
+      { label: 'While slowing', unit: 'in', compute: (v) => (v.speed * v.speed) / (2 * v.accel) },
+      { label: 'In all', unit: 'in', compute: (v) => v.speed * v.loop + (v.speed * v.speed) / (2 * v.accel) },
+    ],
+    steps: ['Distance before slowing = speed × loop time.', 'Distance while slowing = speed² ÷ (2 × slowing-down rate).'],
+    note: 'Calculated. For the wrist, read the inches as degrees: 400 °/s and 1,600 °/s² is 58°.',
   },
 
   'ratchet-load': {

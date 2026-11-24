@@ -1,0 +1,118 @@
+{
+  "commit": "67a30bb",
+  "setpoints": [
+    {
+      "name": "STOW",
+      "carriageIn": 0.0,
+      "wristDeg": -90.0,
+      "placeholder": false
+    },
+    {
+      "name": "STATION",
+      "carriageIn": 1.25,
+      "wristDeg": -35.0,
+      "placeholder": false
+    },
+    {
+      "name": "L1",
+      "carriageIn": 5.0,
+      "wristDeg": -35.0,
+      "placeholder": true
+    },
+    {
+      "name": "L2",
+      "carriageIn": 17.5,
+      "wristDeg": -35.0,
+      "placeholder": false
+    },
+    {
+      "name": "L3",
+      "carriageIn": 33.3,
+      "wristDeg": -35.0,
+      "placeholder": false
+    },
+    {
+      "name": "L4",
+      "carriageIn": 65.25,
+      "wristDeg": -52.0,
+      "placeholder": false
+    },
+    {
+      "name": "ALGAE_LOW",
+      "carriageIn": 8.8,
+      "wristDeg": 46.0,
+      "placeholder": false
+    },
+    {
+      "name": "ALGAE_HIGH",
+      "carriageIn": 24.6,
+      "wristDeg": 46.0,
+      "placeholder": false
+    },
+    {
+      "name": "ALGAE_CARRY",
+      "carriageIn": 1.25,
+      "wristDeg": 45.0,
+      "placeholder": false
+    },
+    {
+      "name": "NET",
+      "carriageIn": 65.25,
+      "wristDeg": 75.0,
+      "placeholder": false
+    },
+    {
+      "name": "PROCESSOR",
+      "carriageIn": 1.25,
+      "wristDeg": 15.0,
+      "placeholder": true
+    },
+    {
+      "name": "CLIMB",
+      "carriageIn": 1.25,
+      "wristDeg": 0.0,
+      "placeholder": false
+    }
+  ],
+  "carriageTolIn": 0.5,
+  "wristTolDeg": 1.5,
+  "elevator": {
+    "gains": {
+      "KG": 0.39,
+      "KS": 0.0,
+      "KV": 0.124,
+      "KA": 0.0014,
+      "KP": 0.7,
+      "KD": 0.014
+    },
+    "inPerMotorRot": 1.375,
+    "cruiseInPerS": 110,
+    "accelInPerS2": 212.3495,
+    "softMaxIn": 65.25,
+    "travelIn": 66,
+    "statorLimitA": 60
+  },
+  "wrist": {
+    "gains": {
+      "KG": 0.3,
+      "KS": 0.0,
+      "KV": 7.45,
+      "KA": 0.05,
+      "KP": 60.0,
+      "KD": 1.0
+    },
+    "cruiseDegPerS": 400,
+    "accelDegPerS2": 1600,
+    "minDeg": -90,
+    "maxDeg": 75,
+    "statorLimitA": 40,
+    "gearRatio": 60
+  },
+  "drive": {
+    "kpAuto": 3.0,
+    "kpTeleop": 3.6,
+    "kd": 0.1,
+    "atTargetM": 0.03,
+    "atTargetDeg": 2.0
+  }
+}

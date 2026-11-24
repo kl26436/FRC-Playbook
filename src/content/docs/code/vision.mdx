@@ -3,6 +3,7 @@ title: "How the camera finds the robot"
 description: "From an AprilTag in the picture to a corrected position on the field, followed through the real code, and how the simulator stands in for the camera."
 ---
 
+import AutoReplay from '../../../components/AutoReplay.astro';
 import Calc from '../../../components/Calc.astro';
 import Flow from '../../../components/Flow.astro';
 import VisionDiagram from '../../../components/VisionDiagram.astro';
@@ -178,6 +179,28 @@ private String evaluate() {
 
 The reason is logged every loop as `Vision/Rejected`. After a match you can see exactly why the camera was or was not used at any moment.
 
+## Watch a reading being used, and one being refused
+
+Both recordings start the same way. The robot sits at the right station holding a coral, and the code has been told the wrong position, as after a hard hit. At 1.0 s the driver holds the button to score on branch C.
+
+<AutoReplay
+  files={[
+    { file: 'vision_fix.json', label: 'Wrong by 0.43 m: reading used' },
+    { file: 'vision_rejected.json', label: 'Wrong by 1.26 m: reading refused' },
+  ]}
+  vision
+  zoom
+  pickLabel="Recording"
+/>
+
+**Before the button.** The camera can already see tag 17, 39 px tall from about 3.7 m. The reading is not used, because no reef face is the target yet. That is the first check in the list.
+
+**Wrong by 0.43 m.** The command names the face, and on its first loop the reading passes every check. The dashed outline jumps onto the robot. Readings keep arriving until the robot is too close to see the whole tag, and it finishes the last few inches on the wheels alone. It scores.
+
+**Wrong by 1.26 m.** The same reading is now over 1 m from the estimate, so it is refused, and so is every one after it. The robot drives the right route in the wrong place, stops 1.26 m short of the branch, raises, and lets the coral go onto the floor. The code believes it scored. The simulator's score judge did not count it.
+
+The simulated camera has no noise, so its reading lands exactly on the true position. A real one will not.
+
 ## The same code with a pretend camera
 
 Everything above runs unchanged in the simulator. One line decides where the numbers come from:
@@ -251,5 +274,5 @@ The first real test is simple: park the robot at a measured spot in front of a t
 ## Your turn
 
 1. In the calculator, find the pixel height where one pixel of error costs 1 in. How far away is that?
-2. The code throws away a fix more than 1 m from the estimate. Describe a match situation where that rule throws away a correct fix. What would the robot do next?
+2. The second recording shows the 1 m rule throwing away a correct fix. Describe a match situation that could put the estimate that far out. What could the code do so the robot does not let go of the coral there?
 3. `VisionIOSim` has `NOISE_PX = 0.0`. Set it to 2 and run `./gradlew simTest --tests '*VisionSimTest'`. Which tests fail first, and what does that tell you about how good the real camera needs to be?

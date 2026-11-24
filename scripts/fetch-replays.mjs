@@ -15,10 +15,13 @@ const FILES = [
   'centre_h_algae',
   'climb',
 ];
+// Recordings a page names itself (see tools/replay-recorder). They are fetched like the others when the robot
+// code repo has them, but are not offered in the list of autos.
+const NAMED = ['teleop_cycle', 'vision_fix', 'vision_rejected'];
 const dir = fileURLToPath(new URL('../public/replays/', import.meta.url));
 await mkdir(dir, { recursive: true });
 
-for (const name of FILES) {
+for (const name of [...FILES, ...NAMED]) {
   try {
     const res = await fetch(`${SOURCE}/${name}.json`, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

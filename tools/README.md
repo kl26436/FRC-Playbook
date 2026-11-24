@@ -83,3 +83,12 @@ robot code, copied exactly, so an excerpt can never drift from what was typed.
 
 Edit the templates, not the generated pages. When the robot code changes, check each line range still points at the same
 method before rebuilding, and update the commit named in each page's note.
+
+## Code pages
+
+- `code-pages/build.py <ClaudeBot clone> code-pages/<page>.mdx` fills each `@@CODE path first last title@@` line with those
+  lines of the robot code and writes the page to `src/content/docs/code/`. Edit the page here, not there.
+- `code-pages/make_control_data.py <ClaudeBot clone>` reads the setpoints, gains and limits out of the code and writes
+  `src/data/control.json`. The Setpoints and control page draws its chart, its gain tables and its model from that file.
+- `replay-recorder/` holds the test that records the runs played back on One button to score and How the camera finds
+  the robot. Its README says how to record, and why the copies in this repo carry a caveat.

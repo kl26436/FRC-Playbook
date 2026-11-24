@@ -37,6 +37,8 @@ Carriage height is inches of travel from the bottom. Wrist angle is degrees from
 | Processor | 1.25 in | +15° |
 | Climb | 1.25 in | 0° |
 
+[Setpoints and control](../setpoints-and-control/) draws these twelve as a chart.
+
 L4 and the net stop at 65.25 in, not the full 66 in of travel, to stay 0.75 in short of the hard stops. L1 is not on the CAD's list yet, and the processor pose is marked marginal on the drawings.
 
 ## The keep-out table
@@ -83,7 +85,15 @@ The motor controllers do not jump to full speed. They follow a motion profile: s
 
 One motor turn moves the carriage 1.375 in: 22 teeth × 0.25 in of chain, × 3 for the three stages, ÷ the 12:1 gearbox.
 
-Holding the elevator still also takes voltage. The code starts with 0.46 V. The [hand calculation](../../subsystems/elevator/) on the elevator page gives about 0.6 V. The difference is the motor data: the code's figure is for the motor running in its FOC mode, which the robot will use, and the hand calculation used the figures without it. Both are starting points, and the real value comes from tuning on the robot.
+### Why the planner looks ahead
+
+A carriage at full speed cannot stop where it is. The planner has to judge the wrist against everywhere the carriage could still reach.
+
+<Calc id="stopping-distance" />
+
+At full speed that is about 31 in. The whole band where the funnel limits the wrist is 23 in tall, so a planner that looked only at where the carriage is would be wrong by more than the band.
+
+Holding the elevator still also takes voltage: 0.39 V in the code. [Setpoints and control](../setpoints-and-control/) shows where that number and the other control numbers come from, and lets you change them.
 
 ## The climb
 

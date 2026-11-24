@@ -1,0 +1,160 @@
+---
+// The elevator's recorded height in one auto against the motion-profile arithmetic, drawn at build time.
+// The recording is public/replays/three_right_ecd.json, made by the robot code's simulator on the team PC.
+// It does not say when each move began, so each calculated curve is slid along the time axis to its best fit.
+import { readFileSync } from 'node:fs';
+import control from '../data/control.json';
+
+const run = JSON.parse(readFileSync(`${process.cwd()}/public/replays/three_right_ecd.json`, 'utf8'));
+const tCol = run.columns.indexOf('t_s');
+const cCol = run.columns.indexOf('carriage_in');
+const points: [number, number][] = run.samples.map((s: number[]) => [s[tCol], s[cCol]]).filter(([t]: [number, number]) => t >= 1.0 && t <= 4.0);
+
+const V = control.elevator.cruiseInPerS;
+const A = control.elevator.accelInPerS2;
+const LOW = 1.25; // the carriage waits here while the wrist swings out, then goes
+const HIGH = control.elevator.softMaxIn;
+const dist = HIGH - LOW;
+const ramp = (V * V) / (2 * A);
+const tRamp = V / A;
+const tCruise = (dist - 2 * ramp) / V;
+const total = 2 * tRamp + tCruise;
+// distance covered t seconds into the move
+const gone = (t: number) =>
+  t <= 0 ? 0 : t < tRamp ? 0.5 * A * t * t : t < tRamp + tCruise ? ramp + V * (t - tRamp) : t < total ? dist - 0.5 * A * (total - t) ** 2 : dist;
+
+function fit(seg: [number, number][], height: (moved: number) => number) {
+  let best = { err: Infinity, t0: 0 };
+  for (let k = -400; k <= 400; k++) {
+    const t0 = seg[0][0] + k / 1000;
+    const err = seg.reduce((sum, [t, c]) => sum + (height(gone(t - t0)) - c) ** 2, 0);
+    if (err < best.err) best = { err, t0 };
+  }
+  return { t0: best.t0, off: Math.max(...seg.map(([t, c]) => Math.abs(height(gone(t - best.t0)) - c))) };
+}
+const up = fit(points.filter(([t]) => t >= 1.2 && t <= 2.5), (d) => LOW + d);
+const down = fit(points.filter(([t]) => t >= 2.5 && t <= 4.0), (d) => HIGH - d);
+const worst = Math.max(up.off, down.off); // the furthest any recorded point is from its curve
+if (worst > 1) throw new Error(`ProfileCheck: the recording no longer matches the profile (a point is ${worst.toFixed(2)} in off)`);
+
+const X = (t: number) => 46 + ((t - 1.0) / 3.0) * 584;
+const Y = (inches: number) => 220 - (inches / 72) * 200;
+const curve = (t0: number, height: (moved: number) => number) =>
+  Array.from({ length: 121 }, (_, i) => t0 - 0.05 + (i / 120) * (total + 0.1))
+    .map((t) => `${X(t).toFixed(1)},${Y(height(gone(t - t0))).toFixed(1)}`)
+    .join(' ');
+---
+
+<figure class="check not-content">
+  <svg viewBox="0 0 640 250" role="img" aria-label={`Carriage height against time in the 3 Right auto. No recorded point is more than ${worst.toFixed(1)} in off the calculated curve.`}>
+    <rect x="46" y="20" width="584" height="200" class="frame"></rect>
+    {[0, 20, 40, 60].map((h) => (
+      <>
+        <line x1="46" x2="630" y1={Y(h)} y2={Y(h)} class="grid" />
+        <text x="41" y={Y(h) + 4} text-anchor="end" class="axis">{h}</text>
+      </>
+    ))}
+    {[1, 1.5, 2, 2.5, 3, 3.5, 4].map((t) => (
+      <>
+        <line x1={X(t)} x2={X(t)} y1="20" y2="220" class="grid" />
+        <text x={X(t)} y="235" text-anchor="middle" class="axis">{t}</text>
+      </>
+    ))}
+    <text x="8" y="14" class="axis">Carriage, in</text>
+    <text x="630" y="248" text-anchor="end" class="axis">seconds into the auto</text>
+    <polyline points={curve(up.t0, (d) => LOW + d)} class="calc-line" />
+    <polyline points={curve(down.t0, (d) => HIGH - d)} class="calc-line" />
+    {points.map(([t, c]) => <circle cx={X(t)} cy={Y(c)} r="4" class="dot" />)}
+    <text x={X(up.t0 + total / 2) - 10} y={Y(34)} text-anchor="end" class="say">up to L4</text>
+    <text x={X(down.t0 + total / 2) + 10} y={Y(34)} class="say">back to stow</text>
+  </svg>
+  <ul>
+    <li><i class="k-line"></i>calculated: speed up at 0.55 g, cruise at {V} in/s, slow down at 0.55 g ({total.toFixed(2)} s for {dist} in)</li>
+    <li><i class="k-dot"></i>simulated: the 3 Right auto, every 0.1 s (commit {run.code})</li>
+  </ul>
+  <figcaption>
+    No point is more than {worst.toFixed(1)} in off its curve. Each curve is slid along the time axis to fit, because the recording does not say when a
+    move began.
+  </figcaption>
+</figure>
+
+<style>
+  .check {
+    margin: 1.5rem 0;
+    padding: 0.5rem;
+    background: #ffffff;
+    color: #0f2029;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .frame {
+    fill: #ffffff;
+    stroke: #d3dae0;
+  }
+  .grid {
+    stroke: #e3e8ec;
+  }
+  .axis {
+    font-size: 11px;
+    fill: #55646e;
+  }
+  @media (max-width: 40rem) {
+    .axis,
+    .say {
+      font-size: 17px;
+    }
+  }
+  .say {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #0f2029;
+  }
+  .calc-line {
+    fill: none;
+    stroke: #1846b8;
+    stroke-width: 2.5;
+  }
+  .dot {
+    fill: #ffffff;
+    stroke: #c77700;
+    stroke-width: 2.5;
+  }
+  ul {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0 0.25rem;
+    display: grid;
+    gap: 0.125rem;
+    font-size: var(--sl-text-xs);
+  }
+  li {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .k-line {
+    flex: none;
+    width: 1.25rem;
+    border-top: 3px solid #1846b8;
+  }
+  .k-dot {
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-inline: 0.325rem;
+    border: 2.5px solid #c77700;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+  figcaption {
+    margin: 0.5rem 0.25rem 0.25rem;
+    font-size: var(--sl-text-xs);
+    color: #55646e;
+  }
+</style>

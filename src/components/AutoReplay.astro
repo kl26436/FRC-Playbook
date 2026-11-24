@@ -3,16 +3,49 @@
 // climber fork and funnel tray as recorded. The climb has no path, so it shows the 3D robot alone.
 // Recordings live in public/replays/ and are copied from the robot code repo by scripts/fetch-replays.mjs.
 import fieldMap from '../assets/field-map.svg';
+import fieldMapText from '../assets/field-map.svg?raw';
 import RobotViewer from './RobotViewer.astro';
 
+interface Props {
+  /** Recordings to offer. Left out, the list is the autos and the climb from index.json. */
+  files?: { file: string; label: string }[];
+  /** Draw what the camera saw, where the robot thought it was, and what was done with each reading. */
+  vision?: boolean;
+  /** Fit the map to the run, not the whole half field. */
+  zoom?: boolean;
+  /** The word beside the list. */
+  pickLabel?: string;
+}
+const { files, vision = false, zoom = false, pickLabel = 'Routine' } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// The autos are drawn over the routes planned on kickoff day. Other recordings are zoomed in, so they get the
+// same map without those routes and without the labels written outside the field edge, which would be cut off.
+const outside = (line: string) => {
+  const y = Number(/<text x="[^"]*" y="([-\d.]+)"/.exec(line)?.[1] ?? 100);
+  return y < 0 || y > 317 || /class="(scale|t-dim)"|<text transform=/.test(line);
+};
+const plainMap =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    fieldMapText
+      .split('\n')
+      .filter((line) => !/class="r[123]n?"/.test(line) && !outside(line))
+      .join('\n'),
+  );
+const mapSrc = files ? plainMap : fieldMap.src;
 ---
 
-<div class="replay not-content" data-replays={`${base}/replays`}>
+<div
+  class="replay not-content"
+  data-replays={`${base}/replays`}
+  data-files={files ? JSON.stringify(files) : undefined}
+  data-vision={vision ? '' : undefined}
+  data-zoom={zoom ? '' : undefined}
+>
   <div class="replay-bar">
     <label>
-      <span>Routine</span>
-      <select data-pick aria-label="Choose a routine"></select>
+      <span>{pickLabel}</span>
+      <select data-pick aria-label={`Choose a ${pickLabel.toLowerCase()}`}></select>
     </label>
     <button type="button" data-play>Play</button>
     <label class="replay-scrub">
@@ -22,11 +55,23 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <output data-clock>0.0 s</output>
   </div>
 
+  <ol class="replay-steps" data-steps hidden aria-label="Where the command is"></ol>
+
   <div class="replay-body">
-    <svg class="replay-field" viewBox="-34 -30 462 392" role="img" aria-label="The robot's simulated path on the blue half of the field">
-      <image href={fieldMap.src} x="-34" y="-30" width="462" height="392"></image>
+    <svg class:list={['replay-field', { fill: zoom }]} viewBox="-34 -30 462 392" role="img" aria-label="The robot's simulated path on the blue half of the field">
+      <image href={mapSrc} x="-34" y="-30" width="462" height="392"></image>
+      <g data-tags></g>
+      <circle data-raise class="raise" r="48" visibility="hidden"></circle>
+      <g data-spot visibility="hidden">
+        <path d="M-7,0 H7 M0,-7 V7" class="spot"></path>
+      </g>
+      <polyline data-est-trail class="est-trail"></polyline>
       <polyline data-trail class="trail"></polyline>
       <g data-scores></g>
+      <line data-sight class="sight" visibility="hidden"></line>
+      <g data-ghost visibility="hidden">
+        <rect x="-17.25" y="-17.25" width="34.5" height="34.5" rx="2" class="ghost"></rect>
+      </g>
       <g data-robot>
         <rect x="-17.25" y="-17.25" width="34.5" height="34.5" rx="2" class="bot"></rect>
         <path d="M17.25,-9 L26,0 L17.25,9 z" class="bot-front"></path>
@@ -40,9 +85,29 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div><dt>Wrist</dt><dd data-wrist-text>-90°</dd></div>
         <div data-holding-row><dt>Holding</dt><dd data-holding>nothing</dd></div>
         <div><dt data-scored-label>Scored</dt><dd data-scored>nothing yet</dd></div>
+        <div data-spot-row hidden><dt>To go</dt><dd data-spot-text></dd></div>
+        {vision && (
+          <>
+            <div><dt>Camera</dt><dd data-cam-text></dd></div>
+            <div><dt>Reading</dt><dd data-fix-text></dd></div>
+            <div><dt>Off by</dt><dd data-err-text></dd></div>
+          </>
+        )}
       </dl>
     </div>
   </div>
+  <ul class="replay-key" data-key hidden>
+    <li data-key-ring><svg viewBox="0 0 20 12" aria-hidden="true"><circle cx="10" cy="6" r="5" class="raise"></circle></svg>48 in from the spot: the elevator starts up</li>
+    {vision && (
+      <>
+        <li><svg viewBox="0 0 20 12" aria-hidden="true"><rect x="5" y="1" width="10" height="10" class="bot"></rect></svg>where the robot really is</li>
+        <li><svg viewBox="0 0 20 12" aria-hidden="true"><rect x="5" y="1" width="10" height="10" class="ghost"></rect></svg>where it thinks it is</li>
+        <li><svg viewBox="0 0 20 12" aria-hidden="true"><line x1="1" y1="6" x2="19" y2="6" class="sight used"></line></svg>reading used</li>
+        <li><svg viewBox="0 0 20 12" aria-hidden="true"><line x1="1" y1="6" x2="19" y2="6" class="sight refused"></line></svg>reading refused</li>
+        <li><svg viewBox="0 0 20 12" aria-hidden="true"><line x1="1" y1="6" x2="19" y2="6" class="sight"></line></svg>tag seen, reading not used</li>
+      </>
+    )}
+  </ul>
   <p class="replay-note" data-note>Simulated. The solid line is where the robot really went in the simulator. The lighter arrows underneath are the routes planned on kickoff day.</p>
 </div>
 
@@ -50,7 +115,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const IN_PER_M = 1 / 0.0254;
   const FIELD_HEIGHT_IN = 317; // the map's y runs down the page, the field's y runs up
 
-  type Replay = { label: string; code?: string; recorded?: string; columns: string[]; events: { t: number; what: string; branch?: string; level?: string }[]; samples: number[][] };
+  type Replay = {
+    label: string;
+    note?: string;
+    caveat?: string;
+    code?: string;
+    recorded?: string;
+    tags?: Record<string, [number, number]>;
+    columns: string[];
+    events: { t: number; what: string; branch?: string; level?: string }[];
+    samples: (number | null)[][];
+  };
+
+  // The steps of a scoring command, by the recording's phase number.
+  const PHASE = ['Waiting for the button', 'Station pickup', 'Drive, stowed', 'Inside 48 in: raise', 'All three ready: release', 'Stow'];
+  const SVG = 'http://www.w3.org/2000/svg';
+  const MAP = { x: -34, y: -30, w: 462, h: 392 };
 
   // Where each branch sits on the map, so a score can be marked on it.
   const BRANCH: Record<string, [number, number]> = {
@@ -77,6 +157,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     const field = q<SVGSVGElement>('.replay-field');
     const model = q<HTMLIFrameElement>('iframe.robot-viewer');
     const note = q<HTMLElement>('[data-note]');
+    const given: { file: string; label: string }[] | null = box.dataset.files ? JSON.parse(box.dataset.files) : null;
+    const vision = 'vision' in box.dataset;
+    const zoom = 'zoom' in box.dataset;
+    const stepList = q<HTMLOListElement>('[data-steps]');
+    const tagMarks = q<SVGGElement>('[data-tags]');
+    const raise = q<SVGCircleElement>('[data-raise]');
+    const spot = q<SVGGElement>('[data-spot]');
+    const estTrail = q<SVGPolylineElement>('[data-est-trail]');
+    const sight = q<SVGLineElement>('[data-sight]');
+    const ghost = q<SVGGElement>('[data-ghost]');
+    const key = q<HTMLElement>('[data-key]');
+    const mapX = (m: number) => m * IN_PER_M;
+    const mapY = (m: number) => FIELD_HEIGHT_IN - m * IN_PER_M;
 
     let run: Replay | null = null;
     let col: Record<string, number> = {};
@@ -94,18 +187,108 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       const f = Math.min(1, Math.max(0, (time - s[i][0]) / dt));
       const a = s[i];
       const b = s[i + 1] ?? a;
-      const v = (name: string) => (name in col ? lerp(a[col[name]], b[col[name]], f) : 0);
+      const num = (row: (number | null)[], name: string) => (row[col[name]] ?? 0) as number;
+      const v = (name: string) => (name in col ? lerp(num(a, name), num(b, name), f) : 0);
+      // Things that change in steps (a goal, a tag number, a reading thrown away) are read from the earlier row.
+      const was = (name: string) => (name in col ? a[col[name]] : null);
+      // The estimate jumps when a reading is used: do not slide between the two.
+      const jump = 'est_x_m' in col && Math.hypot(num(b, 'est_x_m') - num(a, 'est_x_m'), num(b, 'est_y_m') - num(a, 'est_y_m')) > 0.2;
+      const e = (name: string) => (jump ? num(a, name) : v(name));
       return {
         x: v('x_m') * IN_PER_M,
         y: FIELD_HEIGHT_IN - v('y_m') * IN_PER_M,
-        heading: 'heading_deg' in col ? turn(a[col.heading_deg], b[col.heading_deg], f) : 0,
+        heading: 'heading_deg' in col ? turn(num(a, 'heading_deg'), num(b, 'heading_deg'), f) : 0,
         carriage: v('carriage_in'),
         wrist: v('wrist_deg'),
-        coral: 'coral' in col ? a[col.coral] > 0.5 : false,
-        algae: 'algae' in col ? a[col.algae] > 0.5 : false,
+        coral: 'coral' in col ? num(a, 'coral') > 0.5 : false,
+        algae: 'algae' in col ? num(a, 'algae') > 0.5 : false,
         fork: 'fork_deg' in col ? v('fork_deg') : 90,
         tray: 'tray_deg' in col ? v('tray_deg') : 0,
+        phase: was('phase'),
+        goalCarriage: was('goal_carriage_in'),
+        target: 'target_x_m' in col ? { x: mapX(num(a, 'target_x_m')), y: mapY(num(a, 'target_y_m')) } : null,
+        est: 'est_x_m' in col ? { x: mapX(e('est_x_m')), y: mapY(e('est_y_m')) } : null,
+        tag: was('tag'),
+        tagPx: was('tag_height_px'),
+        sees: was('vision'),
       };
+    }
+
+    // The steps this run goes through, lit as it reaches them.
+    function lightSteps(phase: number | null) {
+      if (!run || !('phase' in col)) return;
+      if (!stepList.children.length) {
+        const used = [...new Set(run.samples.map((s) => s[col.phase] as number))].sort((x, y) => x - y);
+        stepList.replaceChildren(
+          ...used.map((n) => {
+            const li = document.createElement('li');
+            li.dataset.n = String(n);
+            li.textContent = PHASE[n] ?? String(n);
+            return li;
+          }),
+        );
+      }
+      for (const li of stepList.children as HTMLCollectionOf<HTMLElement>) {
+        const n = Number(li.dataset.n);
+        li.classList.toggle('on', n === phase);
+        li.classList.toggle('done', phase !== null && n < phase);
+        if (n === phase) li.setAttribute('aria-current', 'step');
+        else li.removeAttribute('aria-current');
+      }
+    }
+
+    // Fit the map to where this run goes.
+    function frame() {
+      if (!run || !zoom || !('x_m' in col)) return field.setAttribute('viewBox', `${MAP.x} ${MAP.y} ${MAP.w} ${MAP.h}`);
+      const xs: number[] = [];
+      const ys: number[] = [];
+      const add = (xm: number | null, ym: number | null) => {
+        if (xm === null || ym === null) return;
+        xs.push(mapX(xm));
+        ys.push(mapY(ym));
+      };
+      for (const s of run.samples) {
+        add(s[col.x_m], s[col.y_m]);
+        if ('est_x_m' in col) add(s[col.est_x_m], s[col.est_y_m]);
+        if ('target_x_m' in col && (s[col.phase] as number) >= 1) add(s[col.target_x_m], s[col.target_y_m]);
+        const seen = vision && run.tags?.[String(s[col.tag])];
+        if (seen) add(seen[0], seen[1]);
+      }
+      const pad = 42;
+      let x0 = Math.min(...xs) - pad;
+      let x1 = Math.max(...xs) + pad;
+      let y0 = Math.min(...ys) - pad;
+      let y1 = Math.max(...ys) + pad;
+      const shape = field.clientWidth && field.clientHeight ? field.clientWidth / field.clientHeight : MAP.w / MAP.h;
+      if ((x1 - x0) / (y1 - y0) < shape) {
+        const grow = (y1 - y0) * shape - (x1 - x0);
+        x0 -= grow / 2;
+        x1 += grow / 2;
+      } else {
+        const grow = (x1 - x0) / shape - (y1 - y0);
+        y0 -= grow / 2;
+        y1 += grow / 2;
+      }
+      const w = x1 - x0;
+      const h = y1 - y0;
+      // keep the frame on the map where it fits
+      if (w <= MAP.w) x0 = Math.min(MAP.x + MAP.w - w, Math.max(MAP.x, x0));
+      if (h <= MAP.h) y0 = Math.min(MAP.y + MAP.h - h, Math.max(MAP.y, y0));
+      field.setAttribute('viewBox', `${x0.toFixed(1)} ${y0.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);
+    }
+
+    // The reef tags, so a sight line has something to end on. The map already carries their numbers.
+    function tags() {
+      tagMarks.replaceChildren();
+      if (!run?.tags || !vision) return;
+      for (const id of Object.keys(run.tags)) {
+        const dot = document.createElementNS(SVG, 'circle');
+        dot.setAttribute('cx', mapX(run.tags[id][0]).toFixed(1));
+        dot.setAttribute('cy', mapY(run.tags[id][1]).toFixed(1));
+        dot.setAttribute('r', '3');
+        dot.setAttribute('class', 'tag');
+        if (mapX(run.tags[id][0]) < MAP.x + MAP.w) tagMarks.append(dot);
+      }
     }
 
     function draw() {
@@ -119,6 +302,51 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           .map((s) => `${(s[col.x_m] * IN_PER_M).toFixed(1)},${(FIELD_HEIGHT_IN - s[col.y_m] * IN_PER_M).toFixed(1)}`);
         pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
         trail.setAttribute('points', pts.join(' '));
+      }
+      lightSteps(p.phase as number | null);
+      const phase = (p.phase ?? -1) as number;
+      // The spot the command is driving to, and the ring where the scoring command starts the elevator up.
+      const driving = !!p.target && phase >= 1 && phase <= 4;
+      spot.setAttribute('visibility', driving ? 'visible' : 'hidden');
+      raise.setAttribute('visibility', driving && phase >= 2 ? 'visible' : 'hidden');
+      if (p.target) {
+        spot.setAttribute('transform', `translate(${p.target.x.toFixed(1)} ${p.target.y.toFixed(1)})`);
+        raise.setAttribute('cx', p.target.x.toFixed(1));
+        raise.setAttribute('cy', p.target.y.toFixed(1));
+      }
+      q<HTMLElement>('[data-spot-row]').hidden = !driving;
+      if (driving && p.target && p.est) {
+        const away = Math.hypot(p.target.x - p.est.x, p.target.y - p.est.y);
+        q('[data-spot-text]').textContent = away < 1.2 ? 'on the spot' : `${away.toFixed(0)} in${phase >= 2 && away <= 48 ? ', inside the ring' : ''}`;
+      }
+      if (vision && p.est) {
+        ghost.setAttribute('visibility', 'visible');
+        ghost.setAttribute('transform', `translate(${p.est.x.toFixed(1)} ${p.est.y.toFixed(1)}) rotate(${(-p.heading).toFixed(1)})`);
+        const pts = run.samples
+          .filter((s) => s[0]! <= t + 1e-6)
+          .map((s) => `${mapX(s[col.est_x_m] as number).toFixed(1)},${mapY(s[col.est_y_m] as number).toFixed(1)}`);
+        estTrail.setAttribute('points', pts.join(' '));
+        const seen = run.tags?.[String(p.tag)];
+        const state = (p.sees ?? 1) as number;
+        sight.setAttribute('visibility', seen ? 'visible' : 'hidden');
+        if (seen) {
+          sight.setAttribute('x1', p.x.toFixed(1));
+          sight.setAttribute('y1', p.y.toFixed(1));
+          sight.setAttribute('x2', mapX(seen[0]).toFixed(1));
+          sight.setAttribute('y2', mapY(seen[1]).toFixed(1));
+          sight.setAttribute('class', `sight${state === 3 ? ' used' : state >= 4 ? ' refused' : ''}`);
+        }
+        const off = Math.hypot(p.est.x - p.x, p.est.y - p.y);
+        q('[data-cam-text]').textContent = seen ? `tag ${p.tag}, ${Number(p.tagPx).toFixed(0)} px tall` : 'no tag in view';
+        q('[data-fix-text]').textContent = [
+          'not used: no reef face is the target',
+          'none',
+          `not used: tag ${p.tag} is not on the target face`,
+          'used',
+          `refused: ${(off * 0.0254).toFixed(2)} m from the estimate`,
+          'refused: the numbers are broken',
+        ][state];
+        q('[data-err-text]').textContent = `${(off * 0.0254).toFixed(2)} m (${off.toFixed(0)} in)`;
       }
       // The 3D robot takes the same four numbers the recording holds.
       model.contentWindow?.postMessage(
@@ -147,7 +375,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       q('[data-scored]').textContent = onField ? (said.length ? said.join(', ') : 'nothing yet') : steps.length ? STEP[steps[steps.length - 1].what] : 'stowed';
       q<HTMLElement>('[data-holding-row]').style.display = onField ? '' : 'none';
       q('[data-holding]').textContent = [p.coral ? 'a coral' : '', p.algae ? 'an algae' : ''].filter(Boolean).join(' and ') || 'nothing';
-      q('[data-carriage-text]').textContent = `${p.carriage.toFixed(1)} in`;
+      q('[data-carriage-text]').textContent =
+        typeof p.goalCarriage === 'number' ? `${p.carriage.toFixed(1)} in, goal ${p.goalCarriage} in` : `${p.carriage.toFixed(1)} in`;
       q('[data-wrist-text]').textContent = `${p.wrist.toFixed(0)}°`;
       clock.textContent = `${t.toFixed(1)} s`;
       scrub.value = String(t);
@@ -178,7 +407,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       field.style.display = onField ? '' : 'none';
       box.classList.toggle('no-field', !onField);
       const stamp = data.code ? ` Recorded from code commit ${data.code}${data.recorded ? ` on ${data.recorded}` : ''}.` : '';
-      note.textContent = onField
+      stepList.replaceChildren();
+      stepList.hidden = !('phase' in col);
+      key.hidden = !('phase' in col) && !vision;
+      frame();
+      tags();
+      note.textContent = given
+        ? `Simulated. ${data.note ?? ''}${stamp}${data.caveat ? ` ${data.caveat}` : ''}`
+        : onField
         ? `Simulated. The solid line is where the robot really went in the simulator. The lighter arrows underneath are the routes planned on kickoff day.${stamp}`
         : `Simulated. Between "fork down, waiting for the cage" and "winding in" the driver backs onto the cage. The recording does not show that: the robot stays where it is.${stamp}`;
       t = 0;
@@ -200,17 +436,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       draw();
     });
     pick.addEventListener('change', () => load(pick.value));
+    if (zoom) new ResizeObserver(() => frame()).observe(field);
     // The 3D robot loads after the first frame is drawn: pose it again once it says it is ready.
     window.addEventListener('message', (e) => {
       if (e.source === model.contentWindow && e.data?.type === 'robot-viewer-ready') draw();
     });
 
-    fetch(`${root}/index.json`)
-      .then((r) => r.json())
-      .then((list: { file: string; label: string; columns: string[] }[]) => {
+    (given ? Promise.resolve(given) : fetch(`${root}/index.json`).then((r) => r.json()))
+      .then((list: { file: string; label: string }[]) => {
         const usable = list;
         if (!usable.length) throw new Error('none');
         pick.replaceChildren(...usable.map((r) => new Option(r.label, r.file)));
+        pick.closest('label')!.hidden = usable.length < 2;
         const first = usable.find((r) => r.file.startsWith('three_')) ?? usable[0];
         pick.value = first.file;
         return load(first.file);
@@ -242,6 +479,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .replay-bar select {
+    min-width: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
   }
   .replay-scrub {
     flex: 1 1 10rem;
@@ -288,6 +532,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     width: 100%;
     height: auto;
   }
+  .replay-field.fill {
+    height: 100%;
+    min-height: 22rem;
+  }
   .replay-side {
     border-left: 1px solid #d3dae0;
     font-size: var(--sl-text-xs);
@@ -328,6 +576,105 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     stroke: #0f2029;
     stroke-width: 2;
     stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .est-trail {
+    fill: none;
+    stroke: #1846b8;
+    stroke-width: 1.5;
+    stroke-dasharray: 4 4;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .ghost {
+    fill: none;
+    stroke: #1846b8;
+    stroke-width: 2;
+    stroke-dasharray: 5 3;
+    vector-effect: non-scaling-stroke;
+  }
+  .raise {
+    fill: #c77700;
+    fill-opacity: 0.08;
+    stroke: #c77700;
+    stroke-width: 1.5;
+    stroke-dasharray: 2 3;
+    vector-effect: non-scaling-stroke;
+  }
+  .spot {
+    fill: none;
+    stroke: #c77700;
+    stroke-width: 2.5;
+    vector-effect: non-scaling-stroke;
+  }
+  .sight {
+    stroke: #7b8a94;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+  .sight.used {
+    stroke: #1c7c54;
+    stroke-width: 3;
+  }
+  .sight.refused {
+    stroke: #c0392b;
+    stroke-width: 3;
+  }
+  :global(.replay .tag) {
+    fill: #0f2029;
+  }
+  .replay-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    font-size: var(--sl-text-xs);
+  }
+  .replay [hidden] {
+    display: none;
+  }
+  .replay-steps :global(li) {
+    margin: 0;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    color: var(--sl-color-gray-3);
+  }
+  .replay-steps :global(li.done) {
+    color: var(--sl-color-gray-2);
+    border-color: var(--sl-color-gray-4);
+  }
+  .replay-steps :global(li.on) {
+    color: var(--sl-color-black);
+    background: var(--sl-color-white);
+    border-color: var(--sl-color-white);
+    font-weight: 600;
+  }
+  .replay-key {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    background: #ffffff;
+    color: #0f2029;
+    border-top: 1px solid #d3dae0;
+    font-size: var(--sl-text-xs);
+  }
+  .replay-key li {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .replay-key svg {
+    width: 1.5rem;
+    height: 0.9rem;
+    flex: none;
   }
   .bot {
     fill: #1846b8;

@@ -1,0 +1,166 @@
+---
+title: "Setpoints and control"
+description: "How a named position becomes volts on a motor: the setpoints, the motion profile, feedforward and feedback, with the robot's real numbers and a model to try them on."
+---
+
+import Calc from '../../../components/Calc.astro';
+import Flow from '../../../components/Flow.astro';
+import GainLab from '../../../components/GainLab.astro';
+import GainTable from '../../../components/GainTable.astro';
+import ProfileCheck from '../../../components/ProfileCheck.astro';
+import SetpointChart from '../../../components/SetpointChart.astro';
+
+:::note[Draft]
+The code and numbers on this page are from the robot code as it was on November 23 (commit `67a30bb`). Every elevator and wrist gain is marked `PLACEHOLDER(tuning)` in the code. They work in the simulator. None has been tried on a real robot.
+:::
+
+A setpoint is a position with a name, like `L4`. A control loop is what gets the mechanism there and holds it. This page follows one request from the name to the volts.
+
+<Flow label="From a named position to volts on a motor" steps={[
+  { title: 'Setpoint', text: 'L4 means 65.25 in and −52°' },
+  { title: 'Planner', text: 'The next safe goal for each axis' },
+  { title: 'Motion profile', text: 'Where to be at each moment on the way' },
+  { title: 'Feedforward', text: 'The volts that move should take' },
+  { title: 'Feedback', text: 'A correction for whatever is left' },
+]} />
+
+The planner has [its own page](../superstructure/). This one covers the rest.
+
+## Setpoints: every position has a name
+
+```java title="Setpoints.java"
+public enum Pose {
+    STOW(0, -90),
+    STATION(1.25, -35),
+    L1(5, -35), // PLACEHOLDER(drawing)
+    L2(17.5, -35),
+    L3(33.3, -35),
+    // Drawn at 66 in, -53: the soft limit stops 0.75 in short, and -52 points at the same branch tip.
+    L4(65.25, -52),
+    ALGAE_LOW(8.8, 46),
+    ALGAE_HIGH(24.6, 46),
+    ALGAE_CARRY(1.25, 45),
+    // Drawn at 66 in; 0.75 in lower leaves about 3.1 in over an 88.9 in rim.
+    NET(65.25, 75),
+    PROCESSOR(1.25, 15), // PLACEHOLDER(robot-check) marked marginal on the drawings
+    CLIMB(1.25, 0);
+```
+
+No other file holds a mechanism position. A button asks for `L4`, an auto asks for `L4`, and the drawing's number lives in one line. When the real robot needs L4 an inch lower, one number changes.
+
+Here are the twelve as a picture. Two are marked as first guesses in the code: `L1` and `PROCESSOR`.
+
+<SetpointChart />
+
+The chart has the same axes as the [keep-out chart](../superstructure/#the-keep-out-table). Every setpoint is a legal point on it, and the planner's job is to get from one to another without leaving the legal area.
+
+### Close enough
+
+No mechanism stops exactly on a number, so "there" is a window:
+
+```java title="Superstructure.java"
+public boolean atPose() {
+    if (!elevator.isHomed() || !wristUsable()) {
+        return false;
+    }
+    Pose p = pose();
+    return Math.abs(elevator.carriageIn() - p.carriageIn) <= Setpoints.CARRIAGE_TOL_IN
+            && Math.abs(wrist.wristDeg() - p.wristDeg) <= Setpoints.WRIST_TOL_DEG;
+}
+```
+
+The carriage counts as there within 0.5 in, and the wrist within 1.5°. [One button to score](../one-button-to-score/) waits for this before it lets go of the coral.
+
+## The motion profile: do not ask for it all at once
+
+The code never tells a motor "be at 65.25 in". It hands the goal to the motor controller, and the controller draws a path to it: speed up at a set rate, cruise, slow down at the same rate. Fifty times a second our code sends the goal. A thousand times a second the controller works out where on that path the carriage should be right now.
+
+```java title="ElevatorIOTalonFX.java"
+@Override
+public void setTargetIn(double carriageIn) {
+    left.setControl(positionRequest.withPosition(carriageIn * ROT_PER_IN));
+}
+```
+
+`positionRequest` is a Motion Magic request, which is the motor maker's name for a profiled move. The cruise speed is 110 in/s and the rate is 0.55 g. Nothing pulls this carriage down except its own weight, so past 1 g on the way down the ropes would go slack.
+
+The [profile calculator](../superstructure/#the-math-how-long-does-a-move-take) says the full 65.25 in takes 1.11 s. In an auto the carriage is already at 1.25 in, which leaves 64 in and 1.10 s. The simulator agrees:
+
+<ProfileCheck />
+
+## From the profile to volts
+
+At each moment the profile gives a position, a speed and a rate of speeding up. The controller turns those into volts in two parts.
+
+**Feedforward** is what the move should take, worked out before anything has gone wrong. **Feedback** looks at where the carriage really is and corrects for the rest.
+
+```java title="ElevatorIOTalonFX.java"
+// Control gains in volts, per motor rotation.
+protected static final double KG = 0.39; // PLACEHOLDER(tuning)
+protected static final double KS = 0.0; // PLACEHOLDER(tuning)
+protected static final double KV = 0.124; // PLACEHOLDER(tuning)
+protected static final double KA = 0.0014; // PLACEHOLDER(tuning)
+protected static final double KP = 0.7; // PLACEHOLDER(tuning)
+protected static final double KD = 0.014; // PLACEHOLDER(tuning)
+```
+
+<GainTable mech="elevator" />
+
+Three of the six can be worked out before the robot exists:
+
+<Calc id="motor-voltage" />
+
+Cruising takes 10.3 V of the battery's 12. That is why cruise is set at 110 in/s and no faster: there has to be something left to speed up with.
+
+The [elevator page](../../subsystems/elevator/) works the holding voltage by hand and gets about 0.6 V. Two things differ. It used the motor's figures without FOC, and it allowed 15% for losses in the gearbox. With FOC figures and the same allowance the answer is 0.46 V. The code uses 0.39 V, with no allowance. The real robot settles it: find the voltage that just holds the carriage still.
+
+## Try it
+
+<GainLab />
+
+Things to try:
+
+1. **No feedforward.** kP has to do all the work, so the carriage trails the profile the whole way up and stops short.
+2. **No kP.** Feedforward alone gets within 2 in, because the model matches the numbers. Nothing corrects the friction it does not know about. Now change kG to 0.3 and see where a wrong guess lands.
+3. **No profile.** The controller sees 65 in of error at once and asks for everything. Look at the current, and at the ropes when it tries to stop.
+4. **kP at 5.** It settles much closer to the goal. Now set kV to 0.1. A strong kP hides a wrong feedforward. Put kP back to 0.7 and see what the same wrong kV costs.
+
+## How far off does it settle?
+
+There is no integral term in these loops, so a loop stops pushing once its correction is as big as whatever it is short by.
+
+<Calc id="steady-error" />
+
+The first version of the code needed the carriage within 0.25 in before the wrist could leave stow. A little friction would have kept the robot in stow all match. The rule the team took from it: wherever one mechanism waits for another, the window has to be wider than both tolerances added together.
+
+## The wrist: the same loop, with gravity that changes
+
+<GainTable mech="wrist" />
+
+The wrist uses the same six numbers and its own profile, 400° a second and 1,600° a second each second. One thing differs. The weight of the claw pulls hardest when the wrist is level and not at all when it hangs straight down, so the controller scales kG by the angle. That is why the code counts the wrist's angle from level.
+
+## Driving to a spot: the same idea, in metres
+
+```java title="DriveToPoint.java"
+double pd = kP * distanceM + kD * derivative;
+double speed = Math.min(Math.max(0.0, pd) + FRICTION_FRACTION * DriveK.MAX_SPEED_MPS, maxSpeedMps);
+```
+
+This is the loop that takes the robot to a scoring spot. The further away it is, the faster it drives, up to the speed limit it was given. kP is 3.0 in autonomous and 3.6 for the driver's buttons. At a 3 m/s limit the robot starts slowing about 1.0 m out in an auto, and about 0.8 m out for the driver. It counts as there within 3 cm and 2°.
+
+There is no profile here. The speed limit and the limit on how hard the robot may speed up, which falls as the carriage rises, do that job. [One button to score](../one-button-to-score/) has a recording of it.
+
+## What is not proven
+
+- **Every gain is a starting point.** The calculated ones assume a perfect gearbox and a full battery. The guessed ones were chosen in a simulator that has no friction to speak of.
+- **kS is zero.** Real friction will make both mechanisms settle off their goals until it is measured and set.
+- **The wrist's kG fits a coral in the claw.** With an algae, or empty, the claw weighs something else.
+
+On the real robot the usual order is kG first, then kV, then kP: get the feedforward right, and leave feedback little to do.
+
+## Your turn
+
+1. In the model, find the smallest kP that still gets the carriage inside 0.5 in with the robot's other numbers. Then work out the same answer with the settling calculator. Do they agree?
+2. The battery sags to 10.5 V in a match. Use the voltage calculator to find the fastest cruise speed that still fits. What does that do to the stow to L4 time?
+3. `L1` and `PROCESSOR` are marked as first guesses. For each, say what you would measure on the real robot to replace the guess, and which one line of code changes.
+4. The wrist's kG is scaled by the angle. At L4 the wrist is at −52°. What fraction of kG is it getting? (Hint: cosine.)

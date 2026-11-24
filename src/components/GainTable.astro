@@ -1,0 +1,63 @@
+---
+// The control gains of one mechanism, with what each does and where its number came from.
+// Values come from src/data/control.json (tools/code-pages/make_control_data.py).
+import control from '../data/control.json';
+
+interface Props {
+  mech: 'elevator' | 'wrist';
+}
+const { mech } = Astro.props;
+const g = control[mech].gains;
+const per = mech === 'elevator' ? 'motor turn' : 'turn of the wrist';
+const rows =
+  mech === 'elevator'
+    ? [
+        ['kG', `${g.KG} V`, 'Holds the weight up. Added all the time, moving or not.', 'Calculated: the current that holds the weight × the motor\'s resistance'],
+        ['kV', `${g.KV} V per ${per} a second`, 'The volts it takes to keep moving at a speed.', 'Calculated: 12 V ÷ the motor\'s free speed'],
+        ['kA', `${g.KA} V per ${per} a second, each second`, 'The extra volts to speed up or slow down.', 'Calculated from the weight that has to be moved'],
+        ['kS', `${g.KS} V`, 'Would cancel friction. Not used yet.', 'Friction can only be measured on the real elevator'],
+        ['kP', `${g.KP} V per ${per} of error`, 'Pushes back toward the profile when the carriage is off it.', 'A first guess that works in the simulator'],
+        ['kD', `${g.KD} V per ${per} a second of error`, 'Pushes back when the speed is off the profile. Calms kP down.', 'A first guess that works in the simulator'],
+      ]
+    : [
+        ['kG', `${g.KG} V at level`, 'Holds the claw up. Scaled by the angle: all of it at level, none straight down.', 'Works out to the 124 lb·in the wrist carries with a coral'],
+        ['kV', `${g.KV} V per ${per} a second`, 'The volts it takes to keep turning at a speed.', `Calculated: 12 V ÷ the motor's free speed through the ${control.wrist.gearRatio}:1 gearbox`],
+        ['kA', `${g.KA} V per ${per} a second, each second`, 'The extra volts to speed up or slow down.', 'Calculated from how hard the claw is to turn'],
+        ['kS', `${g.KS} V`, 'Would cancel friction. Not used yet.', 'Friction can only be measured on the real wrist'],
+        ['kP', `${g.KP} V per ${per} of error (${(g.KP / 360).toFixed(2)} V per degree)`, 'Pushes back toward the profile when the wrist is off it.', 'A first guess that works in the simulator'],
+        ['kD', `${g.KD} V per ${per} a second of error`, 'Pushes back when the speed is off the profile.', 'A first guess that works in the simulator'],
+      ];
+---
+
+<div class="gt not-content">
+  <table>
+    <thead>
+      <tr><th>Gain</th><th>In the code</th><th>What it does</th><th>Where the number came from</th></tr>
+    </thead>
+    <tbody>
+      {rows.map(([name, value, does, from]) => (
+        <tr><td><code>{name}</code></td><td>{value}</td><td>{does}</td><td>{from}</td></tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .gt {
+    margin-block: 1.5rem;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    min-width: 36rem;
+    border-collapse: collapse;
+    font-size: var(--sl-text-sm);
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.4rem 0.75rem 0.4rem 0;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+</style>

@@ -1,0 +1,443 @@
+---
+// A small elevator model for trying control gains. It is a teaching model: one weight on a rope, an ideal
+// motor with a current limit, and a little friction. It is not the robot code's simulator.
+// The starting values are the robot's own, read from the code by tools/code-pages/make_control_data.py.
+import control from '../data/control.json';
+
+const e = control.elevator;
+const sliders = [
+  { key: 'KP', label: 'kP', unit: 'V per turn of error', min: 0, max: 5, step: 0.1 },
+  { key: 'KD', label: 'kD', unit: 'V per turn/s of error', min: 0, max: 0.1, step: 0.002 },
+  { key: 'KG', label: 'kG', unit: 'V, always', min: 0, max: 0.8, step: 0.01 },
+  { key: 'KV', label: 'kV', unit: 'V per turn/s', min: 0, max: 0.2, step: 0.002 },
+] as const;
+const model = {
+  gains: e.gains,
+  inPerRot: e.inPerMotorRot,
+  cruise: e.cruiseInPerS,
+  accel: e.accelInPerS2,
+  goal: e.softMaxIn,
+  travel: e.travelIn,
+  limitA: e.statorLimitA,
+  tol: control.carriageTolIn,
+};
+---
+
+<div class="lab not-content" data-model={JSON.stringify(model)}>
+  <p class="lab-title">Try the gains: stow to L4</p>
+  <div class="lab-grid">
+    <fieldset>
+      <legend>The controller's numbers</legend>
+      {
+        sliders.map((s) => (
+          <label>
+            <span class="lab-name">
+              <b>{s.label}</b> <output data-show={s.key}>{e.gains[s.key]}</output> <i>{s.unit}</i>
+            </span>
+            <input type="range" data-key={s.key} min={s.min} max={s.max} step={s.step} value={e.gains[s.key]} data-default={e.gains[s.key]} />
+          </label>
+        ))
+      }
+      <label class="lab-check">
+        <input type="checkbox" data-profile checked />
+        <span>Follow a motion profile ({e.cruiseInPerS} in/s, 0.55 g)</span>
+      </label>
+      <div class="lab-presets">
+        <button type="button" data-preset="robot">The robot's numbers</button>
+        <button type="button" data-preset="noff">No feedforward</button>
+        <button type="button" data-preset="nokp">No kP</button>
+        <button type="button" data-preset="noprofile">No profile</button>
+      </div>
+    </fieldset>
+    <div class="lab-out" aria-live="polite">
+      <p class="lab-legend">What happens</p>
+      <p><span>Inside {control.carriageTolIn} in of the goal, to stay</span><strong data-m="arrive"></strong></p>
+      <p><span>Goes past the goal by</span><strong data-m="past"></strong></p>
+      <p><span>Settles short by</span><strong data-m="short"></strong></p>
+      <p><span>Most current, each motor</span><strong data-m="amps"></strong></p>
+      <p><span>Ropes</span><strong data-m="ropes"></strong></p>
+    </div>
+  </div>
+  <div class="lab-plots">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Carriage height against time: the goal, the profile and where the carriage really is">
+      <rect x="46" y="10" width="584" height="210" class="frame"></rect>
+      <g data-grid-h></g>
+      <rect data-band x="46" width="584" class="band"></rect>
+      <line data-goal x1="46" x2="630" class="goal"></line>
+      <polyline data-ref class="ref"></polyline>
+      <polyline data-pos class="pos"></polyline>
+      <text x="8" y="16" class="axis">in</text>
+      <text x="630" y="244" text-anchor="end" class="axis">seconds</text>
+    </svg>
+    <svg viewBox="0 0 640 130" role="img" aria-label="Volts sent to the motors against time">
+      <rect x="46" y="10" width="584" height="100" class="frame"></rect>
+      <g data-grid-v></g>
+      <polyline data-volts class="volts"></polyline>
+      <text x="8" y="16" class="axis">V</text>
+    </svg>
+    <ul class="lab-key">
+      <li><i class="k-goal"></i>goal, {e.softMaxIn} in</li>
+      <li><i class="k-ref"></i>where the profile says to be</li>
+      <li><i class="k-pos"></i>where the carriage is</li>
+      <li><i class="k-volts"></i>volts to the motors</li>
+    </ul>
+  </div>
+  <p class="lab-note">
+    A teaching model, not the robot code's simulator: one weight on a rope, an ideal motor held to {e.statorLimitA} A, and 0.13 V of friction the
+    controller does not know about. The rope can pull the carriage up but cannot push it down. Starting values are the code's at commit {control.commit}.
+  </p>
+</div>
+
+<script>
+  type Model = {
+    gains: Record<string, number>;
+    inPerRot: number;
+    cruise: number;
+    accel: number;
+    goal: number;
+    travel: number;
+    limitA: number;
+    tol: number;
+  };
+
+  const OHMS = 12 / 483; // Kraken X60 winding resistance: 12 V at its stall current
+  const FRICTION_V = 0.13;
+  const SECONDS = 2.2;
+  const DT = 0.00025;
+
+  for (const box of document.querySelectorAll<HTMLElement>('.lab[data-model]')) {
+    const m: Model = JSON.parse(box.dataset.model ?? '{}');
+    // The mechanism itself: what it really takes to hold, to move and to speed up. These do not change.
+    const real = { kg: m.gains.KG, kv: m.gains.KV, ka: m.gains.KA };
+    const q = <T extends Element>(sel: string) => box.querySelector<T>(sel)!;
+    const inputs = [...box.querySelectorAll<HTMLInputElement>('input[data-key]')];
+    const profile = q<HTMLInputElement>('[data-profile]');
+
+    const X = (t: number) => 46 + (t / SECONDS) * 584;
+    const Y = (inches: number) => 220 - (inches / 72) * 210;
+    const YV = (v: number) => 110 - ((v + 2) / 14) * 100;
+    const line = (x1: number, y1: number, x2: number, y2: number, text: string, anchor = 'end') =>
+      `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="grid"></line><text x="${anchor === 'end' ? x1 - 5 : x1}" y="${anchor === 'end' ? y1 + 4 : y1 + 14}" text-anchor="${anchor === 'end' ? 'end' : 'middle'}" class="axis">${text}</text>`;
+    q('[data-grid-h]').innerHTML =
+      [0, 20, 40, 60].map((h) => line(46, Y(h), 630, Y(h), String(h))).join('') +
+      [0, 0.5, 1, 1.5, 2].map((t) => line(X(t), 220, X(t), 10, String(t), 'mid')).join('');
+    q('[data-grid-v]').innerHTML =
+      [0, 6, 12].map((v) => line(46, YV(v), 630, YV(v), String(v))).join('') +
+      [0.5, 1, 1.5, 2].map((t) => `<line x1="${X(t)}" y1="110" x2="${X(t)}" y2="10" class="grid"></line>`).join('');
+    q('[data-goal]').setAttribute('y1', String(Y(m.goal)));
+    q('[data-goal]').setAttribute('y2', String(Y(m.goal)));
+    q('[data-band]').setAttribute('y', String(Y(m.goal + m.tol)));
+    q('[data-band]').setAttribute('height', String(Y(m.goal - m.tol) - Y(m.goal + m.tol)));
+
+    function run() {
+      const g: Record<string, number> = {};
+      for (const el of inputs) {
+        g[el.dataset.key ?? ''] = Number(el.value);
+        q(`[data-show="${el.dataset.key}"]`).textContent = el.value;
+      }
+      const target = m.goal / m.inPerRot; // motor turns
+      const top = m.travel / m.inPerRot;
+      const cruise = m.cruise / m.inPerRot;
+      const accel = m.accel / m.inPerRot;
+      let p = 0;
+      let w = 0;
+      let pr = 0;
+      let vr = 0;
+      let peakA = 0;
+      let slack = false;
+      let hitTop = false;
+      let highest = 0;
+      let lastOutside = 0;
+      const ref: string[] = [];
+      const pos: string[] = [];
+      const volts: string[] = [];
+      const steps = Math.round(SECONDS / DT);
+      for (let i = 0; i <= steps; i++) {
+        const t = i * DT;
+        // Where the profile says to be: speed up, cruise, and slow down in time to stop on the goal.
+        let ar = 0;
+        if (profile.checked) {
+          const left = target - pr;
+          if (left <= 1e-6 && vr <= accel * DT) {
+            pr = target;
+            vr = 0;
+          } else {
+            ar = (vr * vr) / (2 * accel) >= left ? -accel : vr < cruise ? accel : 0;
+            vr = Math.max(0, Math.min(cruise, vr + ar * DT));
+            pr = Math.min(target, pr + vr * DT);
+          }
+        } else {
+          pr = target;
+          vr = 0;
+        }
+        // The controller: feedforward from the profile, feedback from the error.
+        const v = Math.max(-12, Math.min(12, g.KG + g.KV * vr + m.gains.KA * ar + g.KP * (pr - p) + g.KD * (vr - w)));
+        // The motor: current from the volts left over after its own back-voltage, held to the limit.
+        const wanted = (v - real.kv * w) / OHMS;
+        if (wanted < -2 && p > 0.05) slack = true;
+        const amps = Math.max(0, Math.min(m.limitA, wanted));
+        peakA = Math.max(peakA, amps);
+        const net = amps * OHMS - real.kg;
+        let a = 0;
+        if (Math.abs(w) < 1e-4 && Math.abs(net) <= FRICTION_V) {
+          w = 0;
+        } else {
+          a = (net - FRICTION_V * Math.sign(Math.abs(w) < 1e-4 ? net : w)) / real.ka;
+          const next = w + a * DT;
+          w = w !== 0 && Math.sign(next) !== Math.sign(w) && Math.abs(net) <= FRICTION_V ? 0 : next;
+        }
+        p += w * DT;
+        if (p <= 0) {
+          p = 0;
+          w = Math.max(0, w);
+        }
+        if (p >= top) {
+          p = top;
+          if (w > 0) hitTop = true;
+          w = Math.min(0, w);
+        }
+        const inches = p * m.inPerRot;
+        highest = Math.max(highest, inches);
+        if (Math.abs(inches - m.goal) > m.tol) lastOutside = t;
+        if (i % 40 === 0) {
+          ref.push(`${X(t).toFixed(1)},${Y(pr * m.inPerRot).toFixed(1)}`);
+          pos.push(`${X(t).toFixed(1)},${Y(inches).toFixed(1)}`);
+          volts.push(`${X(t).toFixed(1)},${YV(v).toFixed(1)}`);
+        }
+      }
+      q('[data-ref]').setAttribute('points', profile.checked ? ref.join(' ') : '');
+      q('[data-pos]').setAttribute('points', pos.join(' '));
+      q('[data-volts]').setAttribute('points', volts.join(' '));
+      const end = p * m.inPerRot;
+      const set = (name: string, text: string, bad = false) => {
+        const el = q<HTMLElement>(`[data-m="${name}"]`);
+        el.textContent = text;
+        el.classList.toggle('bad', bad);
+      };
+      const never = lastOutside > SECONDS - 0.05;
+      set('arrive', never ? 'not in 2.2 s' : `${(lastOutside + DT).toFixed(2)} s`, never);
+      set('past', hitTop ? 'hits the end of the travel' : highest > m.goal + 0.05 ? `${(highest - m.goal).toFixed(1)} in` : 'nothing', hitTop || highest > m.goal + m.tol);
+      set('short', Math.abs(m.goal - end) < 0.005 ? 'nothing' : `${(m.goal - end).toFixed(2)} in`, Math.abs(m.goal - end) > m.tol);
+      set('amps', `${peakA.toFixed(0)} A${peakA >= m.limitA - 0.5 ? ', at the limit' : ''}`);
+      set('ropes', slack ? 'go slack' : 'stay tight', slack);
+    }
+
+    const presets: Record<string, { on: boolean; set: Record<string, number> }> = {
+      robot: { on: true, set: {} },
+      noff: { on: true, set: { KG: 0, KV: 0 } },
+      nokp: { on: true, set: { KP: 0, KD: 0 } },
+      noprofile: { on: false, set: {} },
+    };
+    for (const button of box.querySelectorAll<HTMLButtonElement>('[data-preset]')) {
+      button.addEventListener('click', () => {
+        const preset = presets[button.dataset.preset ?? 'robot'];
+        for (const el of inputs) el.value = String(preset.set[el.dataset.key ?? ''] ?? el.dataset.default);
+        profile.checked = preset.on;
+        run();
+      });
+    }
+    for (const el of [...inputs, profile]) el.addEventListener('input', run);
+    run();
+  }
+</script>
+
+<style>
+  .lab {
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 4px solid var(--sl-color-accent);
+    background: var(--sl-color-gray-7, var(--sl-color-gray-6));
+    padding: 1rem 1.25rem;
+    margin-block: 1.5rem;
+    border-radius: 0.375rem;
+  }
+  .lab-title {
+    font-size: var(--sl-text-h4);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    margin: 0 0 0.75rem;
+  }
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.625rem;
+  }
+  legend,
+  .lab-legend {
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sl-color-gray-3);
+    margin: 0 0 0.5rem;
+    padding: 0;
+  }
+  label {
+    display: grid;
+    gap: 0.125rem;
+    font-size: var(--sl-text-sm);
+  }
+  .lab-name b {
+    color: var(--sl-color-white);
+  }
+  .lab-name output {
+    color: var(--sl-color-white);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .lab-name i {
+    font-style: normal;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+  input[type='range'] {
+    width: 100%;
+    min-height: 1.75rem;
+  }
+  .lab-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .lab-check input {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .lab-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+  button {
+    font: inherit;
+    font-size: var(--sl-text-xs);
+    padding: 0.35rem 0.6rem;
+    color: var(--sl-color-white);
+    background: transparent;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+  .lab-out p {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    padding: 0.3rem 0;
+    font-size: var(--sl-text-sm);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  .lab-out p.lab-legend {
+    display: block;
+    border: 0;
+    padding: 0;
+    font-size: var(--sl-text-xs);
+  }
+  .lab-out strong {
+    color: var(--sl-color-white);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .lab-out strong.bad {
+    color: var(--sl-color-orange, #d97706);
+  }
+  .lab-plots {
+    margin-top: 1rem;
+    background: #ffffff;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+  }
+  .lab-plots svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .frame {
+    fill: #ffffff;
+    stroke: #d3dae0;
+  }
+  .lab-plots :global(.grid) {
+    stroke: #e3e8ec;
+    stroke-width: 1;
+  }
+  .lab-plots :global(.axis),
+  .axis {
+    font-size: 11px;
+    fill: #55646e;
+  }
+  @media (max-width: 40rem) {
+    .lab-plots :global(.axis),
+    .axis {
+      font-size: 17px;
+    }
+  }
+  .band {
+    fill: #1c7c54;
+    fill-opacity: 0.18;
+  }
+  .goal {
+    stroke: #1c7c54;
+    stroke-width: 1.5;
+  }
+  .ref {
+    fill: none;
+    stroke: #1846b8;
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+  }
+  .pos {
+    fill: none;
+    stroke: #0f2029;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+  .volts {
+    fill: none;
+    stroke: #c77700;
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+  .lab-key {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0 0.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    font-size: var(--sl-text-xs);
+    color: #0f2029;
+  }
+  .lab-key li {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .lab-key i {
+    display: inline-block;
+    width: 1.25rem;
+    height: 0;
+    border-top: 3px solid #0f2029;
+  }
+  .lab-key .k-goal {
+    border-color: #1c7c54;
+  }
+  .lab-key .k-ref {
+    border-top: 3px dashed #1846b8;
+  }
+  .lab-key .k-volts {
+    border-color: #c77700;
+  }
+  .lab-note {
+    margin: 0.75rem 0 0;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+</style>
