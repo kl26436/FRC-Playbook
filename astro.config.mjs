@@ -83,7 +83,12 @@ export default defineConfig({
         },
         {
                 "label": "8. Code it",
-                "slug": "code-it"
+                "items": [
+                        { "label": "How the code is built", "slug": "code/how-it-is-built" },
+                        { "label": "Moving without hitting anything", "slug": "code/superstructure" },
+                        { "label": "Driving, aiming and autos", "slug": "code/driving-and-autos" },
+                        { "label": "Simulation and tests", "slug": "code/simulation-and-tests" }
+                ]
         },
         {
                 "label": "9. Math reference",

@@ -1,0 +1,100 @@
+---
+title: "Moving without hitting anything"
+description: "How the code moves the elevator and wrist together, and the rules that stop the robot hitting itself."
+---
+
+import Calc from '../../../components/Calc.astro';
+
+:::note[Draft]
+First draft, written from the code and its notes as of November 23. Nothing here has run on a real robot yet.
+:::
+
+The elevator and the wrist share the same space as the funnel, the climber and the camera. Move them in the wrong order and the robot hits itself. One part of the code, the superstructure, owns that problem.
+
+## What we decided
+
+- **One wanted pose at a time.** The driver or an auto asks for a pose, such as L4. The superstructure works out how to get there.
+- **The rules are data.** A table says which wrist angles are allowed at each carriage height. A redesigned part changes numbers in one file, not code.
+- **Checked every loop.** Fifty times a second, each axis's target is limited to what the other axis's position allows.
+
+## The poses
+
+Carriage height is inches of travel from the bottom. Wrist angle is degrees from level: −90° is stowed pointing down, 0° is level.
+
+| Pose | Carriage | Wrist |
+| --- | --- | --- |
+| Stow | 0 in | −90° |
+| Station pickup | 1.25 in | −35° |
+| L1 | 5 in | −35° |
+| L2 | 17.5 in | −35° |
+| L3 | 33.3 in | −35° |
+| L4 | 65.25 in | −52° |
+| Reef algae, low | 8.8 in | +46° |
+| Reef algae, high | 24.6 in | +46° |
+| Carrying an algae | 1.25 in | +45° |
+| Net | 65.25 in | +75° |
+| Processor | 1.25 in | +15° |
+| Climb | 1.25 in | 0° |
+
+L4 and the net stop at 65.25 in, not the full 66 in of travel, to stay 0.75 in short of the hard stops. L1 is not on the CAD's list yet, and the processor pose is marked marginal on the drawings.
+
+## The keep-out table
+
+| Carriage height | Wrist angles allowed |
+| --- | --- |
+| Below 0.75 in | Stowed only (−90°) |
+| 0.75 to 2 in | Any |
+| 2 to 7 in | −75° or higher |
+| 7 to 9 in | −60° or higher |
+| 9 to 15 in | −45° or higher |
+| 15 to 23 in | −40° or higher |
+| 23 in and up | Any |
+
+<Calc id="keep-out" />
+
+The table came from the CAD: 3,256 clash tests of the wrist against every other part, at 15 carriage heights and 12 wrist angles.
+
+### How a move stays legal
+
+- **Stow to L2.** The carriage rises to 1.25 in and stops. The wrist swings out. Then the carriage goes up, with the wrist already at an angle that is legal the whole way.
+- **Back to stow.** The same in reverse: down to 1.25 in, wrist to −90°, then the last 1.25 in.
+- **Stopping distance counts.** A wrist target must be legal everywhere the carriage could reach before it can stop, not just where it is now.
+- **If the wrist angle cannot be trusted,** the carriage freezes where it is.
+
+One more rule sits on top: with an algae in the claw, the wrist stays at +10° or higher and never stows.
+
+## The math: how long does a move take?
+
+The motor controllers do not jump to full speed. They follow a motion profile: speed up at a set rate, cruise, slow down at the same rate.
+
+<Calc id="motion-profile" />
+
+One motor turn moves the carriage 1.375 in: 22 teeth × 0.25 in of chain, × 3 for the three stages, ÷ the 12:1 gearbox.
+
+Holding the elevator still also takes voltage. The code starts with 0.46 V. The [hand calculation](../../subsystems/elevator/) gives about 0.6 V. Both are starting points, and the real value comes from tuning on the robot.
+
+## The climb
+
+The climb is the one move that cannot be undone in a match, so the code is strict about it.
+
+1. **Hold the climb button.** The mechanism moves out of the way, the funnel swings open, and the fork comes down to level. Let go to pause at any point.
+2. **Back onto the cage and hold the button again.** The winch winds the fork in and lifts the robot. Pawls stop it letting itself back down.
+
+- On a field, the climb is locked until the last 30 seconds.
+- Once the funnel opens, the mechanism stays in the climb pose, even if the code restarts.
+- After a missed cage, a second button lets an empty fork back down. It refuses if the robot is hanging.
+- After every climb, the pit crew stows the fork, latches the funnel and presses a reset on the dashboard.
+
+## What went wrong
+
+**The first keep-out table gave the wrist no way out of stow.** Read literally, it allowed only stow below 1.25 in and only −75° or higher above it, and the wrist stows at −90°. Looking again at the clash results showed that every angle is clear at exactly 1.25 in. Measuring further on the CAD gave a band from 0.75 to 2 in where the whole swing is clear. The code now stops the carriage at 1.25 in while the wrist leaves or returns to stow.
+
+That band still has to be checked on the real robot: by hand first, with the carriage at 0.75, 1.25 and 2 in.
+
+## Your turn
+
+- [ ] List every pose the robot needs, with a number for each axis.
+- [ ] Find every pair of parts that can hit each other. Sweep the mechanism through its range in CAD and write down where it is clear.
+- [ ] Put the rules in a table, not in code.
+- [ ] Test every move from every pose to every other pose. No move may enter a forbidden zone, and every move must finish.
+- [ ] Check that there is a legal way out of the starting pose.

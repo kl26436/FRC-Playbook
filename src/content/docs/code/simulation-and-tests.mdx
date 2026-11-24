@@ -1,0 +1,79 @@
+---
+title: "Simulation and tests"
+description: "How the robot was driven and tested before it existed, and what a simulation cannot tell you."
+---
+
+:::note[Draft]
+First draft, written from the code and its notes as of November 23. Replays of the simulated autos will be added here.
+:::
+
+There is no robot yet, and the code already plays a full match. This page explains how, and how far to trust it.
+
+## What we decided
+
+- **Simulate with real physics.** Mechanisms have weight, gravity and current limits, and they take time to move.
+- **Judge honestly.** A released piece scores only if it would really have landed on a branch, measured from where the robot truly is and not where it thinks it is.
+- **Three layers of tests,** from pure maths to whole autos.
+
+## What the simulation contains
+
+| Part | What it does |
+| --- | --- |
+| Mechanism physics | Simulated motors drive models of the elevator, wrist and climber, with gravity, weight and current limits |
+| The field | Walls, the reef, bumper contact, and coral and algae as objects. This comes from maple-sim |
+| Game pieces | At a station, a coral arrives 0.7 s after the robot settles with its intake running. A released coral scores only if it lands on a branch |
+| The camera | Works out what the real camera would report from the robot's true position, with noise. The real position-fix code then runs on that |
+
+## Watching it
+
+AdvantageScope shows the simulation on a 3D field, live or from a recorded log:
+
+- the robot as the CAD model, with both elevator stages, the carriage, the wrist, the climber fork and the funnel moving
+- where the robot really is, beside where it thinks it is, so a bad position fix is easy to see
+- each mechanism's target against where it actually is
+- coral and algae on the field and in the robot
+
+## The three layers of tests
+
+| Layer | What it proves | Test methods | Time to run |
+| --- | --- | --- | --- |
+| 1. Rules and geometry | The maths is right. No simulator needed | 74 | Seconds |
+| 2. Mechanism moves | Each mechanism does what it is told, against physics | 86 | Minutes |
+| 3. Whole matches | Teleop cycles, the climb and every auto, with the whole robot on the simulated field | 37 | Minutes |
+
+Layers 2 and 3 together take 10 to 15 minutes, because the simulated motor controllers run in real time and cannot be sped up.
+
+Some examples of what the tests check:
+
+- **Layer 1:** every move from one pose to another obeys the keep-out table. All 12 branch positions on both alliances sit square to their tag. No CAN ID is used twice.
+- **Layer 2:** the elevator reaches every setpoint in time and never passes 65.25 in. The wrist holds a coral and an algae against gravity without exceeding its current limit.
+- **Layer 3:** for every auto on red and blue, the listed coral end up on the listed branches inside 15 seconds.
+
+A fourth check runs on the real robot at start-up: the code calls every device on its list and names any that do not answer.
+
+## What a simulation cannot tell you
+
+| Simulation can show | Only the robot can show |
+| --- | --- |
+| The logic is right and the interlocks hold | Whether the claw really grips an algae |
+| A mechanism can reach its target in time | Whether the robot tips with the elevator up. The simulated field is flat |
+| An auto fits in 15 seconds | How the real camera behaves |
+| The position fix works on a clean image | Motor directions, servo positions and the encoder offset |
+| | A real cage: nothing on the robot measures the fork, the pawls or the funnel |
+
+## What went wrong
+
+**The simulator has limits of its own, and they have to be written down.** Two examples:
+
+- The simulated motor controller mishandled one units setting, which looked like a problem with the elevator and was not. That story is on the [elevator page](../../subsystems/elevator/).
+- The simulator cannot take a sensor off the bus, so a lost sensor is faked one layer up. The tests of "what if the coral sensor dies" are only as good as that fake.
+
+Every known limit is listed in one document in the code, next to the unconfirmed numbers.
+
+## Your turn
+
+- [ ] Get the simulation driving in week one, before the drivebase exists.
+- [ ] Make mechanisms take real time to move. A simulation that passes because it is fake is worse than none.
+- [ ] Write a test for every rule that would hurt the robot if it broke.
+- [ ] Make every auto prove what it claims to score.
+- [ ] Keep a list of what the simulation cannot show, and take it to the first day with the real robot.

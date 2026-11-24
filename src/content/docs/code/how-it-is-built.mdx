@@ -1,0 +1,90 @@
+---
+title: "How the code is built"
+description: "What the robot code is made of, how it is laid out, and why it runs the same on the robot and in simulation."
+---
+
+:::note[Draft]
+First draft, written from the code and its notes as of November 23. Nothing here has run on a real robot yet.
+:::
+
+The robot code is finished as designed and runs a full match in simulation. This chapter explains how it is put together and why. The code is public at [github.com/kl26436/ClaudeBot](https://github.com/kl26436/ClaudeBot).
+
+## What we decided
+
+| Choice | What we picked |
+| --- | --- |
+| Language and libraries | Java on WPILib 2026, with AdvantageKit for logging and Phoenix 6 for the motors |
+| Layout | The way Team 2910 lays out their code |
+| Simulation | Real physics: simulated motors push simulated mechanisms that take time to move |
+| Motion control | Runs on the motor controllers, not on the roboRIO |
+| Device addresses | Every CAN ID and port in one file |
+
+## Why
+
+The goal was one project that runs the real robot and the simulation, with tests that prove the parts that matter.
+
+- **The same control code runs in both places.** A test in simulation then exercises the code the robot will really run.
+- **Real physics.** Tests of interlocks and auto timing mean nothing if mechanisms jump straight to their targets.
+- **One file for addresses.** A wiring change is one edit, and a test checks that no CAN ID is used twice.
+
+### Options we did not take
+
+| Option | What it is | Why not |
+| --- | --- | --- |
+| Separate real and simulated classes for every mechanism | The AdvantageKit template style | The simulator would run different control code than the robot |
+| Mechanisms that jump to their targets in simulation | Fastest to set up | Interlock and timing tests would mean little |
+| Drawn paths for autos | PathPlanner or Choreo | Autos drive straight to a pose instead, using the same code as teleop |
+
+## How one mechanism is put together
+
+Every mechanism has the same four pieces. Learn one and you can read them all.
+
+1. **An IO interface** lists what the mechanism reads and what it can be told to do. Every input is logged.
+2. **One motor class** implements it. The robot and the simulator both run this class.
+3. **A simulation subclass** adds only physics. It reads the voltage the simulated motor applies and feeds position and speed back.
+4. **The subsystem** holds a wanted state and a current state.
+
+Only one part of the code, the superstructure, tells the mechanisms where to go. That is covered in [Moving without hitting anything](../superstructure/).
+
+## Where things live
+
+| Folder | Holds |
+| --- | --- |
+| `config/` | `Ports` (every CAN ID and port), `RobotConstants` (dimensions and ratios), `Setpoints`, `KeepOut` |
+| `subsystems/` | One folder per mechanism: drive, elevator, wrist, coral rollers, claw, climber, vision |
+| `commands/` | Scoring and pickup moves shared by teleop and autos |
+| `autos/` | The auto list, the chooser and the building blocks |
+| `field/` | Reef, station, barge and start positions for both alliances |
+| `sim/` | The simulated robot and the judge that decides whether a piece scored |
+
+## Numbers nobody has confirmed yet
+
+A number in code looks certain even when it is a guess. So every unconfirmed value carries a comment on its own line saying why, and one document lists them all. There are four reasons:
+
+| Marker | Meaning | What settles it |
+| --- | --- | --- |
+| `drawing` | Should come from a drawing that does not exist yet | The released drawing |
+| `tuning` | A starting guess for a gain, limit or setpoint | A tuning session on the built robot |
+| `robot-check` | Only the built robot can show it: a direction, a clearance, a servo position | Checking it on the robot, by hand first |
+| `field-check` | Depends on the real field | Measuring on a real field |
+
+On November 23, 92 lines carried one of these markers. When a value is confirmed, the value changes and the marker comes off in the same commit.
+
+## Built on other teams' work
+
+The code builds on work other teams share in the open:
+
+- **[Team 2910, Jack in the Bot](https://github.com/FRCTeam2910):** the project layout, the autos and the swerve drive are adapted from their published robot code.
+- **[Team 5516, Iron Maple](https://github.com/Shenzhen-Robotics-Alliance/maple-sim):** maple-sim, the field physics in the simulator.
+- **[Team 6328, Mechanical Advantage](https://github.com/Mechanical-Advantage):** AdvantageKit and AdvantageScope.
+- **[WPILib](https://github.com/wpilibsuite)** and **[CTR Electronics](https://github.com/CrossTheRoadElec)**, for the libraries and Phoenix 6.
+
+The code itself was written with Claude Code.
+
+## Your turn
+
+- [ ] Decide what "done" means for the code before writing any. Write down what would make it a failure.
+- [ ] Put every device address in one file on day one.
+- [ ] Build each mechanism from the same pieces, so anyone can read any of them.
+- [ ] Mark every guessed number where it sits, and keep one list of them.
+- [ ] Give credit to the teams whose code you learn from, and follow their licence.

@@ -64,9 +64,11 @@ So the code limits how hard the robot can accelerate whenever the carriage is hi
 
 ## What went wrong
 
-**The code runs the elevator at 65 in/s, not the 110 in/s it was designed for.** At 110 in/s in simulation, the motion controller did not slow down in time and the carriage hit the top stop. A fix has been proposed and not yet tried.
+**For a while the code had to run the elevator at 65 in/s, not the 110 in/s it was designed for.** At 110 in/s in simulation, the motion controller stopped slowing down in time and the carriage reached the top stop.
 
-The lesson: a mechanism can be fast enough on paper and still be held back by how it is controlled. Check both.
+The cause was a units setting. The motor controller was asked to work in inches through a conversion ratio below 1, and its simulator did not handle that well. The fix was to let the controller work in motor turns and convert to inches in our own code. The elevator now runs at 110 in/s in simulation.
+
+The lesson: a mechanism can be fast enough on paper and still be held back by how it is controlled. Run it in simulation at full speed before trusting the paper number.
 
 ## Your turn
 

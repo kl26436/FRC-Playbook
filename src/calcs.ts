@@ -21,7 +21,7 @@ export interface CalcOutput {
 
 export interface CalcDef {
   title: string;
-  group: 'Game' | 'Mechanical';
+  group: 'Game' | 'Mechanical' | 'Software';
   page: string; // slug of the page that explains it
   inputs: CalcInput[];
   outputs: CalcOutput[];
@@ -43,6 +43,25 @@ const elevatorHoldAmps = (v: Values) => elevatorMotorTorque(v) / (v.stallTorque 
 const cycleSeconds = (v: Values) => (2 * v.dist) / v.speed + v.intake + v.score;
 const weightTotal = (v: Values) =>
   v.drive + v.elev + v.wrist + v.climb + v.funnel + v.elec + v.wiring + v.fasteners;
+
+// Wrist angles the code allows at each carriage height (the keep-out table, from the code's KeepOut.java).
+export const keepOutZones = [
+  { from: 0, to: 0.75, min: -90, max: -90 },
+  { from: 0.75, to: 2, min: -90, max: 75 },
+  { from: 2, to: 7, min: -75, max: 75 },
+  { from: 7, to: 9, min: -60, max: 75 },
+  { from: 9, to: 15, min: -45, max: 75 },
+  { from: 15, to: 23, min: -40, max: 75 },
+  { from: 23, to: 65.25, min: -90, max: 75 },
+];
+const zoneAt = (h: number) => keepOutZones.find((z) => h < z.to) ?? keepOutZones[keepOutZones.length - 1];
+const profileAccelDist = (v: Values) => (v.cruise * v.cruise) / (2 * v.accel);
+const profilePeak = (v: Values) => (2 * profileAccelDist(v) > v.travel ? Math.sqrt(v.accel * v.travel) : v.cruise);
+const profileTime = (v: Values) => {
+  const peak = profilePeak(v);
+  const ramps = (peak * peak) / v.accel; // distance covered speeding up plus slowing down
+  return (2 * peak) / v.accel + Math.max(0, v.travel - ramps) / peak;
+};
 
 export const calcs: Record<string, CalcDef> = {
   'cycle-value': {
@@ -246,5 +265,45 @@ export const calcs: Record<string, CalcDef> = {
       'Multiply by 32.17 for feet per second squared.',
     ],
     note: 'Modelled, with battery and bumpers on. The default is the worst case: carriage at the top, wrist level.',
+  },
+
+  'keep-out': {
+    title: 'What wrist angles are allowed at this height?',
+    group: 'Software',
+    page: 'code/superstructure',
+    inputs: [{ key: 'h', label: 'Carriage height', unit: 'in', value: 17.5, step: 0.25 }],
+    outputs: [
+      { label: 'Lowest wrist angle allowed', unit: '°', digits: 0, compute: (v) => zoneAt(v.h).min },
+      { label: 'Highest wrist angle allowed', unit: '°', digits: 0, compute: (v) => zoneAt(v.h).max },
+    ],
+    steps: [
+      'Find the band of the keep-out table that the carriage height falls in.',
+      'Read off the lowest and highest wrist angle for that band. −90° is stowed, 0° is level, +75° is tipped all the way up.',
+    ],
+    note: 'Modelled: the bands come from clash checks on the CAD. The band from 0.75 to 2 in still has to be checked by hand on the real robot.',
+  },
+
+  'motion-profile': {
+    title: 'How long does a profiled move take?',
+    group: 'Software',
+    page: 'code/superstructure',
+    inputs: [
+      { key: 'travel', label: 'Distance to move', unit: 'in', value: 65.25, step: 0.25 },
+      { key: 'cruise', label: 'Cruise speed', unit: 'in/s', value: 110, step: 5 },
+      { key: 'accel', label: 'Acceleration', unit: 'in/s²', value: 212.3, step: 1 },
+    ],
+    outputs: [
+      { label: 'Top speed reached', unit: 'in/s', digits: 0, compute: profilePeak },
+      { label: 'Time spent speeding up', unit: 's', digits: 2, compute: (v) => profilePeak(v) / v.accel },
+      { label: 'Distance covered speeding up', unit: 'in', compute: (v) => (profilePeak(v) * profilePeak(v)) / (2 * v.accel) },
+      { label: 'Whole move', unit: 's', digits: 2, compute: profileTime },
+    ],
+    steps: [
+      'Time to reach cruise speed = cruise speed ÷ acceleration.',
+      'Distance covered while speeding up = cruise speed² ÷ (2 × acceleration). Slowing down takes the same distance again.',
+      'If those two distances add up to more than the move, the mechanism never reaches cruise speed. Its top speed is then the square root of (acceleration × distance).',
+      'Whole move = time speeding up + time at cruise + time slowing down.',
+    ],
+    note: 'Calculated. The acceleration is 0.55 g (g is 386.09 in/s²), just under the 0.6 g cap the code sets for the elevator.',
   },
 };
