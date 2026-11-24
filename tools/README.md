@@ -14,6 +14,19 @@ After a new CAD package, also replace what the site hosts under `public/files/`:
 (`pdftoppm -r 100 -jpeg`, named `<pdf name>-<page>.jpg`), the DXF folders and the four list CSVs. Then update the revision
 letters on the Downloads page.
 
+## The 2D views on the part pages
+
+A router part's picture is its DXF. Every other made part gets views drawn from its solid by `make_part_views.py [folder
+of the package's STEP files]`, which writes `src/data/part-views.json`. Run it after `make_site_data.py`, because it reads
+`parts.json` to see which parts have no flat pattern. It looks for each part by its mark in the package's subsystem STEP
+files, and in `printed/` for the few small printed parts that are not in those.
+
+- It looks at the part along the direction of its biggest flat face, and adds a view along any other direction holes run
+  in. A round part gets a side view and an end view.
+- A hole is a cylinder face that curves inwards and goes all the way round. Slots and fillets are left out of the table.
+- Hole names (drill size, what it is usually for) come from the same list the flat patterns use, plus the two rivnut sizes.
+- Check that every job sheet still prints on one page after running it.
+
 ## When a CAD package arrives without a new mesh export
 
 `update_mesh_from_step.py` was written for package 3.3, which changed the elevator's fixed parts, the climber and one side

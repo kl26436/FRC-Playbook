@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import parts from '../../data/parts.json';
 import RobotViewer from '../../components/RobotViewer.astro';
 import model from '../../../public/robot-viewer/robot.json';
+import partViews from '../../data/part-views.json';
 
 export function getStaticPaths() {
   return parts.map((part) => ({ params: { slug: part.slug }, props: { part } }));
@@ -20,6 +21,12 @@ const pdf = `${base}/files/drawings/${part.pdf}#page=${part.page}`;
 const fmt = (n: number) => String(Number(n.toFixed(3)));
 const inModel = part.mark in (model.made as Record<string, unknown>);
 const letter = (i: number) => String.fromCharCode(65 + i);
+// A router part has its flat pattern. Every other part with a solid in the CAD has views drawn from that solid.
+type View = { kind: string; title: string; w: number; h: number; strip: boolean; svg: string };
+type Drawn = { views: View[]; side: string; holes: { dia: number; n: number; drill: string; use: string }[] };
+const drawn = part.outline ? undefined : (partViews as Record<string, Drawn>)[part.mark];
+const holes = part.holes.length > 0 ? part.holes : (drawn?.holes ?? []);
+const printed = part.kind === 'printed';
 const headings = [
   ...(inModel ? [{ depth: 2, slug: 'see-it', text: 'See it' }] : []),
   { depth: 2, slug: 'how-to-make-it', text: 'How to make it' },
@@ -67,14 +74,32 @@ const headings = [
     }
 
     {
-      part.holes.length > 0 && (
+      drawn && (
+      <div class:list={['views', { pair: drawn.views.length > 1 && !drawn.views.some((v) => v.strip) }]}>
+      {drawn.views.map((v, i) => (
+        <figure class:list={['outline', { long: v.strip, extra: i > 0 }]}>
+          <div class="scroll" set:html={v.svg} />
+          <figcaption>
+            {v.title}: {fmt(v.w)} × {fmt(v.h)} in.
+            {i === 0 && ' Dashed lines are edges hidden behind.'}
+            {i === 0 && holes.length > 0 && ' Each letter marks one hole size, listed in the table below.'}
+            {i === 0 && drawn.side && ` This is the ${drawn.side} one of the pair.`}
+          </figcaption>
+        </figure>
+      ))}
+      </div>
+      )
+    }
+
+    {
+      holes.length > 0 && (
         <table class="holes">
           <thead>
-            <tr><th>Mark</th><th>Hole</th><th>How many</th><th>Cut with</th><th>Usually for</th></tr>
+            <tr><th>Mark</th><th>Hole</th><th>How many</th>{!printed && <th>Cut with</th>}<th>Usually for</th></tr>
           </thead>
           <tbody>
-            {part.holes.map((h, i) => (
-              <tr><td><span class={`key h${i}`}>{letter(i)}</span></td><td>{fmt(h.dia)} in</td><td>{h.n}</td><td>{h.drill}</td><td>{h.use}</td></tr>
+            {holes.map((h, i) => (
+              <tr><td><span class={`key h${i}`}>{letter(i)}</span></td><td>{fmt(h.dia)} in</td><td>{h.n}</td>{!printed && <td>{h.drill}</td>}<td>{h.use}</td></tr>
             ))}
           </tbody>
         </table>
@@ -180,6 +205,41 @@ const headings = [
   .key.h4 {
     color: #c23b33;
   }
+  .outline :global(.h5),
+  .key.h5 {
+    color: #0b7285;
+  }
+  .outline :global(.h6),
+  .key.h6 {
+    color: #8a6d00;
+  }
+  .outline :global(.h7),
+  .key.h7 {
+    color: #5b5f66;
+  }
+  /* a long thin part is drawn full length and scrolls sideways on a narrow screen, so its holes stay big enough to see */
+  .outline.long .scroll {
+    overflow-x: auto;
+  }
+  .outline.long :global(svg) {
+    min-width: 42rem;
+  }
+  .outline.extra {
+    margin-top: -0.75rem;
+  }
+  /* two views of a small part sit side by side when there is room */
+  @media (min-width: 50rem) {
+    .views.pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .views.pair .outline,
+    .views.pair .outline.extra {
+      margin: 1.5rem 0;
+    }
+  }
 
   .key {
     display: inline-block;
@@ -283,6 +343,36 @@ const headings = [
     }
     .outline :global(svg) {
       max-height: 7rem;
+    }
+    .outline.long :global(svg) {
+      min-width: 0;
+    }
+    .outline.extra {
+      margin-top: 0;
+    }
+    .views.pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .views.pair .outline,
+    .views.pair .outline.extra {
+      margin: 0.6rem 0;
+    }
+    .views .outline :global(svg) {
+      max-height: 5.5rem;
+    }
+    .views .outline figcaption {
+      margin-top: 0.15rem;
+      font-size: 7pt;
+    }
+    .views .outline,
+    .views .outline.extra,
+    .views.pair .outline,
+    .views.pair .outline.extra {
+      margin: 0.3rem 0;
+      padding: 0.2rem 0.4rem;
+      border: 0;
     }
     .steps li + li {
       margin-top: 0.2rem;
