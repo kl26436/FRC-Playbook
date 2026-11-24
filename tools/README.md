@@ -35,6 +35,12 @@ Four steps, in this order. Each prints a short check when it finishes.
 - The assembly steps are written by hand in `tools/assembly/steps.py`. The script checks that every part and every fastener
   in the model is placed by some step, and stops if a step names a part that is not there.
 
+## Rebuilding the wiring data
+
+`make_wiring_data.py [robotA_can_map.csv]` turns the CAD package's CAN map into `src/data/wiring.json`. The Wire it
+chapter's diagrams and its ID table are drawn from that file, so they cannot disagree with each other. The build stops
+if a device in the map is missing from the bus diagram.
+
 ## Rebuilding the code example pages
 
 The three example pages under `src/content/docs/code/` (`one-button-to-score`, `vision`, `write-an-auto`) are written in

@@ -1,0 +1,185 @@
+---
+// The two CAN buses as two lines of stops, in the order the wire visits them.
+// The order and every number come from src/data/wiring.json (the CAD package's CAN map).
+import W from '../data/wiring.json';
+type Dev = (typeof W.devices)[number];
+// which devices sit at each stop the CAD names
+const AT: Record<string, number[]> = {
+  'Pigeon 2': [10], 'front left module': [11, 12, 13], 'front right module': [21, 22, 23], 'back left module': [31, 32, 33], 'back right module': [41, 42, 43],
+  'PDH (in and out, terminator switch OFF)': [1], 'lift left': [51], 'lift right': [52], 'wrist': [53], 'coral rollers': [54],
+  'claw front': [55], 'claw rear': [56], 'climber left': [57], 'climber right': [58], 'coral CANrange': [61], 'algae CANrange': [62],
+};
+const NAME: Record<string, string> = {
+  'CANivore': 'CANivore', 'Pigeon 2': 'Gyro', 'PDH (in and out, terminator switch OFF)': 'Power hub', 'roboRIO': 'roboRIO',
+  'lift left': 'Lift motor, left', 'lift right': 'Lift motor, right', 'wrist': 'Wrist motor', 'coral rollers': 'Coral roller motor',
+  'claw front': 'Claw front roller motor', 'claw rear': 'Claw rear roller motor', 'climber left': 'Climber motor, left', 'climber right': 'Climber motor, right',
+  'coral CANrange': 'Coral sensor', 'algae CANrange': 'Algae sensor', 'up the cable chain': 'Up the cable chain', '120 ohm terminator': '120 ohm resistor',
+};
+const NOTE: Record<string, string> = {
+  'CANivore': 'A second CAN port for the roboRIO. It plugs in by USB and has no ID.',
+  'roboRIO': 'The robot\'s computer. It ends the bus at this end.',
+  'PDH (in and out, terminator switch OFF)': 'The pair goes in and comes out again, so its end-of-bus switch is set to OFF.',
+  'up the cable chain': 'From here on, every device rides on the elevator. The pair goes up once and does not come back.',
+  '120 ohm terminator': 'The end of the bus.',
+};
+const byId = new Map<number, Dev>(W.devices.map((d) => [d.id, d]));
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const role = (d: Dev) => d.does.replace(/^(front|back) (left|right) /, '');
+const power = (d: Dev) => (d.channel === '-' ? '' : d.channel.startsWith('MPM') ? `small power module slot ${d.channel.slice(4)}` : `hub channel ${d.channel}`);
+const lines = W.buses.map((b) => ({
+  key: b.bus.startsWith('canivore') ? 'drive' : 'mech',
+  title: b.bus.startsWith('canivore') ? 'Drivetrain bus' : 'Mechanism bus',
+  sub: b.bus.startsWith('canivore') ? 'Starts at the CANivore. Stays in the frame.' : 'Starts at the roboRIO. Ends at the claw.',
+  stops: b.order.map((s) => ({ raw: s, name: NAME[s] ?? cap(s), note: NOTE[s] ?? '', devs: (AT[s] ?? []).map((id) => byId.get(id)!), kind: s === '120 ohm terminator' ? 'end' : /cable chain/.test(s) ? 'mark' : 'stop' })),
+}));
+// every device in the CAN map must be at exactly one stop
+const placed = lines.flatMap((l) => l.stops.flatMap((s) => s.devs.map((d) => d.id))).sort((a, b) => a - b);
+const all = W.devices.map((d) => d.id).sort((a, b) => a - b);
+if (JSON.stringify(placed) !== JSON.stringify(all)) throw new Error('CanBus: the stops do not cover the CAN map exactly: ' + JSON.stringify({ placed, all }));
+---
+
+<div class="buses not-content">
+  {lines.map((l) => (
+    <section class={`bus ${l.key}`} aria-label={l.title}>
+      <h3>{l.title}</h3>
+      <p class="sub">{l.sub}</p>
+      <ol>
+        {l.stops.map((s) => (
+          <li class={s.kind}>
+            <span class="dot" aria-hidden="true"></span>
+            <div class="body">
+              <strong>{s.name}</strong>
+              {s.note && <span class="note">{s.note}</span>}
+              {s.devs.length > 0 && (
+                <ul>
+                  {s.devs.map((d) => (
+                    <li>
+                      <span class="id">ID {d.id}</span>
+                      <span>{s.devs.length > 1 ? cap(role(d)) + ': ' : ''}{d.device}{power(d) ? ', ' + power(d) : ''}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+  ))}
+</div>
+
+<style>
+  .buses {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.25rem;
+    margin: 1.5rem 0;
+    align-items: start;
+  }
+  .bus {
+    --line: var(--sl-color-blue);
+    padding: 0.875rem 1rem 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+  }
+  .bus.mech {
+    --line: var(--sl-color-purple);
+  }
+  h3 {
+    margin: 0;
+    font-size: var(--sl-text-lg);
+    color: var(--sl-color-white);
+  }
+  .sub {
+    margin: 0.15rem 0 0.9rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  ol,
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ol > li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    gap: 0.6rem;
+    padding-bottom: 0.8rem;
+  }
+  /* the wire */
+  ol > li::before {
+    content: '';
+    position: absolute;
+    left: calc(0.625rem - 2px);
+    top: 0.3rem;
+    bottom: -0.3rem;
+    width: 4px;
+    background: var(--line);
+  }
+  ol > li:last-child {
+    padding-bottom: 0;
+  }
+  ol > li:last-child::before {
+    display: none;
+  }
+  .dot {
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.1rem;
+    border: 4px solid var(--line);
+    border-radius: 50%;
+    background: var(--sl-color-bg);
+  }
+  .end .dot {
+    border-radius: 0.2rem;
+    background: var(--line);
+  }
+  .mark .dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    margin: 0.35rem 0.25rem 0;
+    border-width: 3px;
+  }
+  .body {
+    display: grid;
+    gap: 0.15rem;
+    font-size: var(--sl-text-sm);
+    line-height: 1.4;
+  }
+  .body strong {
+    color: var(--sl-color-white);
+  }
+  .mark strong {
+    font-weight: 400;
+    font-style: italic;
+    color: var(--sl-color-gray-2);
+  }
+  .note {
+    color: var(--sl-color-gray-3);
+  }
+  .body ul {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: 0.1rem;
+  }
+  .body ul li {
+    display: grid;
+    grid-template-columns: 3.4rem 1fr;
+    gap: 0.5rem;
+    align-items: baseline;
+    color: var(--sl-color-gray-2);
+  }
+  .id {
+    padding: 0 0.35rem;
+    border-radius: 0.25rem;
+    background: var(--line);
+    color: var(--sl-color-black);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    white-space: nowrap;
+  }
+</style>

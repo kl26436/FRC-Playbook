@@ -23,7 +23,8 @@ It prints a NumPy import error on start-up if NumPy is missing. The script does 
 - **The robot is the CAD**, posed with the same joint numbers as the viewer and the robot code. Parts the CAD colours for
   clarity (the elevator stages, printed parts) are given their real finish: aluminium, and black for printed Onyx.
 - **Fasteners, wires, chain and rope are not in the mesh**, so they are not in the pictures.
-- **The swerve modules are outline shapes**, as in the CAD.
+- **The swerve modules, motors and electronics are the makers' own models**, made coarser (see `tools/README.md`).
+  Their finishes are set from the model's colours: black plates, blue tread, a red power hub.
 - **The field parts are stand-ins** built from boxes and tubes at the sizes and positions the kickoff brief's model used:
   one reef face with a branch pair, a coral station wall and chute, a deep cage on a chain. They are not the field CAD.
 - **Game pieces are placed by geometry, not by simulation.**

@@ -1,0 +1,168 @@
+---
+title: "7. Wire it"
+description: "Where the power goes, how the devices talk to each other, and what to check before the first power-up."
+---
+
+import PowerPath from '../../components/PowerPath.astro';
+import PdhMap from '../../components/PdhMap.astro';
+import CanBus from '../../components/CanBus.astro';
+import W from '../../data/wiring.json';
+
+The robot has three kinds of wire.
+
+| Kind | What it looks like | What it does |
+| --- | --- | --- |
+| Power | Red and black, thick | Carries the battery's power to every motor and box |
+| CAN | Yellow and green, thin, twisted together | Lets the roboRIO talk to every motor and smart sensor |
+| Signal | Thin, three wires to a plug | Two sensors and three servos that plug straight into the roboRIO |
+
+:::caution[This is the plan]
+Nothing is wired yet. Wire lengths and where each wire is tied down will be settled on the real robot.
+:::
+
+The boxes are already mounted by this point. Where they sit, and why, is on the [electronics page](../subsystems/electronics/).
+
+## Power
+
+Power leaves the battery on one thick pair of wires and reaches the power hub. The hub splits it up, and every branch has its own breaker or fuse.
+
+<PowerPath />
+
+- **Keep the thick wires short.** Aim for under 24 in for each one, laid along the cross member. A long wire wastes voltage.
+- **The battery's terminals and connector point right**, toward the main breaker on the right rail.
+- **Drive motor wires run along the rails.** Leave a loop of spare wire at each module so the module can come off.
+- **Lift, wrist and claw wires go up the cable chain** on the right side. Use high-flex cable there, because it bends every time the elevator moves.
+- **Label both ends of every wire** with its CAN ID or its hub channel.
+
+### What plugs into each hub channel
+
+<PdhMap />
+
+These channel numbers are a first pick. If a wire reaches the hub from the other side, move it to a channel on that side. Then change the number in the CAN map, so the list still matches the robot.
+
+The small power module has six slots with 5 A fuses.
+
+| Slot | What it feeds |
+| --- | --- |
+| 1 | The gyro |
+| 2 | The four wheel-angle sensors |
+| 3 | The coral sensor and the algae sensor |
+| 4 to 6 | Spare |
+
+### Starting current limits
+
+Each motor is told, in software, the most current it may use. These are starting values from sheet EL-001. Expect to tune them.
+
+| Motors | Limit |
+| --- | --- |
+| Swerve drive | 60 A |
+| Swerve steer | 30 A |
+| Elevator lift | 60 A |
+| Wrist | 40 A |
+| Coral and claw rollers | 30 A |
+| Climber | 60 A |
+
+## The CAN bus
+
+CAN is one pair of wires that many devices share. Every device has a number, its ID, so the roboRIO can talk to one device at a time. The pair goes into a device and out to the next one, like a string of lights.
+
+This robot has two buses. The swerve drive and gyro are on one, and everything above the frame is on the other. If a wire breaks in the elevator's cable chain, the robot can still drive.
+
+Each diagram below reads top to bottom, in the order the wire visits each stop.
+
+<CanBus />
+
+### The rules
+
+1. **Yellow to yellow, green to green.** Keep the pair twisted.
+2. **One line with no branches.** Never join three pairs at one point.
+3. **An end at each end.** Each bus starts at a box that ends it, and finishes with a 120 ohm resistor. The power hub is in the middle of its bus, so its own end switch is OFF.
+4. **Set every ID before the device goes on the robot.** It is much harder once the device is bolted in.
+5. **Name the CANivore `canivore`** in Phoenix Tuner X. The code looks for that name.
+
+### Every ID
+
+The tens digit says where a device is: 1 front left, 2 front right, 3 back left, 4 back right, 5 mechanisms, 6 sensors.
+
+<table>
+  <thead>
+    <tr><th>ID</th><th>Bus</th><th>Device</th><th>What it does</th><th>Power from</th><th>Protection</th></tr>
+  </thead>
+  <tbody>
+    {W.devices.map((d) => (
+      <tr>
+        <td>{d.id}</td>
+        <td>{d.bus === 'rio' ? 'Mechanism' : 'Drivetrain'}</td>
+        <td>{d.device}</td>
+        <td>{d.does.charAt(0).toUpperCase() + d.does.slice(1)}</td>
+        <td>{d.channel === '-' ? '-' : d.channel.startsWith('MPM') ? `Small module, slot ${d.channel.slice(4)}` : `Hub channel ${d.channel}`}</td>
+        <td>{d.protection.replace(/^(\d+ A)$/, '$1 breaker')}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+The robot code holds the same list in one file, `Ports.java`. A test compares that file with this table, device by device. When the robot starts, it calls every device and shows an alert naming any that do not answer.
+
+## Straight into the roboRIO
+
+| Port | What plugs in |
+| --- | --- |
+| DIO 0 | The elevator's home switch, a magnetic switch on post E-109 |
+| DIO 1 | The wrist's absolute encoder |
+| PWM 0 | The funnel latch servo |
+| PWM 1 | Both climber pawl servos, on one Y lead |
+| USB | The CANivore |
+| Ethernet | The radio's port marked RIO. The camera goes in the radio's port marked AUX 1 |
+
+The three servos take their power from the roboRIO's 6 V supply. If that supply sags when a servo stalls, move the servos to a REV Servo Power Module on a spare hub channel.
+
+## Before the first power-up
+
+Put the robot on blocks with the wheels off the ground. Leave the main breaker off until this list is done.
+
+1. **No shorts.** Check the battery leads, the battery connector and the breaker for the right polarity, and that neither wire touches the frame.
+2. **Each CAN bus reads about 60 ohm** between yellow and green with the power off. Two 120 ohm ends side by side make 60. A reading near 120 means one end is missing.
+3. **Every device has its ID** and current firmware.
+4. **Weigh the robot.** The limit is 115 lb without battery and bumpers, and the model is [just over it](../subsystems/from-concept-to-design/).
+5. **Measure the height** in the starting pose. The limit is 42 in and the model says 38.9 in.
+
+## First power, one mechanism at a time
+
+Run each mechanism by itself, slowly, before running anything together.
+
+### Drivetrain
+
+- Point all four wheels forward and set the four wheel-angle sensor offsets.
+- Check that each module steers and drives the right way.
+
+### Elevator
+
+- Move the stages by hand first. The home switch should read at the bottom.
+- The carriage travels 0 to 66 in, 22 in for each stage.
+- The two lift motors are mirror images, so one follows the other in reverse. Start with a 60 A limit.
+
+### Wrist
+
+- Let the wrist hang stowed, read the absolute encoder, and set that reading as −90°. Level and forward is 0°.
+- **Raise the carriage to 1.25 in before the first wrist move.** With the carriage down, the wrist hits the camera and the lift gearbox.
+- Turn it slowly to each end. The stops are at −93° and +77°.
+
+### Funnel
+
+- Latch servo: the horn is 10° up when closed and 32° down when open.
+- Tilt the robot 10° and fire the latch. The tray must swing fully open onto its stop.
+
+### Climber
+
+- Pawl servos: the horn at 145° holds the pawls down, and 123° lifts them.
+- With the ropes off, check that both ratchets lock and will not pay out.
+- The two motors run as leader and follower in opposite directions, in brake mode. Start with a 60 A limit.
+- To let the fork down: wind in a little, lift the pawls, and let the springs push the fork out of stow. Its weight takes it to level, and it stops at −2°.
+- Wind in to about 88° and stop. The hard stop is at 97°.
+
+## Not done yet
+
+- **A current budget.** Every motor has a 40 A breaker, but nobody has added up what the robot draws when several motors run at once.
+- **The cable chain's size** and the exact wire lengths.
+- **Which way the roboRIO faces.** It fits its plate either way round. Decide which side its connectors face before drilling.

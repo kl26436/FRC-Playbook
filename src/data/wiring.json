@@ -1,0 +1,299 @@
+{
+ "devices": [
+  {
+   "id": 1,
+   "bus": "rio",
+   "device": "REV PDH",
+   "does": "power distribution",
+   "channel": "-",
+   "protection": "-"
+  },
+  {
+   "id": 10,
+   "bus": "canivore",
+   "device": "Pigeon 2.0",
+   "does": "gyro",
+   "channel": "MPM 1",
+   "protection": "5 A fuse"
+  },
+  {
+   "id": 11,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "front left drive",
+   "channel": "18",
+   "protection": "40 A"
+  },
+  {
+   "id": 12,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "front left steer",
+   "channel": "19",
+   "protection": "40 A"
+  },
+  {
+   "id": 13,
+   "bus": "canivore",
+   "device": "CANcoder",
+   "does": "front left angle",
+   "channel": "MPM 2",
+   "protection": "5 A fuse"
+  },
+  {
+   "id": 21,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "front right drive",
+   "channel": "1",
+   "protection": "40 A"
+  },
+  {
+   "id": 22,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "front right steer",
+   "channel": "0",
+   "protection": "40 A"
+  },
+  {
+   "id": 23,
+   "bus": "canivore",
+   "device": "CANcoder",
+   "does": "front right angle",
+   "channel": "MPM 2",
+   "protection": "5 A fuse"
+  },
+  {
+   "id": 31,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "back left drive",
+   "channel": "11",
+   "protection": "40 A"
+  },
+  {
+   "id": 32,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "back left steer",
+   "channel": "10",
+   "protection": "40 A"
+  },
+  {
+   "id": 33,
+   "bus": "canivore",
+   "device": "CANcoder",
+   "does": "back left angle",
+   "channel": "MPM 2",
+   "protection": "5 A fuse"
+  },
+  {
+   "id": 41,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "back right drive",
+   "channel": "8",
+   "protection": "40 A"
+  },
+  {
+   "id": 42,
+   "bus": "canivore",
+   "device": "Kraken X60",
+   "does": "back right steer",
+   "channel": "9",
+   "protection": "40 A"
+  },
+  {
+   "id": 43,
+   "bus": "canivore",
+   "device": "CANcoder",
+   "does": "back right angle",
+   "channel": "MPM 2",
+   "protection": "5 A fuse"
+  },
+  {
+   "id": 51,
+   "bus": "rio",
+   "device": "Kraken X60",
+   "does": "elevator lift, left motor",
+   "channel": "16",
+   "protection": "40 A"
+  },
+  {
+   "id": 52,
+   "bus": "rio",
+   "device": "Kraken X60",
+   "does": "elevator lift, right motor",
+   "channel": "3",
+   "protection": "40 A"
+  },
+  {
+   "id": 53,
+   "bus": "rio",
+   "device": "Kraken X60",
+   "does": "wrist",
+   "channel": "15",
+   "protection": "40 A"
+  },
+  {
+   "id": 54,
+   "bus": "rio",
+   "device": "Kraken X44",
+   "does": "coral rollers",
+   "channel": "14",
+   "protection": "40 A"
+  },
+  {
+   "id": 55,
+   "bus": "rio",
+   "device": "Kraken X44",
+   "does": "claw front roller",
+   "channel": "13",
+   "protection": "40 A"
+  },
+  {
+   "id": 56,
+   "bus": "rio",
+   "device": "Kraken X44",
+   "does": "claw rear roller",
+   "channel": "12",
+   "protection": "40 A"
+  },
+  {
+   "id": 57,
+   "bus": "rio",
+   "device": "Kraken X60",
+   "does": "climber, left motor",
+   "channel": "17",
+   "protection": "40 A"
+  },
+  {
+   "id": 58,
+   "bus": "rio",
+   "device": "Kraken X60",
+   "does": "climber, right motor",
+   "channel": "2",
+   "protection": "40 A"
+  },
+  {
+   "id": 61,
+   "bus": "rio",
+   "device": "CANrange",
+   "does": "coral in the wrist",
+   "channel": "MPM 3",
+   "protection": "5 A fuse"
+  },
+  {
+   "id": 62,
+   "bus": "rio",
+   "device": "CANrange",
+   "does": "algae in the claw",
+   "channel": "MPM 3",
+   "protection": "5 A fuse"
+  }
+ ],
+ "other": [
+  {
+   "channel": "PDH 4",
+   "load": "Limelight 4",
+   "protection": "10 A breaker"
+  },
+  {
+   "channel": "PDH 5",
+   "load": "Mini Power Module feed",
+   "protection": "20 A breaker"
+  },
+  {
+   "channel": "PDH 6, 7",
+   "load": "spare",
+   "protection": "-"
+  },
+  {
+   "channel": "PDH 20",
+   "load": "roboRIO",
+   "protection": "10 A fuse"
+  },
+  {
+   "channel": "PDH 21",
+   "load": "radio VH-109, 12 V direct (no PoE)",
+   "protection": "10 A fuse"
+  },
+  {
+   "channel": "PDH 22",
+   "load": "spare",
+   "protection": "-"
+  },
+  {
+   "channel": "PDH 23 (switched)",
+   "load": "spare (lights)",
+   "protection": "-"
+  },
+  {
+   "channel": "MPM 4 to 6",
+   "load": "spare",
+   "protection": "-"
+  }
+ ],
+ "ports": [
+  {
+   "port": "DIO 0",
+   "use": "elevator home switch (REV magnetic switch on post E-109)"
+  },
+  {
+   "port": "DIO 1",
+   "use": "wrist absolute encoder (REV through bore, duty cycle)"
+  },
+  {
+   "port": "PWM 0",
+   "use": "funnel latch servo (signal and 6 V from the roboRIO)"
+  },
+  {
+   "port": "PWM 1",
+   "use": "climber pawl servos, both on one Y lead (lift the pawls to pay the rope out)"
+  },
+  {
+   "port": "USB",
+   "use": "CANivore"
+  },
+  {
+   "port": "Ethernet",
+   "use": "radio port RIO; Limelight 4 on radio port AUX 1"
+  }
+ ],
+ "buses": [
+  {
+   "bus": "canivore (CAN FD)",
+   "order": [
+    "CANivore",
+    "Pigeon 2",
+    "back left module",
+    "back right module",
+    "front right module",
+    "front left module",
+    "120 ohm terminator"
+   ],
+   "note": "drivetrain only: 8 motors, 4 CANcoders, gyro"
+  },
+  {
+   "bus": "rio",
+   "order": [
+    "roboRIO",
+    "PDH (in and out, terminator switch OFF)",
+    "climber right",
+    "climber left",
+    "lift right",
+    "lift left",
+    "up the cable chain",
+    "wrist",
+    "coral rollers",
+    "coral CANrange",
+    "claw front",
+    "claw rear",
+    "algae CANrange",
+    "120 ohm terminator"
+   ],
+   "note": "mechanisms and the PDH; the roboRIO ends the bus at one end, the resistor at the claw ends the other"
+  }
+ ]
+}

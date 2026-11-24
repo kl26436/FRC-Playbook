@@ -416,9 +416,9 @@ SETS["robot"] = dict(
              do=["It goes in after the funnel because the stowed fork sits under the tray, and the funnel's eye bolt has to be checked against a tower plate."]),
         dict(t="Bumpers", link="bumpers", parts=[ALL("bumpers")],
              do=["They can be built at any time. They go on last so the frame stays easy to reach."]),
-        dict(t="Wiring", link=None, parts=[],
+        dict(t="Wiring", link="/wire-it/", linkText="The wiring chapter", parts=[],
              do=["Now run every wire. The boxes were mounted back in step 4."]),
-        dict(t="First power and checks", link=None, parts=[],
+        dict(t="First power and checks", link="/wire-it/#before-the-first-power-up", linkText="The checks, in order", parts=[],
              do=["Power up with the robot on blocks. Check each mechanism by itself, slowly, before running anything together."]),
     ])
 

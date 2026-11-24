@@ -86,6 +86,7 @@ SPEC = {
     'plywood':       dict(color=0xb08a58, rough=0.7, bump=(14, 0.2)),
     'wheel_green':   dict(color=0x1f9a3e, rough=0.72, bump=(20, 0.2)),
     'rubber':        dict(color=0x101113, rough=0.78, bump=(30, 0.2)),
+    'tread_blue':    dict(color=0x143a86, rough=0.8, bump=(30, 0.2)),
     'tpu_teal':      dict(color=0x1a7f8c, rough=0.6),
     'red_anodised':  dict(color=0xa3241f, metallic=0.7, rough=0.4),
     'yellow_strap':  dict(color=0xd9b81c, rough=0.8, bump=(60, 0.4)),
@@ -128,9 +129,15 @@ def material_for(color, sub, labels):
     if 'flex wheel' in text: return 'wheel_green'
     if 'rope' in text: return 'rope'
     if 'strap' in text: return 'yellow_strap'
-    if 'Pigeon' in text: return 'pcb_green'
+    if g > r + 0.3 and g > b + 0.3: return 'pcb_green'
+    if sub == 5 and ('Pigeon' in text or 'CANivore' in text): return 'plastic_black'
     if 'MAXPlanetary 25:1' in text or 'Power Distribution' in text: return 'red_anodised'
-    if 'MK4i' in text: return 'rubber' if 'wheel' in text else 'alu_black'
+    if 'MK4i' in text:                                     # the vendor model's own colours say which piece this is
+        if b > r + 0.2: return 'tread_blue'
+        if max(r, g, b) < 0.1: return 'rubber'
+        if max(r, g, b) < 0.35: return 'alu_black'
+        if b > 0.9: return 'plastic_black'                  # encoder housing
+        return 'alu' if b > r + 0.05 else 'steel'
     if 'sleeve' in text or 'neoprene' in text or 'belt' in text: return 'rubber'
     if max(r, g, b) < 0.3: return 'alu_black' if ('Kraken' in text or 'gearbox' in text) else 'plastic_black'
     if abs(r - g) < 0.05 and abs(g - b) < 0.08 and r < 0.5: return 'alu_plate'

@@ -9,7 +9,7 @@ interface Props {
   set: keyof typeof all;
 }
 type Step = {
-  t: string; do: string[]; hw?: string[]; check?: string; warn?: string; link?: string | null;
+  t: string; do: string[]; hw?: string[]; check?: string; warn?: string; link?: string | null; linkText?: string;
   pl: { k?: string; n: number; name: string; slug?: string }[]; fk: [string, number][]; fam: Record<string, number>;
 };
 const { set } = Astro.props;
@@ -68,7 +68,9 @@ const famText = (fam: Record<string, number>) =>
             )
           }
           {st.check && <p class="as-check"><span class="box" aria-hidden="true"></span><span><strong>Check.</strong> {st.check}</span></p>}
-          {st.link && <p class="as-more"><a href={`${base}/assemble/${st.link}/`}>Every step for this part of the build</a></p>}
+          {st.link && (st.link.startsWith('/')
+            ? <p class="as-more"><a href={`${base}${st.link}`}>{st.linkText ?? 'More on this step'}</a></p>
+            : <p class="as-more"><a href={`${base}/assemble/${st.link}/`}>Every step for this part of the build</a></p>)}
         </li>
       ))
     }
