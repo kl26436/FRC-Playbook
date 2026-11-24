@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept robot, interactive model</title>
+<style>
+/* Layout idea: an engineering brief. One reading column with wide figures; colour comes from the field itself
+   (violet reef pipes, teal algae, blue alliance) and is used only where it carries meaning. */
+:root {
+  --bg: #eef1f3; --surface: #ffffff; --ink: #0f2029; --muted: #55646e; --line: #d3dae0;
+  --accent: #0b7f74; --violet: #7a3ea3; --blue: #1846b8; --red: #c23b33; --amber: #a86a12;
+  --good: #1c7c54; --bad: #c23b33;
+  --r1: #cf6a0a; --r2: #2a8a3b; --r3: #bd2278;
+  --viewer-bg: #dde4e9; --viewer-floor: #4b525a; --field: #e3e8ec;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d171d; --surface: #14222b; --ink: #e5edf1; --muted: #9aaab4; --line: #273843;
+    --accent: #3cc9ba; --violet: #b98be0; --blue: #7099f5; --red: #f0776d; --amber: #e3b341;
+    --good: #4fc08d; --bad: #f0776d;
+    --r1: #f59e42; --r2: #5fc272; --r3: #ee6bb0;
+    --viewer-bg: #111e26; --viewer-floor: #2a3239; --field: #1a2a34;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d171d; --surface: #14222b; --ink: #e5edf1; --muted: #9aaab4; --line: #273843;
+  --accent: #3cc9ba; --violet: #b98be0; --blue: #7099f5; --red: #f0776d; --amber: #e3b341;
+  --good: #4fc08d; --bad: #f0776d;
+  --r1: #f59e42; --r2: #5fc272; --r3: #ee6bb0;
+  --viewer-bg: #111e26; --viewer-floor: #2a3239; --field: #1a2a34;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 72px; }
+.col { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.05; margin: 0; letter-spacing: 0.01em; }
+h1 { font-size: clamp(2.6rem, 7vw, 4.4rem); font-weight: 700; text-transform: uppercase; }
+h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 700; text-transform: uppercase; }
+h3 { font-size: 1.35rem; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num, td.n, .tiles strong, .readout b { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+header.top { padding: 44px 0 26px; display: grid; gap: 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.18rem; max-width: 60ch; }
+.note { border-left: 4px solid var(--amber); background: var(--surface); padding: 14px 16px; max-width: 78ch; font-size: 0.95rem; }
+.note strong { color: var(--amber); }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 22px 0 8px; }
+.tiles div { background: var(--surface); padding: 14px 14px 12px; display: grid; gap: 4px; align-content: start; }
+.tiles strong { font-size: 1.7rem; font-weight: 500; line-height: 1; }
+.tiles span { font-size: 0.84rem; color: var(--muted); line-height: 1.3; }
+
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-family: var(--font-display); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.04em; }
+nav.toc a { color: var(--ink); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); }
+
+section { padding-top: 54px; display: grid; gap: 20px; }
+section > .kicker { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: -12px; }
+ul, ol { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+li::marker { color: var(--muted); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
+.card h3 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.card p, .card li { font-size: 0.95rem; }
+.tag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 7px; border: 1px solid currentColor; border-radius: 2px; white-space: nowrap; }
+.tag.must { color: var(--good); } .tag.should { color: var(--amber); } .tag.could { color: var(--muted); }
+.rule { font-family: var(--font-mono); font-size: 0.82em; color: var(--muted); white-space: nowrap; }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-display); font-size: 1.02rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+tr.hl td { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+
+figure { margin: 0; display: grid; gap: 10px; }
+figcaption { font-size: 0.9rem; color: var(--muted); max-width: 78ch; }
+.figbox { background: var(--surface); border: 1px solid var(--line); padding: 12px; overflow-x: auto; }
+.fig-svg { display: block; width: 100%; height: auto; min-width: 560px; color: var(--ink); font-family: var(--font-body); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.86rem; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 4px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+.legend i.dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* diagram classes */
+.carpet { fill: var(--field); }
+.rail { stroke: currentColor; stroke-width: 2; }
+.wall-blue { stroke: var(--blue); stroke-width: 4; }
+.station { stroke: var(--blue); stroke-width: 4; stroke-linecap: round; }
+.proc { fill: var(--blue); }
+.truss { fill: currentColor; opacity: 0.16; }
+.centre { stroke: currentColor; stroke-width: 0.6; stroke-dasharray: 3 3; opacity: 0.5; }
+.zone-blue { fill: none; stroke: var(--blue); stroke-width: 1.4; }
+.zone-red { fill: none; stroke: var(--red); stroke-width: 1.4; opacity: 0.75; }
+.cage-blue { fill: var(--blue); } .cage-red { fill: var(--red); opacity: 0.75; }
+.startline { stroke: currentColor; stroke-width: 2; }
+.reefzone { fill: none; stroke: var(--blue); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.reef { fill: color-mix(in srgb, var(--violet) 16%, var(--field)); stroke: var(--violet); stroke-width: 1.6; }
+.branch { fill: var(--violet); }
+.alg-lo { fill: var(--accent); opacity: 0.85; }
+.alg-hi { fill: none; stroke: var(--accent); stroke-width: 2.2; }
+.coral-dot { fill: var(--surface); stroke: currentColor; stroke-width: 0.8; }
+.t { font-size: 7.4px; fill: currentColor; opacity: 0.82; }
+.t-dim { font-size: 6.6px; fill: currentColor; opacity: 0.62; }
+.t-strong { font-size: 8px; font-weight: 600; fill: currentColor; letter-spacing: 0.04em; }
+.t-branch { font-size: 7.6px; font-weight: 600; fill: var(--violet); }
+.t-tag { font-size: 6px; fill: currentColor; opacity: 0.6; font-family: var(--font-mono); }
+.t-num { font-size: 7px; font-weight: 600; fill: #fff; }
+.scale { stroke: currentColor; stroke-width: 1; }
+.bot { fill: none; stroke-width: 1.4; stroke-dasharray: 3 2; }
+.r1 { fill: none; stroke: var(--r1); stroke-width: 2.2; } .r1f, .r1n { fill: var(--r1); } .r1s { stroke: var(--r1); }
+.r2 { fill: none; stroke: var(--r2); stroke-width: 2.2; } .r2f, .r2n { fill: var(--r2); } .r2s { stroke: var(--r2); }
+.r3 { fill: none; stroke: var(--r3); stroke-width: 2.2; } .r3f, .r3n { fill: var(--r3); } .r3s { stroke: var(--r3); }
+.reef-svg .t { font-size: 11px; } .reef-svg .t-strong { font-size: 12.5px; }
+.carpet-line { stroke: currentColor; stroke-width: 1.5; }
+.lvl { stroke: currentColor; stroke-width: 0.6; stroke-dasharray: 2 4; opacity: 0.45; }
+.bump { fill: var(--blue); } .frame { fill: currentColor; opacity: 0.3; }
+.reefbase { fill: currentColor; opacity: 0.78; }
+.pipe { stroke: var(--violet); fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.coral-ok { fill: var(--surface); stroke: var(--good); stroke-width: 2; }
+.coral-no { fill: none; stroke: var(--bad); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.alg-ball { fill: var(--accent); opacity: 0.5; stroke: var(--accent); stroke-width: 1.5; }
+.t-alg { font-size: 9px; font-weight: 600; fill: currentColor; letter-spacing: 0.06em; }
+.t-ok { font-size: 11px; font-weight: 600; fill: var(--good); } .t-no { font-size: 11px; font-weight: 600; fill: var(--bad); }
+
+/* renders */
+.renders { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.renders figure:first-child { grid-column: 1 / -1; }
+.renders figure { align-content: start; }
+.renders img { display: block; width: 100%; height: auto; max-width: 100%; border: 1px solid var(--line); background: var(--surface); }
+@media (max-width: 640px) { .renders { grid-template-columns: 1fr; } }
+
+/* 3D viewer */
+.viewer { border: 1px solid var(--line); background: var(--surface); display: grid; grid-template-columns: minmax(0, 1fr) 300px; }
+.viewer-main { display: grid; grid-template-rows: auto 1fr; min-width: 0; border-right: 1px solid var(--line); }
+.bar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border-bottom: 1px solid var(--line); }
+.bar .lbl { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); align-self: center; margin-right: 4px; }
+button.chip { font: inherit; font-size: 0.86rem; padding: 6px 11px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; border-radius: 2px; }
+button.chip:hover { border-color: var(--accent); }
+button.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.stage { position: relative; background: var(--viewer-bg); min-height: 0; }
+#rb-canvas { display: block; width: 100%; height: clamp(360px, 62vh, 620px); touch-action: pan-y; cursor: grab; }
+#rb-canvas:active { cursor: grabbing; }
+.readout { position: absolute; left: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+.readout span { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid var(--line); padding: 4px 8px; font-size: 0.78rem; color: var(--muted); }
+.readout b { color: var(--ink); font-weight: 500; }
+.hint { position: absolute; right: 10px; top: 10px; font-size: 0.76rem; color: var(--muted); background: color-mix(in srgb, var(--surface) 80%, transparent); padding: 3px 7px; pointer-events: none; }
+.side { padding: 12px; display: grid; gap: 14px; align-content: start; }
+.side h4 { margin: 0 0 6px; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.side .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.side label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer; }
+.side .toggles { display: grid; gap: 6px; }
+.info { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; font-size: 0.9rem; }
+.info strong { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.fallback { padding: 18px; font-size: 0.95rem; }
+@media (max-width: 860px) { .viewer { grid-template-columns: 1fr; } .viewer-main { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+.steps { counter-reset: s; list-style: none; padding: 0; gap: 10px; }
+.steps li { counter-increment: s; background: var(--surface); border: 1px solid var(--line); padding: 12px 14px 12px 54px; position: relative; }
+.steps li::before { content: counter(s); position: absolute; left: 14px; top: 8px; font-family: var(--font-display); font-size: 1.9rem; font-weight: 700; color: var(--accent); }
+.steps li b { font-weight: 600; }
+footer { margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.88rem; color: var(--muted); display: grid; gap: 8px; max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* v3: part breaks, build timeline, Robot A viewer extras */
+[hidden] { display: none !important; }
+.toc-part { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); align-self: center; }
+.partbreak { margin-top: 64px; padding: 26px 0 6px; border-top: 4px solid var(--ink); display: grid; gap: 14px; }
+.partbreak .kicker { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.partbreak h2 { font-size: clamp(2.2rem, 5.5vw, 3.4rem); }
+.journey { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; min-width: 0; }
+.journey:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.jstep { flex: 0 0 min(560px, 86%); scroll-snap-align: start; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--accent); padding: 16px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.jstep p, .jstep li { font-size: 0.95rem; }
+.jday { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+.jnav { display: flex; align-items: center; gap: 12px; }
+.jcount { font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); }
+#ra-canvas { display: block; width: 100%; height: clamp(380px, 66vh, 660px); touch-action: pan-y; cursor: grab; }
+.sliders { display: grid; gap: 10px; }
+.sl { display: grid !important; gap: 2px; font-size: 0.86rem; }
+.sl span { display: flex; justify-content: space-between; color: var(--muted); }
+.sl b { font-family: var(--font-mono); font-weight: 500; color: var(--ink); }
+.sl input { width: 100%; accent-color: var(--accent); }
+.keep { font-size: 0.85rem; padding: 8px 10px; border-left: 4px solid var(--good); background: color-mix(in srgb, var(--good) 8%, transparent); }
+.keep.bad { border-left-color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, transparent); }
+.keep b { font-weight: 600; }
+.bars { display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--line); padding: 14px 16px; }
+.wrow { display: grid; grid-template-columns: minmax(110px, 220px) 1fr 56px; gap: 10px; align-items: center; font-size: 0.9rem; }
+.wt { height: 14px; background: color-mix(in srgb, var(--line) 60%, transparent); position: relative; }
+.wt i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); }
+.wv { text-align: right; }
+.wsum { border-top: 1px solid var(--line); padding-top: 6px; font-weight: 600; }
+.progress { position: relative; height: 26px; background: var(--surface); border: 1px solid var(--line); }
+.progress div { position: absolute; left: 0; top: 0; bottom: 0; background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.progress span { position: relative; padding: 0 10px; line-height: 26px; font-family: var(--font-mono); font-size: 0.82rem; }
+
+html, body { margin: 0; padding: 0; background: var(--surface); }
+body { font-family: var(--font-body); color: var(--ink); font-size: 16px; line-height: 1.5; }
+.viewer { margin: 0; }
+#rb-canvas, #rb-canvas-b { display: block; width: 100%; height: 440px; touch-action: pan-y; cursor: grab; }
+#rb-canvas-b:active { cursor: grabbing; }
+
+</style>
+</head>
+<body>
+  <div class="viewer" id="viewer">
+    <div class="viewer-main">
+      <div class="bar" role="group" aria-label="Robot pose">
+        <span class="lbl">Pose</span>
+        <button class="chip" data-pose="start" aria-pressed="true">Start</button>
+        <button class="chip" data-pose="station" aria-pressed="false">Station</button>
+        <button class="chip" data-pose="l2" aria-pressed="false">L2</button>
+        <button class="chip" data-pose="l3" aria-pressed="false">L3</button>
+        <button class="chip" data-pose="l4" aria-pressed="false">L4</button>
+        <button class="chip" data-pose="algae" aria-pressed="false">Algae</button>
+        <button class="chip" data-pose="processor" aria-pressed="false">Processor</button>
+        <button class="chip" data-pose="net" aria-pressed="false">Net</button>
+        <button class="chip" data-pose="climb" aria-pressed="false">Climb</button>
+      </div>
+      <div class="stage">
+        <canvas id="rb-canvas" aria-label="Interactive 3D model of the concept robot"></canvas>
+        <div class="hint">drag to orbit &middot; scroll or pinch to zoom</div>
+        <div class="readout" id="readout"></div>
+      </div>
+    </div>
+    <div class="side">
+      <div>
+        <h4>Show one subsystem</h4>
+        <div class="chips" role="group" aria-label="Subsystem">
+          <button class="chip" data-sub="" aria-pressed="true">Whole robot</button>
+          <button class="chip" data-sub="drive" aria-pressed="false">Drivebase</button>
+          <button class="chip" data-sub="elev" aria-pressed="false">Elevator</button>
+          <button class="chip" data-sub="coral" aria-pressed="false">Coral wrist</button>
+          <button class="chip" data-sub="algae" aria-pressed="false">Algae claw</button>
+          <button class="chip" data-sub="funnel" aria-pressed="false">Funnel</button>
+          <button class="chip" data-sub="climb" aria-pressed="false">Climber</button>
+          <button class="chip" data-sub="vision" aria-pressed="false">Vision</button>
+        </div>
+      </div>
+      <div class="toggles">
+        <h4>View</h4>
+        <label><input type="checkbox" id="tg-explode"> Pull subsystems apart</label>
+        <label><input type="checkbox" id="tg-env"> Show rule envelopes</label>
+        <label><input type="checkbox" id="tg-field" checked> Show field elements</label>
+        <div class="chips" role="group" aria-label="Camera">
+          <button class="chip" data-view="38,70">3/4</button>
+          <button class="chip" data-view="90,86">Side</button>
+          <button class="chip" data-view="0,86">Front</button>
+          <button class="chip" data-view="38,12">Top</button>
+        </div>
+      </div>
+      <div class="info" id="info" aria-live="polite"></div>
+    </div>
+  </div>
+<script src="three.min.js"></script>
+<script>
+/* REEFSCAPE kickoff concept robot. Units are inches. X forward (toward the reef), Y up, Z to the robot's right. */
+(function () {
+  'use strict';
+  var D2R = Math.PI / 180;
+
+  function buildViewer(canvas, opts) {
+    opts = opts || {};
+    var CONCEPT_B = opts.concept === 'B';
+    var T = window.THREE;
+    var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: !!opts.preserve });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = T.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = T.PCFSoftShadowMap;
+    renderer.toneMapping = T.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+
+    var scene = new T.Scene();
+    var camera = new T.PerspectiveCamera(30, 1, 2, 3000);
+
+    var hemi = new T.HemisphereLight(0xffffff, 0x6f757c, 0.78);
+    scene.add(hemi);
+    var sun = new T.DirectionalLight(0xffffff, 1.25);
+    sun.position.set(70, 190, 110);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -90; sun.shadow.camera.right = 90;
+    sun.shadow.camera.top = 150; sun.shadow.camera.bottom = -40;
+    sun.shadow.camera.near = 10; sun.shadow.camera.far = 500;
+    sun.shadow.bias = -0.0015;
+    scene.add(sun);
+    var fill = new T.DirectionalLight(0xdfe8ff, 0.35);
+    fill.position.set(-120, 60, -80);
+    scene.add(fill);
+
+    /* ---------- materials ---------- */
+    function mk(name, color, o) {
+      var m = new T.MeshStandardMaterial(Object.assign({ color: color, roughness: 0.6, metalness: 0.1 }, o || {}));
+      m.name = name;
+      return m;
+    }
+    var M = {
+      alu: mk('alu', 0xc6cbd0, { metalness: 0.75, roughness: 0.42 }),
+      aluDark: mk('alu_black', 0x24282d, { metalness: 0.55, roughness: 0.48 }),
+      steel: mk('steel', 0x9aa1a8, { metalness: 0.85, roughness: 0.32 }),
+      pan: mk('belly_pan', 0x30353a, { metalness: 0.3, roughness: 0.6 }),
+      poly: mk('polycarbonate', 0xcfe2ec, { transparent: true, opacity: 0.38, roughness: 0.12, metalness: 0.0, side: T.DoubleSide }),
+      bumper: mk('bumper_blue', 0x1846b8, { roughness: 0.92, metalness: 0 }),
+      rubber: mk('rubber', 0x17181a, { roughness: 0.95, metalness: 0 }),
+      motor: mk('motor', 0x1b1c1f, { metalness: 0.5, roughness: 0.42 }),
+      rollO: mk('roller_orange', 0xe2702a, { roughness: 0.85 }),
+      rollG: mk('roller_green', 0x38a84f, { roughness: 0.85 }),
+      vec: mk('vector_wheel', 0x59626c, { roughness: 0.55, metalness: 0.1 }),
+      pvc: mk('pvc_white', 0xf1f0ea, { roughness: 0.55, side: T.DoubleSide }),
+      algae: mk('algae_ball', 0x2bb5a2, { roughness: 0.5 }),
+      violet: mk('reef_violet', 0x7a3ea3, { metalness: 0.35, roughness: 0.42 }),
+      hdpe: mk('hdpe_black', 0x1d1e21, { roughness: 0.75 }),
+      battery: mk('battery', 0x2b2c2f, { roughness: 0.6 }),
+      red: mk('electronics_red', 0xb5322e, { roughness: 0.55 }),
+      rio: mk('electronics_grey', 0xd2d6da, { roughness: 0.5, metalness: 0.2 }),
+      cam: mk('camera', 0x121315, { roughness: 0.5 }),
+      lens: mk('lens', 0x2d7fd0, { roughness: 0.2, metalness: 0.4 }),
+      carpet: mk('carpet', 0x596069, { roughness: 1 }),
+      cage: mk('cage_blue', 0x2957c8, { metalness: 0.4, roughness: 0.45 }),
+      zinc: mk('zinc', 0xb9bdc2, { metalness: 0.8, roughness: 0.4 }),
+      wall: mk('field_wall', 0xdde2e6, { transparent: true, opacity: 0.32, roughness: 0.15, side: T.DoubleSide }),
+      diamond: mk('diamond_plate', 0xb5babf, { metalness: 0.8, roughness: 0.38 }),
+      net: mk('net', 0x2957c8, { transparent: true, opacity: 0.28, roughness: 0.9, side: T.DoubleSide }),
+      tagW: mk('tag_panel', 0xf4f4f4, { roughness: 0.7 })
+    };
+    var EDGE = new T.LineBasicMaterial({ color: 0x0b1620, transparent: true, opacity: 0.32 });
+
+    var meshes = [];   // every mesh with a subsystem tag
+    function add(parent, geo, material, sub, pos, edges) {
+      var m = new T.Mesh(geo, material.clone());
+      m.material.name = material.name;
+      m.castShadow = true; m.receiveShadow = true;
+      if (pos) m.position.set(pos[0], pos[1], pos[2]);
+      m.userData.sub = sub;
+      m.userData.baseOpacity = material.opacity;
+      m.userData.baseTransparent = material.transparent;
+      if (edges !== false) {
+        var e = new T.LineSegments(new T.EdgesGeometry(geo, 28), EDGE.clone());
+        e.userData.edge = true;
+        m.add(e);
+      }
+      parent.add(m);
+      meshes.push(m);
+      return m;
+    }
+    function box(p, sub, mat, w, h, d, x, y, z) {
+      return add(p, new T.BoxGeometry(w, h, d), mat, sub, [x, y, z]);
+    }
+    function cyl(p, sub, mat, r, len, axis, x, y, z, edges) {
+      var g = new T.CylinderGeometry(r, r, len, 28);
+      if (axis === 'x') g.rotateZ(Math.PI / 2);
+      if (axis === 'z') g.rotateX(Math.PI / 2);
+      return add(p, g, mat, sub, [x, y, z], edges === true);
+    }
+    function tube(p, sub, mat, a, b, r) {
+      var va = new T.Vector3(a[0], a[1], a[2]), vb = new T.Vector3(b[0], b[1], b[2]);
+      var g = new T.CylinderGeometry(r, r, va.distanceTo(vb), 18);
+      var m = add(p, g, mat, sub, null, false);
+      m.position.copy(va).add(vb).multiplyScalar(0.5);
+      m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), vb.clone().sub(va).normalize());
+      return m;
+    }
+    function plate(p, sub, mat, pts, thick, z) {
+      var s = new T.Shape();
+      pts.forEach(function (q, i) { if (i) s.lineTo(q[0], q[1]); else s.moveTo(q[0], q[1]); });
+      s.closePath();
+      var g = new T.ExtrudeGeometry(s, { depth: thick, bevelEnabled: false });
+      g.translate(0, 0, -thick / 2);
+      return add(p, g, mat, sub, [0, 0, z]);
+    }
+    function group(parent, x, y, z) {
+      var g = new T.Group();
+      g.position.set(x || 0, y || 0, z || 0);
+      parent.add(g);
+      return g;
+    }
+
+    /* ---------- ground ---------- */
+    var ground = new T.Mesh(new T.PlaneGeometry(900, 900), M.carpet.clone());
+    ground.material.name = 'carpet';
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    ground.userData.ground = true;
+    scene.add(ground);
+    var grid = new T.GridHelper(240, 20, 0x8f98a1, 0x737c85);
+    grid.position.y = 0.03;
+    grid.material.transparent = true; grid.material.opacity = 0.35;
+    grid.userData.helper = true;
+    scene.add(grid);
+
+    /* ---------- robot ---------- */
+    var robot = group(scene);
+    var gDrive = group(robot), gElev = group(robot), gFunnel = group(robot), gClimb = group(robot), gVision = group(robot);
+
+    // frame: 28 x 28 in, 2 x 1 tube
+    box(gDrive, 'drive', M.alu, 1, 2, 28, 13.5, 2.75, 0);
+    box(gDrive, 'drive', M.alu, 1, 2, 28, -13.5, 2.75, 0);
+    box(gDrive, 'drive', M.alu, 26, 2, 1, 0, 2.75, 13.5);
+    box(gDrive, 'drive', M.alu, 26, 2, 1, 0, 2.75, -13.5);
+    box(gDrive, 'drive', M.pan, 27.6, 0.12, 27.6, 0, 1.72, 0);
+
+    function swerve(sx, sz) {
+      var g = group(gDrive, sx * 11.25, 0, sz * 11.25);
+      box(g, 'drive', M.aluDark, 5.6, 0.3, 5.6, 0, 3.95, 0);
+      cyl(g, 'drive', M.rubber, 2, 1.5, 'z', 0, 2, 0);
+      cyl(g, 'drive', M.alu, 1.15, 1.58, 'z', 0, 2, 0);
+      box(g, 'drive', M.aluDark, 3.4, 2.6, 0.25, 0, 2.5, 0.98);
+      box(g, 'drive', M.aluDark, 3.4, 2.6, 0.25, 0, 2.5, -0.98);
+      cyl(g, 'drive', M.motor, 1.18, 3.4, 'y', -sx * 1.35, 5.8, -sz * 1.35);
+      cyl(g, 'drive', M.motor, 1.18, 3.4, 'y', sx * 1.3, 5.8, -sz * 1.4);
+      cyl(g, 'drive', M.steel, 0.6, 0.9, 'y', -sx * 1.4, 4.55, sz * 1.55);
+    }
+    swerve(1, 1); swerve(1, -1); swerve(-1, 1); swerve(-1, -1);
+
+    // bumpers: 3.25 in thick, 2.0 to 6.75 in off the carpet
+    box(gDrive, 'drive', M.bumper, 3.25, 4.75, 34.5, 15.625, 4.375, 0);
+    box(gDrive, 'drive', M.bumper, 3.25, 4.75, 34.5, -15.625, 4.375, 0);
+    box(gDrive, 'drive', M.bumper, 28, 4.75, 3.25, 0, 4.375, 15.625);
+    box(gDrive, 'drive', M.bumper, 28, 4.75, 3.25, 0, 4.375, -15.625);
+    var numTex = null;
+    if (opts.numberTexture) {
+      numTex = new T.TextureLoader().load(opts.numberTexture, function () { requestRender(); });
+      numTex.encoding = T.sRGBEncoding;
+      numTex.anisotropy = 4;
+      var nh = 3.7, nw = nh * (opts.numberAspect || 4);
+      var nm = new T.MeshStandardMaterial({ map: numTex, transparent: true, roughness: 0.85, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2 });
+      nm.name = 'bumper_number';
+      [[17.27, 0, Math.PI / 2], [-17.27, 0, -Math.PI / 2], [0, 17.27, 0], [0, -17.27, Math.PI]].forEach(function (c) {
+        var pm = new T.Mesh(new T.PlaneGeometry(nw, nh), nm);
+        pm.position.set(c[0], 4.375, c[1]);
+        pm.rotation.y = c[2];
+        pm.userData.sub = 'drive'; pm.userData.decal = true;
+        gDrive.add(pm);
+      });
+    }
+
+    // electronics on the belly pan
+    if (CONCEPT_B) box(gDrive, 'drive', M.battery, 7.1, 3.0, 6.6, -7.5, 3.3, 5.6);
+    else box(gDrive, 'drive', M.battery, 7.1, 6.6, 3.0, -7.5, 5.1, 6.5);
+    box(gDrive, 'drive', M.red, 7.6, 1.6, 4.7, 0.5, 2.6, 5.4);
+    box(gDrive, 'drive', M.rio, 5.7, 1.3, 5.6, -6.6, 2.45, -4.4);
+    box(gDrive, 'drive', M.red, 2, 1.8, 1.6, -3.0, 2.7, 10.6);
+    box(gDrive, 'drive', M.rio, 4.5, 1.2, 4.5, 1.5, 2.4, -4.6);
+
+    /* elevator: three-stage continuous, rails centred at x = 6 */
+    var EX = 6;
+    box(gElev, 'elev', M.alu, 2, 2, 26, EX, 2.75, 0);
+    box(gElev, 'elev', M.alu, 2, 34, 1, EX, 21, 11.5);
+    box(gElev, 'elev', M.alu, 2, 34, 1, EX, 21, -11.5);
+    tube(gElev, 'elev', M.alu, [5, 30, 11.5], [-8, 3.75, 13.2], 0.5);
+    box(gElev, 'elev', M.aluDark, 3, 3.6, 2.2, 3.4, 6, 11.4);
+    cyl(gElev, 'elev', M.motor, 1.18, 3.4, 'x', 0.3, 5.3, 11.3);
+    cyl(gElev, 'elev', M.motor, 1.18, 3.4, 'x', 0.3, 7.9, 11.3);
+    var st1 = group(gElev), st2 = group(gElev), carriage = group(gElev, EX, 24.5, 0);
+    box(st1, 'elev', M.alu, 1.5, 34, 0.9, EX, 21.75, 10.45);
+    box(st1, 'elev', M.alu, 1.5, 34, 0.9, EX, 21.75, -10.45);
+    box(st1, 'elev', M.alu, 1, 1.5, 20, EX, 5.5, 0);
+    box(st2, 'elev', M.alu, 1.25, 34, 0.9, EX, 22.5, 9.45);
+    box(st2, 'elev', M.alu, 1.25, 34, 0.9, EX, 22.5, -9.45);
+    box(st2, 'elev', M.alu, 1, 1.5, 18, EX, 7.25, 0);
+    var carPts = [[-1.6, -18], [1.6, -18], [1.6, -8], [2.2, -2.2], [2.2, 2.2], [-2.2, 2.2], [-2.2, -2.2], [-1.6, -8]];
+    plate(carriage, 'elev', M.aluDark, carPts, 0.25, 8.2);
+    plate(carriage, 'elev', M.aluDark, carPts, 0.25, -8.2);
+    box(carriage, 'elev', M.steel, 2, 2, 0.7, 0, -17, 8.75);
+    box(carriage, 'elev', M.steel, 2, 2, 0.7, 0, -17, -8.75);
+    box(carriage, 'elev', M.steel, 2, 2, 0.7, 0, -9, 8.75);
+    box(carriage, 'elev', M.steel, 2, 2, 0.7, 0, -9, -8.75);
+    cyl(carriage, 'coral', M.motor, 1.18, 3.2, 'z', 0, -12, 6.4);
+
+    /* wrist: pass-through coral box with the algae claw on top */
+    var wrist = group(carriage);
+    var wPts = [[-1.7, -1.7], [4, -3.5], [16, -3.5], [16, 3.5], [4, 3.5], [-1.7, 1.7]];
+    plate(wrist, 'coral', M.aluDark, wPts, 0.2, 4.7);
+    plate(wrist, 'coral', M.aluDark, wPts, 0.2, -4.7);
+    cyl(wrist, 'coral', M.steel, 0.55, 3.3, 'z', 0, 0, 6.45);
+    cyl(wrist, 'coral', M.steel, 0.55, 3.3, 'z', 0, 0, -6.45);
+    [[7, 2.9], [13, 2.9], [7, -2.9], [13, -2.9]].forEach(function (q) {
+      cyl(wrist, 'coral', M.rollO, 0.65, 8.8, 'z', q[0], q[1], 0);
+    });
+    cyl(wrist, 'coral', M.motor, 1.18, 3.2, 'z', 6.2, 0.2, 6.5);
+    var sPts = [[7.6, -3.5], [8.0, -13.4], [10.2, -13.4], [12.8, -5.4], [12.8, -3.5]];
+    plate(wrist, 'algae', M.aluDark, sPts, 0.2, 4.95);
+    plate(wrist, 'algae', M.aluDark, sPts, 0.2, -4.95);
+    cyl(wrist, 'algae', M.rollG, 0.9, 12, 'z', 11.55, -4.5, 0);
+    cyl(wrist, 'algae', M.rollG, 0.9, 12, 'z', 9.05, -12.5, 0);
+    cyl(wrist, 'algae', M.motor, 1.18, 3.2, 'z', 9.6, -8.6, -6.7);
+    box(wrist, 'vision', M.lens, 0.9, 0.8, 0.6, 5.2, 3.95, 0);
+    box(wrist, 'vision', M.lens, 1.1, 0.7, 0.9, 15.2, 3.9, 0);
+
+    function coralPiece(parent) {
+      var g = group(parent);
+      var c = add(g, new T.CylinderGeometry(2.25, 2.25, 11.875, 36, 1, true), M.pvc, 'piece', null, false);
+      c.geometry.rotateZ(Math.PI / 2);
+      var inner = add(g, new T.CylinderGeometry(2.0, 2.0, 11.875, 36, 1, true), M.pvc, 'piece', null, false);
+      inner.geometry.rotateZ(Math.PI / 2);
+      [-5.9375, 5.9375].forEach(function (x) {
+        var r = add(g, new T.RingGeometry(2.0, 2.25, 36), M.pvc, 'piece', [x, 0, 0], false);
+        r.rotation.y = Math.PI / 2;
+      });
+      return g;
+    }
+    function algaePiece(parent) {
+      return add(parent, new T.SphereGeometry(8.125, 40, 28), M.algae, 'piece', null, false);
+    }
+    var heldCoral = coralPiece(wrist); heldCoral.position.set(10, 0, 0);
+    var heldAlgae = algaePiece(wrist); heldAlgae.position.set(17.9, -10.87, 0);
+
+    /* station funnel */
+    if (CONCEPT_B) {
+      tube(gFunnel, 'funnel', M.alu, [-13.5, 4.1, 12.7], [-13.5, 35.75, 12.7], 0.5);
+      tube(gFunnel, 'funnel', M.alu, [-13.5, 4.1, -12.7], [-13.5, 35.75, -12.7], 0.5);
+    } else {
+      tube(gFunnel, 'funnel', M.alu, [-13.5, 3.75, 7.9], [-13.5, 35.75, 12.6], 0.5);
+      tube(gFunnel, 'funnel', M.alu, [-13.5, 3.75, -7.9], [-13.5, 35.75, -12.6], 0.5);
+    }
+    cyl(gFunnel, 'funnel', M.steel, 0.4, 26, 'z', -13.5, 35.75, 0);
+    cyl(gFunnel, 'funnel', M.steel, 0.35, 23, 'z', 3.2, 25.6, 0);
+    box(gFunnel, 'funnel', M.aluDark, 2.4, 0.8, 0.25, 4.2, 25.6, 11.9);
+    box(gFunnel, 'funnel', M.aluDark, 2.4, 0.8, 0.25, 4.2, 25.6, -11.9);
+    var hopper = group(gFunnel, -13.5, 35.75, 0);
+    (function () {
+      var s = new T.Shape();
+      s.moveTo(0, -12.5); s.lineTo(20.55, -3.5); s.lineTo(20.55, 3.5); s.lineTo(0, 12.5); s.closePath();
+      var g = new T.ExtrudeGeometry(s, { depth: 0.14, bevelEnabled: false });
+      g.rotateX(Math.PI / 2);
+      add(hopper, g, M.poly, 'funnel', [0, 0, 0]);
+      var a = Math.atan2(9, 20.55), len = Math.sqrt(20.55 * 20.55 + 81);
+      var w1 = box(hopper, 'funnel', M.poly, len, 4.5, 0.14, 10.275, 2.25, 8.0); w1.rotation.y = a;
+      var w2 = box(hopper, 'funnel', M.poly, len, 4.5, 0.14, 10.275, 2.25, -8.0); w2.rotation.y = -a;
+    })();
+    var funnelCoral = coralPiece(hopper); funnelCoral.position.set(9.5, 2.45, 0.6); funnelCoral.rotation.y = 0.12;
+
+
+    /* concept B: rear floor feeder. Split vectoring roller, kick ramp, 30 degree run into the wrist nose */
+    var intk = null, rampCoral = null, floorProps = null;
+    var PV = [-12.8, 10.2];
+    if (CONCEPT_B) {
+      var gIntake = group(robot);
+      box(gIntake, 'intake', M.aluDark, 2.6, 7.3, 0.25, -12.7, 7.75, 11.75);
+      box(gIntake, 'intake', M.aluDark, 2.6, 7.3, 0.25, -12.7, 7.75, -11.75);
+      cyl(gIntake, 'intake', M.motor, 1.18, 3.0, 'z', PV[0], PV[1] + 0.1, -9.9);
+      intk = group(gIntake, PV[0], PV[1], 0);
+      var L = function (x, y) { return [x - PV[0], y - PV[1]]; };
+      cyl(intk, 'intake', M.steel, 0.4, 23.9, 'z', 0, 0, 0);
+      var aPts = [L(-11.6, 11.6), L(-15.4, 16.6), L(-21.8, 13.3), L(-30.0, 6.5), L(-30.3, 4.3), L(-28.2, 1.2), L(-21.0, 5.3), L(-12.4, 8.9)];
+      plate(intk, 'intake', M.aluDark, aPts, 0.2, 11.2);
+      plate(intk, 'intake', M.aluDark, aPts, 0.2, -11.2);
+      // fence: a sideways coral stops here, on the carpet, under the split roller
+      box(intk, 'intake', M.aluDark, 0.15, 3.3, 7.3, -27.4 - PV[0], 1.95 - PV[1], 7.4);
+      box(intk, 'intake', M.aluDark, 0.15, 3.3, 7.3, -27.4 - PV[0], 1.95 - PV[1], -7.4);
+      // throat: 7.5 in wide kick ramp from the lip (-27.5, 0.15) to the knee (-21, 6.3), then a 30 degree run
+      var k1 = box(intk, 'intake', M.poly, 8.95, 0.12, 7.5, -24.25 - PV[0], 3.225 - PV[1], 0); k1.rotation.z = 43.4 * D2R;
+      [3.8, -3.8].forEach(function (z) { var w = box(intk, 'intake', M.poly, 8.95, 3.0, 0.12, -25.28 - PV[0], 4.31 - PV[1], z); w.rotation.z = 43.4 * D2R; });
+      var run = group(intk, -21 - PV[0], 6.3 - PV[1], 0); run.rotation.z = 30 * D2R;
+      box(run, 'intake', M.poly, 12.12, 0.12, 7.5, 6.06, -0.06, 0);
+      box(run, 'intake', M.poly, 12.12, 3.2, 0.12, 6.06, 1.6, 3.8);
+      box(run, 'intake', M.poly, 12.12, 3.2, 0.12, 6.06, 1.6, -3.8);
+      // R1: split roller of 2 in vectored wheels, one motor per half
+      var r1 = L(-29.3, 5.1);
+      [-1, 1].forEach(function (sd) {
+        cyl(intk, 'intake', M.steel, 0.25, 10.1, 'z', r1[0], r1[1], sd * 5.75);
+        [1.6, 3.7, 5.8, 7.9, 10.0].forEach(function (z) { cyl(intk, 'intake', M.vec, 1.0, 0.875, 'z', r1[0], r1[1], sd * z); });
+        cyl(intk, 'intake', M.motor, 0.87, 2.4, 'z', -27.0 - PV[0], 7.3 - PV[1], sd * 9.7);
+      });
+      // R2 over the knee and R3 at the top of the run: flex wheels across the throat
+      var r2 = L(-21.3, 11.9), r3 = L(-15.4, 15.3);
+      cyl(intk, 'intake', M.steel, 0.25, 22.2, 'z', r2[0], r2[1], 0);
+      [-2.2, 0, 2.2].forEach(function (z) { cyl(intk, 'intake', M.rollG, 1.0, 1.0, 'z', r2[0], r2[1], z); });
+      cyl(intk, 'intake', M.steel, 0.25, 22.2, 'z', r3[0], r3[1], 0);
+      [-2.2, 0, 2.2].forEach(function (z) { cyl(intk, 'intake', M.rollO, 1.0, 1.0, 'z', r3[0], r3[1], z); });
+      cyl(intk, 'intake', M.motor, 0.87, 2.4, 'z', -18.4 - PV[0], 13.7 - PV[1], 9.7);
+      box(intk, 'vision', M.lens, 0.7, 0.7, 0.9, -21.6 - PV[0], 8.1 - PV[1], 7);
+      box(intk, 'vision', M.lens, 0.7, 0.7, 0.9, -21.6 - PV[0], 8.1 - PV[1], -7);
+      rampCoral = coralPiece(intk); rampCoral.rotation.z = 30 * D2R;
+      // coral lying on the carpet: sideways under the roller, end-on further out, and one upright
+      floorProps = group(scene);
+      var f1 = coralPiece(floorProps); f1.position.set(-29.9, 2.27, 0.8); f1.rotation.y = Math.PI / 2 + 0.16;
+      var f2 = coralPiece(floorProps); f2.position.set(-47, 2.27, -11); f2.rotation.y = 0.45;
+      var f3 = coralPiece(floorProps); f3.position.set(-52, 5.94, 13); f3.rotation.z = Math.PI / 2;
+    }
+
+    /* deep-cage climber on the left rail */
+    var CX = -1.5, CZ = -12.4, CY = 16, ARM = 9.2;
+    box(gClimb, 'climb', M.aluDark, 0.25, 13.75, 3.2, CX + 5.9, 10.625, CZ);
+    box(gClimb, 'climb', M.aluDark, 0.25, 13.75, 3.2, CX - 5.9, 10.625, CZ);
+    cyl(gClimb, 'climb', M.steel, 0.5, 12.6, 'x', CX, CY, CZ);
+    box(gClimb, 'climb', M.aluDark, 2.4, 4.6, 3, CX - 7.3, CY, CZ + 0.3);
+    cyl(gClimb, 'climb', M.motor, 1.18, 3.2, 'x', CX - 10.1, CY + 1.25, CZ + 0.3);
+    cyl(gClimb, 'climb', M.motor, 1.18, 3.2, 'x', CX - 10.1, CY - 1.25, CZ + 0.3);
+    var arm = group(gClimb, CX, CY, CZ);
+    box(arm, 'climb', M.alu, 0.25, 2.6, 14.6, 4.5, 0, -6.3);
+    box(arm, 'climb', M.alu, 0.25, 2.6, 14.6, -4.5, 0, -6.3);
+    cyl(arm, 'climb', M.steel, 0.4, 9, 'x', 0, 0, -5.1);
+    box(arm, 'climb', M.rollO, 1.1, 1.8, 0.6, 3.75, 0, -13.25);
+    box(arm, 'climb', M.rollO, 1.1, 1.8, 0.6, -3.75, 0, -13.25);
+    box(arm, 'climb', M.alu, 9, 1, 0.25, 0, -0.8, 0.6);
+    function cageProp(parent) {
+      var g = group(parent);
+      [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (q) {
+        cyl(g, 'prop', M.cage, 0.66, 24, 'y', q[0] * 3.03, 12, q[1] * 3.03);
+      });
+      box(g, 'prop', M.cage, 6.75, 0.14, 6.75, 0, 0.07, 0);
+      box(g, 'prop', M.cage, 6.75, 0.14, 6.75, 0, 23.93, 0);
+      cyl(g, 'prop', M.zinc, 0.3, 1.6, 'y', 0, 24.8, 0);
+      var ring = add(g, new T.TorusGeometry(0.6, 0.16, 10, 24), M.zinc, 'prop', [0, 26.1, 0], false);
+      ring.rotation.y = Math.PI / 2;
+      return g;
+    }
+    var armCage = cageProp(arm); armCage.position.set(0, 3.1 - CY, -ARM);
+
+    /* vision and sensors */
+    function camera3(parent, x, y, z, yaw, pitch) {
+      var g = group(parent, x, y, z);
+      g.rotation.order = 'YXZ';
+      g.rotation.y = yaw; g.rotation.z = pitch;
+      box(g, 'vision', M.cam, 1.2, 1.5, 1.7, 0, 0, 0);
+      cyl(g, 'vision', M.lens, 0.42, 0.5, 'x', 0.8, 0, 0);
+      var cone = new T.Mesh(new T.ConeGeometry(15, 30, 4, 1, true), new T.MeshBasicMaterial({ color: 0x2d7fd0, transparent: true, opacity: 0.13, side: T.DoubleSide, depthWrite: false }));
+      cone.geometry.rotateY(Math.PI / 4);
+      cone.geometry.rotateZ(Math.PI / 2);
+      cone.position.x = 15.8;
+      cone.userData.cone = true; cone.visible = false;
+      g.add(cone);
+      return g;
+    }
+    var cones = [];
+    [camera3(gVision, 7.7, 9.6, 11.5, 18 * D2R, 12 * D2R), camera3(gVision, 7.7, 9.6, -11.5, -18 * D2R, 12 * D2R),
+     camera3(gVision, -13.0, 31.5, 11.9, Math.PI, 22 * D2R)].forEach(function (g) {
+      g.traverse(function (o) { if (o.userData.cone) cones.push(o); });
+    });
+
+    /* ---------- field props ---------- */
+    var props = {};
+    function tagTexture() {
+      var c = document.createElement('canvas'); c.width = c.height = 160;
+      var x = c.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, 160, 160);
+      x.fillStyle = '#111'; x.fillRect(16, 16, 128, 128);
+      x.fillStyle = '#fff';
+      var cells = ['011010', '100110', '010011', '110100', '001101', '101010'];
+      cells.forEach(function (row, r) { row.split('').forEach(function (v, k) { if (v === '1') x.fillRect(32 + k * 16, 32 + r * 16, 16, 16); }); });
+      var t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.magFilter = T.NearestFilter;
+      return t;
+    }
+    var tagTex = tagTexture();
+    function aprilTag(parent, x, y, z, rotY) {
+      var g = group(parent, x, y, z); g.rotation.y = rotY;
+      box(g, 'prop', M.tagW, 10.5, 10.5, 0.25, 0, 0, 0);
+      var m = new T.Mesh(new T.PlaneGeometry(8.125, 8.125), new T.MeshStandardMaterial({ map: tagTex, roughness: 0.8 }));
+      m.material.name = 'apriltag';
+      m.position.z = 0.14; m.userData.sub = 'prop'; g.add(m);
+      return g;
+    }
+
+    // one reef face, the robot's bumper touching it at x = 17.25
+    (function () {
+      var g = props.reef = group(scene);
+      var XF = 17.25, XM = XF + 12.84;
+      box(g, 'prop', M.hdpe, 0.5, 17.88, 37.8, XF + 0.25, 8.94, 0);
+      box(g, 'prop', M.hdpe, 16, 0.5, 37.8, XF + 8.5, 0.6, 0);
+      var floor = box(g, 'prop', M.hdpe, 9.6, 0.25, 37.8, XF + 5.0, 14.6, 0); floor.rotation.z = -0.34;
+      box(g, 'prop', M.hdpe, 0.25, 10, 37.8, XF + 9.6, 17.9, 0);
+      box(g, 'prop', M.hdpe, 7, 0.25, 37.8, XF + 13.1, 22.8, 0);
+      box(g, 'prop', M.hdpe, 9.2, 11.6, 37.8, XF + 5.1, 6.4, 0);
+      box(g, 'prop', M.hdpe, 7, 21.9, 37.8, XF + 13.1, 11.55, 0);
+      aprilTag(g, XF - 0.14, 12.13, 0, -Math.PI / 2);
+      [6.47, -6.47].forEach(function (z) {
+        tube(g, 'prop', M.violet, [XM, 0.63, z], [XM, 53.8, z], 0.83);
+        tube(g, 'prop', M.violet, [XM, 23.7, z], [XF + 1.61, 31.72, z], 0.83);
+        tube(g, 'prop', M.violet, [XM, 39.55, z], [XF + 1.61, 47.59, z], 0.83);
+        tube(g, 'prop', M.violet, [XM, 53.8, z], [XF + 1.18, 61.96, z], 0.83);
+        tube(g, 'prop', M.violet, [XF + 1.18, 61.96, z], [XF + 1.18, 71.87, z], 0.83);
+        add(g, new T.SphereGeometry(0.83, 16, 12), M.violet, 'prop', [XM, 53.8, z], false);
+        add(g, new T.SphereGeometry(0.83, 16, 12), M.violet, 'prop', [XF + 1.18, 61.96, z], false);
+      });
+      props.reefLow = algaePiece(g); props.reefLow.position.set(XF + 6.65, 35.6, 0); props.reefLow.userData.sub = 'prop';
+      props.reefHigh = algaePiece(g); props.reefHigh.position.set(XF + 6.65, 51.45, 0); props.reefHigh.userData.sub = 'prop';
+      // a coral already scored on the far L4 branch, for scale
+      var sc = coralPiece(g); sc.rotation.z = Math.PI / 2; sc.position.set(XF + 1.18, 66.4, -6.47);
+      props.reefScored = sc;
+    })();
+
+    // coral station behind the robot, rear bumper at x = -17.25
+    (function () {
+      var g = props.station = group(scene);
+      var XS = -17.5;
+      box(g, 'prop', M.diamond, 0.5, 37.5, 76, XS, 18.75, 0);
+      var up = box(g, 'prop', M.wall, 0.3, 31, 76, XS, 60, 0);
+      up.userData.keepOpacity = true;
+      var ramp = box(g, 'prop', M.hdpe, 16.5, 0.5, 76, XS - 4.73, 44.26, 0); ramp.rotation.z = -55 * D2R;
+      aprilTag(g, XS + 0.35, 58.5, 0, Math.PI / 2);
+      var c = coralPiece(g); c.rotation.z = -55 * D2R; c.position.set(XS - 4.6, 48.6, 4);
+      props.stationCoral = c;
+    })();
+
+    // processor wall in front of the robot
+    (function () {
+      var g = props.processor = group(scene);
+      var XP = 22.6;
+      box(g, 'prop', M.hdpe, 0.5, 7, 46, XP, 3.5, 0);
+      box(g, 'prop', M.hdpe, 0.5, 20, 9, XP, 17, 18.5);
+      box(g, 'prop', M.hdpe, 0.5, 20, 9, XP, 17, -18.5);
+      box(g, 'prop', M.hdpe, 0.5, 2.5, 46, XP, 28.25, 0);
+      var up = box(g, 'prop', M.wall, 0.3, 24, 46, XP, 41.5, 0); up.userData.keepOpacity = true;
+      var r = box(g, 'prop', M.hdpe, 18, 0.4, 28, XP + 9, 5.5, 0); r.rotation.z = -0.08;
+      aprilTag(g, XP - 0.4, 51.1, 0, -Math.PI / 2);
+    })();
+
+    // barge net: lowest point 76 in, rim near 88 in on the field drawing
+    (function () {
+      var g = props.net = group(scene);
+      var XN = 18.5;
+      tube(g, 'prop', M.zinc, [XN, 88.5, -40], [XN, 88.5, 40], 0.6);
+      tube(g, 'prop', M.zinc, [XN + 48, 88.5, -40], [XN + 48, 88.5, 40], 0.6);
+      var geo = new T.PlaneGeometry(48, 80, 12, 1);
+      var pos = geo.attributes.position;
+      for (var i = 0; i < pos.count; i++) { var px = pos.getX(i) / 24; pos.setZ(i, -12.5 * (1 - px * px)); }
+      geo.computeVertexNormals();
+      var n = add(g, geo, M.net, 'prop', [XN + 24, 88.5, 0], false);
+      n.rotation.x = -Math.PI / 2; n.castShadow = false;
+      n.userData.keepOpacity = true;
+      box(g, 'prop', M.alu, 12, 12, 80, XN + 24, 68, 0).userData.keepOpacity = true;
+    })();
+
+    // truss, chain and the hanging cage for the climb
+    (function () {
+      var g = props.truss = group(scene);
+      props.trussBeam = box(g, 'prop', M.alu, 70, 12, 12, CX, 68, 0);
+      props.chain = tube(g, 'prop', M.zinc, [0, 0, 0], [0, 1, 0], 0.28);
+      props.freeCage = cageProp(g);
+    })();
+
+    // rule envelopes
+    var envelope = group(scene);
+    (function () {
+      function wire(w, h, d, y, color) {
+        var l = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(w, h, d)), new T.LineBasicMaterial({ color: color, transparent: true, opacity: 0.9 }));
+        l.position.y = y; l.userData.helper = true; envelope.add(l); return l;
+      }
+      wire(28, 42, 28, 21, 0xe0a100);
+      wire(64, 118, 64, 59, 0xd2452f);
+    })();
+    envelope.visible = false;
+
+    /* ---------- kinematics ---------- */
+    var state = { yp: 24.5, th: 90, hop: -30, eject: 0, climb: 0, coral: 1, algae: 0, fcoral: 0, explode: 0, ink: 130, rc: 0, fl: 0, rcv: 0 };
+    var CG = new T.Vector3(0, 10, 0);
+    var Tloc = new T.Vector3(), tmpV = new T.Vector3();
+    var EXPL = { elev: [0, 16, 0], wrist: [15, 3, 0], funnel: [-17, 13, 0], climb: [0, 3, -17], vision: [0, 0, 0], drive: [0, 0, 0] };
+
+    function applyState() {
+      var s = state, t = s.yp - 24.5;
+      var c = Math.min(t, 22), s2 = Math.min(Math.max(t - 22, 0), 22), s1 = Math.max(t - 44, 0);
+      var e = s.explode;
+      st1.position.y = s1; st2.position.y = s1 + s2;
+      carriage.position.set(EX, s.yp, 0);
+      gElev.position.set(EXPL.elev[0] * e, EXPL.elev[1] * e, 0);
+      wrist.position.set(EXPL.wrist[0] * e, EXPL.wrist[1] * e, 0);
+      wrist.rotation.z = s.th * D2R;
+      gFunnel.position.set(EXPL.funnel[0] * e, EXPL.funnel[1] * e, 0);
+      gClimb.position.set(0, EXPL.climb[1] * e, EXPL.climb[2] * e);
+      hopper.rotation.z = s.hop * D2R;
+      heldCoral.position.x = 10 + s.eject;
+      heldCoral.visible = s.coral > 0.5;
+      heldAlgae.visible = s.algae > 0.5;
+      funnelCoral.visible = s.fcoral > 0.5;
+      if (intk) {
+        intk.rotation.z = -s.ink * D2R;
+        var cx0 = -18 + (-10.6 + 18) * s.rc, cy0 = 24.5 + 0.5774 * (cx0 - 6);
+        rampCoral.position.set(cx0 - PV[0], cy0 - PV[1], 0);
+        rampCoral.visible = s.rcv > 0.5;
+        floorProps.visible = s.fl > 0.5;
+      }
+
+      // climb: phase A deploys the fork and strafes in, phase B rotates the cage and lifts
+      var k = s.climb, alpha = 90, zr = 0, yr = 0, roll = 0, latched = false;
+      var ZA = 1.0;                       // chain line, world z
+      if (k > 0) {
+        if (k < 0.12) {
+          zr = (ZA + ARM - CZ + 10) * (k / 0.12);
+        } else if (k < 0.35) {
+          var a = (k - 0.12) / 0.23;
+          alpha = 90 * (1 - a);
+          zr = (ZA + ARM - CZ) + 10 * (1 - a);
+        } else {
+          var b = (k - 0.35) / 0.65;
+          alpha = 108 * b; latched = true;
+          var ar = alpha * D2R;
+          var ty = CY + 11.1 * Math.cos(ar) + ARM * Math.sin(ar);
+          var tz = CZ + 11.1 * Math.sin(ar) - ARM * Math.cos(ar);
+          Tloc.set(CX, ty, tz);
+          yr = Math.max(0, 27.1 - ty);
+          if (yr > 0) roll = Math.atan(-(CG.z - tz) / (CG.y - ty)) * Math.min(1, yr / 3);
+          robot.rotation.x = roll;
+          tmpV.copy(Tloc).applyEuler(robot.rotation);
+          zr = ZA - tmpV.z;
+          if (yr > 0) yr = 27.1 - tmpV.y;
+        }
+      }
+      robot.rotation.x = roll;
+      robot.position.set(0, yr, zr);
+      cam.tz = zr;
+      arm.rotation.x = alpha * D2R;
+      armCage.visible = latched;
+      props.truss.visible = k > 0.02;
+      if (k > 0.02) {
+        props.trussBeam.position.set(CX, 68, ZA);
+        props.freeCage.visible = !latched;
+        props.freeCage.position.set(CX, 3.1, ZA);
+        var top = new T.Vector3(CX, 27.1 + 1.9, ZA);
+        if (latched) { robot.updateMatrixWorld(true); top.set(0, 26.2, 0); armCage.localToWorld(top); }
+        var anchor = new T.Vector3(CX, 62, ZA);
+        props.chain.position.copy(top).add(anchor).multiplyScalar(0.5);
+        props.chain.scale.set(1, top.distanceTo(anchor), 1);
+        props.chain.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), anchor.clone().sub(top).normalize());
+      }
+    }
+
+    /* ---------- poses ---------- */
+    var POSES = {
+      start:     { yp: 24.5, th: -90, hop: -30, eject: 0, climb: 0, coral: 1, algae: 0, fcoral: 0, prop: null, view: [38, 70, 150, 19] },
+      station:   { yp: 24.5, th: -30, hop: -30, eject: 0, climb: 0, coral: 1, algae: 0, fcoral: 1, prop: 'station', view: [68, 66, 215, 30] },
+      l2:        { yp: 40.73, th: -35, hop: -30, eject: 2, climb: 0, coral: 1, algae: 0, fcoral: 0, prop: 'reef', reef: 'high', reefZ: -6.47, view: [58, 72, 190, 32] },
+      l3:        { yp: 56.6, th: -35, hop: -30, eject: 2, climb: 0, coral: 1, algae: 0, fcoral: 0, prop: 'reef', reef: 'none', reefZ: -6.47, view: [58, 72, 200, 36] },
+      l4:        { yp: 87, th: -50, hop: -30, eject: 4, climb: 0, coral: 1, algae: 0, fcoral: 0, prop: 'reef', reef: 'low', reefZ: -6.47, view: [60, 76, 245, 46] },
+      algae:     { yp: 62.32, th: 0, hop: -30, eject: 0, climb: 0, coral: 0, algae: 1, fcoral: 0, prop: 'reef', reef: 'none', reefZ: 0, view: [58, 72, 205, 38] },
+      processor: { yp: 27.5, th: 0, hop: -30, eject: 0, climb: 0, coral: 0, algae: 1, fcoral: 0, prop: 'processor', view: [50, 68, 185, 24] },
+      net:       { yp: 90, th: 75, hop: -30, eject: 0, climb: 0, coral: 0, algae: 1, fcoral: 0, prop: 'net', view: [62, 78, 310, 56] },
+      climb:     { yp: 24.5, th: -20, hop: -90, eject: 0, climb: 1, coral: 0, algae: 0, fcoral: 0, prop: 'truss', view: [-52, 72, 225, 36] },
+      bstow:     { yp: 24.5, th: -75, hop: -30, eject: 0, climb: 0, coral: 1, algae: 0, fcoral: 0, prop: null, ink: 130, view: [146, 70, 165, 18] },
+      floor:     { yp: 24.5, th: -150, hop: -30, eject: 0, climb: 0, coral: 0, algae: 0, fcoral: 0, prop: null, ink: 0, rc: 0, fl: 1, rcv: 0, view: [140, 72, 185, 13] },
+      handoff:   { yp: 24.5, th: -150, hop: -30, eject: 0, climb: 0, coral: 0, algae: 0, fcoral: 0, prop: null, ink: 0, rc: 1, fl: 0, rcv: 1, view: [104, 80, 150, 15] },
+      bl4:       { yp: 87, th: -50, hop: -30, eject: 4, climb: 0, coral: 1, algae: 0, fcoral: 0, prop: 'reef', reef: 'low', reefZ: -6.47, ink: 130, view: [60, 76, 245, 46] }
+    };
+    var currentPose = CONCEPT_B ? 'bstow' : 'start';
+
+    var cam = { az: 38 * D2R, pol: 68 * D2R, r: 150, ty: 22, tx: 2, tz: 0 };
+    function placeCamera() {
+      var sp = Math.sin(cam.pol), cp = Math.cos(cam.pol);
+      camera.position.set(cam.tx + cam.r * sp * Math.cos(cam.az), cam.ty + cam.r * cp, cam.tz + cam.r * sp * Math.sin(cam.az));
+      camera.lookAt(cam.tx, cam.ty, cam.tz);
+    }
+
+    function setProps(p) {
+      props.reef.visible = p.prop === 'reef';
+      props.station.visible = p.prop === 'station';
+      props.processor.visible = p.prop === 'processor';
+      props.net.visible = p.prop === 'net';
+      props.reefLow.visible = p.reef === 'low';
+      props.reefHigh.visible = p.reef === 'high';
+      props.reef.position.z = p.reefZ || 0;
+      if (!showField) { props.reef.visible = props.station.visible = props.processor.visible = props.net.visible = false; }
+    }
+
+    var tween = null, dirty = true, showField = true;
+    function requestRender() { dirty = true; }
+    function setPose(name, instant) {
+      var p = POSES[name]; if (!p) return;
+      currentPose = name;
+      var keys = ['yp', 'th', 'hop', 'eject', 'climb', 'ink', 'rc'];
+      var from = {}, camFrom = { az: cam.az, pol: cam.pol, r: cam.r, ty: cam.ty };
+      keys.forEach(function (k) { from[k] = state[k]; });
+      var camTo = { az: p.view[0] * D2R, pol: p.view[1] * D2R, r: p.view[2], ty: p.view[3] };
+      // keep the turn short
+      while (camTo.az - camFrom.az > Math.PI) camTo.az -= 2 * Math.PI;
+      while (camTo.az - camFrom.az < -Math.PI) camTo.az += 2 * Math.PI;
+      state.coral = p.coral; state.algae = p.algae; state.fcoral = p.fcoral;
+      state.fl = p.fl || 0; state.rcv = p.rcv || 0;
+      setProps(p);
+      var dur = instant ? 0 : (name === 'climb' || from.climb > 0 ? 2600 : 900);
+      var t0 = performance.now();
+      tween = function (now) {
+        var u = dur ? Math.min(1, (now - t0) / dur) : 1;
+        var e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+        keys.forEach(function (k) { var to = p[k] !== undefined ? p[k] : (k === 'ink' ? 130 : 0); state[k] = from[k] + (to - from[k]) * e; });
+        ['az', 'pol', 'r', 'ty'].forEach(function (k) { cam[k] = camFrom[k] + (camTo[k] - camFrom[k]) * e; });
+        applyState(); placeCamera(); dirty = true;
+        if (u >= 1) { tween = null; if (opts.onPose) opts.onPose(name, measure()); }
+      };
+      if (instant) tween(t0);
+    }
+
+    function measure() {
+      // tallest point and reach past the 28 in frame, mechanism only
+      scene.updateMatrixWorld(true);
+      var b = new T.Box3(), bb = new T.Box3(), any = false;
+      meshes.forEach(function (m) {
+        var s = m.userData.sub;
+        if (s === 'prop' || s === 'piece' || !m.geometry || m.material.name === 'bumper_blue') return;
+        if (CONCEPT_B) {
+          // exact vertex bounds, since the stowed intake is a rotated outline
+          var pa = m.geometry.attributes.position, vv = new T.Vector3();
+          for (var i = 0; i < pa.count; i++) { vv.fromBufferAttribute(pa, i).applyMatrix4(m.matrixWorld); if (any) b.expandByPoint(vv); else { b.set(vv.clone(), vv.clone()); any = true; } }
+          return;
+        }
+        if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+        bb.copy(m.geometry.boundingBox).applyMatrix4(m.matrixWorld);
+        if (any) b.union(bb); else { b.copy(bb); any = true; }
+      });
+      var rz = robot.position.z, ry = robot.position.y;
+      var reach = Math.max(b.max.x - 14, -b.min.x - 14, b.max.z - rz - 14, -(b.min.z - rz) - 14, 0);
+      if (reach < 0.3) reach = 0;   // tilted tubes inflate their boxes slightly
+      return { height: b.max.y - ry, reach: reach, pivot: state.yp, lift: ry, wrist: state.th };
+    }
+
+    /* subsystem isolate */
+    var focus = null;
+    function setFocus(sub) {
+      focus = sub || null;
+      meshes.forEach(function (m) {
+        var s = m.userData.sub;
+        if (s === 'prop' || s === 'piece') return;
+        var on = !focus || s === focus;
+        m.material.transparent = on ? m.userData.baseTransparent : true;
+        m.material.opacity = on ? m.userData.baseOpacity : 0.07;
+        m.material.depthWrite = on;
+        m.castShadow = on;
+        m.children.forEach(function (c) { if (c.userData.edge) c.material.opacity = on ? 0.32 : 0.05; });
+      });
+      gDrive.children.forEach(function (c) { if (c.userData.decal) c.visible = !focus || focus === 'drive'; });
+      cones.forEach(function (c) { c.visible = focus === 'vision'; });
+      dirty = true;
+    }
+    function setExplode(on) {
+      var from = state.explode, to = on ? 1 : 0, t0 = performance.now();
+      var prev = tween;
+      tween = function (now) {
+        var u = Math.min(1, (now - t0) / 700);
+        state.explode = from + (to - from) * (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
+        applyState(); dirty = true;
+        if (u >= 1) tween = null;
+      };
+      if (prev) prev(performance.now() + 1e6);
+    }
+    function setEnvelope(on) { envelope.visible = !!on; dirty = true; }
+    function setField(on) { showField = !!on; setProps(POSES[currentPose]); dirty = true; }
+    function setView(az, pol) { cam.az = az * D2R; cam.pol = pol * D2R; placeCamera(); dirty = true; }
+
+    function setTheme(bg, floor) {
+      scene.background = new T.Color(bg);
+      ground.material.color.set(floor);
+      dirty = true;
+    }
+
+    /* ---------- orbit ---------- */
+    var ptrs = {}, pinch = 0;
+    canvas.addEventListener('pointerdown', function (e) { ptrs[e.pointerId] = [e.clientX, e.clientY]; try { canvas.setPointerCapture(e.pointerId); } catch (err) {} });
+    canvas.addEventListener('pointermove', function (e) {
+      var p = ptrs[e.pointerId]; if (!p) return;
+      var ids = Object.keys(ptrs);
+      if (ids.length === 1) {
+        cam.az += (e.clientX - p[0]) * 0.0085;
+        cam.pol = Math.min(1.54, Math.max(0.12, cam.pol - (e.clientY - p[1]) * 0.0065));
+      } else if (ids.length === 2) {
+        ptrs[e.pointerId] = [e.clientX, e.clientY];
+        var a = ptrs[ids[0]], b = ptrs[ids[1]], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+        if (pinch) cam.r = Math.min(520, Math.max(60, cam.r * pinch / d));
+        pinch = d;
+      }
+      ptrs[e.pointerId] = [e.clientX, e.clientY];
+      placeCamera(); dirty = true;
+    });
+    function up(e) { delete ptrs[e.pointerId]; pinch = 0; }
+    canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      cam.r = Math.min(520, Math.max(60, cam.r * (1 + Math.sign(e.deltaY) * 0.08)));
+      placeCamera(); dirty = true;
+    }, { passive: false });
+
+    function resize() {
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      dirty = true;
+    }
+    if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas); else window.addEventListener('resize', resize);
+
+    function frame(now) {
+      if (tween) tween(now);
+      if (dirty) { renderer.render(scene, camera); dirty = false; }
+      requestAnimationFrame(frame);
+    }
+
+    setTheme(opts.bg || '#e9eef1', opts.floor || '#596069');
+    applyState(); setPose(CONCEPT_B ? 'bstow' : 'start', true); resize();
+    requestAnimationFrame(frame);
+
+    return {
+      setPose: setPose, setFocus: setFocus, setExplode: setExplode, setEnvelope: setEnvelope, setField: setField,
+      setView: setView, setTheme: setTheme, measure: measure, poses: POSES,
+      three: { scene: scene, camera: camera, renderer: renderer, robot: robot, grid: grid, envelope: envelope, cones: cones, cam: cam, placeCamera: placeCamera,
+        render: function () { renderer.render(scene, camera); } }
+    };
+  }
+
+  window.KBViewer = { build: buildViewer };
+})();
+
+</script>
+<script>
+(function () {
+  var NOTES = {
+    start: ['Starting configuration', 'Everything sits inside the 28 in frame and under 42 in. One coral is preloaded in the wrist, which hangs straight down between the elevator rails.'],
+    station: ['Station pickup', 'Rear bumper on the station wall. Coral leaves the chute at 37.5 in, lands in the funnel 1.75 in below, slides at 30° and passes between the rails into the wrist rollers.'],
+    l2: ['Scoring L2', 'Wrist at −35° to match the branch. The branch tip is already inside the coral when the bumper touches. A high algae on this face does not block L2.'],
+    l3: ['Scoring L3', 'Same wrist angle, 16 in higher. Every L3 branch starts blocked, so this face has already had its algae removed.'],
+    l4: ['Scoring L4', 'Wrist pivot at 87 in, wrist at −50°. The open end of the coral goes over the vertical tip and the rollers push it on. The low algae underneath does not matter.'],
+    algae: ['Algae off the reef', 'Wrist level. The claw rollers pull the ball off the branches. Ball centre is 51.5 in on a high face and 35.6 in on a low face.'],
+    processor: ['Processor', 'The robot stops about 5 in short of the wall and rolls the ball through the 28 by 20 in opening.'],
+    net: ['Net', 'Full height, wrist at 75°. The claw lobs the ball forward over a rim near 88 in. The robot is about 106 in tall here, so drive acceleration is limited.'],
+    climb: ['Deep cage', 'Strafe into the cage, latch two pipes, rotate the fork 108°. The cage lies across the robot with its chain over the centre of gravity and the wheels about 4.5 in off the carpet. The funnel drops first so nothing touches the chain.']
+  };
+  var SUBS = {
+    '': null,
+    drive: ['Swerve drivebase', '28 × 28 in frame, 34.5 in across the bumpers, four modules, battery low on the right to balance the climber.'],
+    elev: ['Three-stage elevator', 'Continuous rigging: the carriage moves first, then the inner stage, then the middle stage. 65.5 in of pivot travel.'],
+    coral: ['Pass-through coral wrist', 'Coral enters from behind and leaves from the front. Stub-axle pivot keeps the bore open.'],
+    algae: ['Algae claw', 'Two wide rollers under the wrist hold the ball clear of the coral path.'],
+    funnel: ['Station funnel', 'Catch lip at 35.75 in on a rear hinge. Drops out of the way for the climb.'],
+    climb: ['Deep-cage climber', 'Fork and latches on the left rail, 108° of rotation, two motors.'],
+    vision: ['Vision and sensors', 'Blue cones show the three camera views. Small blue blocks on the wrist are the beam break and range sensor.']
+  };
+  var canvas = document.getElementById('rb-canvas');
+  var info = document.getElementById('info'), readout = document.getElementById('readout');
+  var pose = 'start', sub = '', last = null;
+
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function paint() {
+    var n = NOTES[pose], s = SUBS[sub];
+    info.innerHTML = '<strong>' + esc(n[0]) + '</strong><p>' + esc(n[1]) + '</p>' + (s ? '<strong style="margin-top:8px">' + esc(s[0]) + '</strong><p>' + esc(s[1]) + '</p>' : '');
+    if (last) {
+      readout.innerHTML = '<span>Tallest point <b>' + last.height.toFixed(1) + ' in</b></span><span>Reach past frame <b>' + last.reach.toFixed(1) + ' in</b></span><span>Wrist pivot <b>' + last.pivot.toFixed(1) + ' in</b></span>' + (last.lift > 0.2 ? '<span>Lifted <b>' + last.lift.toFixed(1) + ' in</b></span>' : '');
+    }
+  }
+  function press(group, el) {
+    Array.prototype.forEach.call(group, function (b) { b.setAttribute('aria-pressed', b === el ? 'true' : 'false'); });
+  }
+
+  var V = null;
+  try {
+    if (!window.THREE) throw new Error('3D library did not load');
+    V = window.KBViewer.build(canvas, {
+      numberTexture: 'data:image/png;base64,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', numberAspect: 4.076,
+      bg: css('--viewer-bg'), floor: css('--viewer-floor'),
+      onPose: function (name, m) { last = m; paint(); }
+    });
+    last = V.measure();
+  } catch (err) {
+    var stage = canvas.parentNode;
+    stage.innerHTML = '<p class="fallback">The interactive model needs WebGL, which is not available in this view. The renders above show the same robot.</p>';
+  }
+  paint();
+  if (!V) return;
+
+  var poseBtns = document.querySelectorAll('[data-pose]'), subBtns = document.querySelectorAll('[data-sub]');
+  Array.prototype.forEach.call(poseBtns, function (b) {
+    b.addEventListener('click', function () { pose = b.getAttribute('data-pose'); press(poseBtns, b); paint(); V.setPose(pose); });
+  });
+  Array.prototype.forEach.call(subBtns, function (b) {
+    b.addEventListener('click', function () { sub = b.getAttribute('data-sub'); press(subBtns, b); V.setFocus(sub); paint(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-view]'), function (b) {
+    b.addEventListener('click', function () { var v = b.getAttribute('data-view').split(','); V.setView(+v[0], +v[1]); });
+  });
+  document.getElementById('tg-explode').addEventListener('change', function (e) { V.setExplode(e.target.checked); });
+  document.getElementById('tg-env').addEventListener('change', function (e) { V.setEnvelope(e.target.checked); });
+  document.getElementById('tg-field').addEventListener('change', function (e) { V.setField(e.target.checked); });
+
+  function retheme() { V.setTheme(css('--viewer-bg'), css('--viewer-floor')); }
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', retheme); else if (mq.addListener) mq.addListener(retheme);
+  }
+  if (window.MutationObserver) new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
+</body>
+</html>

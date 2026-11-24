@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" viewBox="-34 -30 462 392" role="img" aria-label="Blue half of the REEFSCAPE field with the reef, coral stations, processor, barge and three autonomous routes" class="fig-svg field-svg">
+<style>
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.86rem; color: #55646e; }
+.legend i { display: inline-block; width: 14px; height: 4px; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+.legend i.dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* diagram classes */
+.carpet { fill: #e3e8ec; }
+.rail { stroke: #0f2029; stroke-width: 2; }
+.wall-blue { stroke: #1846b8; stroke-width: 4; }
+.station { stroke: #1846b8; stroke-width: 4; stroke-linecap: round; }
+.proc { fill: #1846b8; }
+.truss { fill: #0f2029; opacity: 0.16; }
+.centre { stroke: #0f2029; stroke-width: 0.6; stroke-dasharray: 3 3; opacity: 0.5; }
+.zone-blue { fill: none; stroke: #1846b8; stroke-width: 1.4; }
+.zone-red { fill: none; stroke: #c23b33; stroke-width: 1.4; opacity: 0.75; }
+.cage-blue { fill: #1846b8; } .cage-red { fill: #c23b33; opacity: 0.75; }
+.startline { stroke: #0f2029; stroke-width: 2; }
+.reefzone { fill: none; stroke: #1846b8; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.reef { fill: #d2cde0; stroke: #7a3ea3; stroke-width: 1.6; }
+.branch { fill: #7a3ea3; }
+.alg-lo { fill: #0b7f74; opacity: 0.85; }
+.alg-hi { fill: none; stroke: #0b7f74; stroke-width: 2.2; }
+.coral-dot { fill: #ffffff; stroke: #0f2029; stroke-width: 0.8; }
+.t { font-size: 7.4px; fill: #0f2029; opacity: 0.82; }
+.t-dim { font-size: 6.6px; fill: #0f2029; opacity: 0.62; }
+.t-strong { font-size: 8px; font-weight: 600; fill: #0f2029; letter-spacing: 0.04em; }
+.t-branch { font-size: 7.6px; font-weight: 600; fill: #7a3ea3; }
+.t-tag { font-size: 6px; fill: #0f2029; opacity: 0.6; font-family: ui-monospace, Menlo, monospace; }
+.t-num { font-size: 7px; font-weight: 600; fill: #fff; }
+.scale { stroke: #0f2029; stroke-width: 1; }
+.bot { fill: none; stroke-width: 1.4; stroke-dasharray: 3 2; }
+.r1 { fill: none; stroke: #cf6a0a; stroke-width: 2.2; } .r1f, .r1n { fill: #cf6a0a; } .r1s { stroke: #cf6a0a; }
+.r2 { fill: none; stroke: #2a8a3b; stroke-width: 2.2; } .r2f, .r2n { fill: #2a8a3b; } .r2s { stroke: #2a8a3b; }
+.r3 { fill: none; stroke: #bd2278; stroke-width: 2.2; } .r3f, .r3n { fill: #bd2278; } .r3s { stroke: #bd2278; }
+</style>
+<rect x="-34" y="-30" width="462" height="392" fill="#ffffff"/>
+<defs><marker id="ar1" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" class="r1f"/></marker><marker id="ar2" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" class="r2f"/></marker><marker id="ar3" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" class="r3f"/></marker></defs>
+<rect x="0" y="0" width="386" height="317.0" class="carpet"/>
+<rect x="322.44" y="12.0" width="46" height="146.5" class="zone-blue"/>
+<rect x="322.44" y="158.5" width="46" height="146.5" class="zone-red"/>
+<rect x="339.44" y="0" width="12" height="317.0" class="truss"/>
+<rect x="341.7" y="113.3" width="7.4" height="7.4" class="cage-blue"/>
+<rect x="341.7" y="70.4" width="7.4" height="7.4" class="cage-blue"/>
+<rect x="341.7" y="27.4" width="7.4" height="7.4" class="cage-blue"/>
+<rect x="341.7" y="196.3" width="7.4" height="7.4" class="cage-red"/>
+<rect x="341.7" y="239.2" width="7.4" height="7.4" class="cage-red"/>
+<rect x="341.7" y="282.2" width="7.4" height="7.4" class="cage-red"/>
+<line x1="345.44" y1="-6" x2="345.44" y2="323.0" class="centre"/>
+<line x1="0" y1="267.7" x2="0" y2="49.3" class="wall-blue"/>
+<line x1="65.8" y1="0" x2="386" y2="0" class="rail"/>
+<line x1="65.8" y1="317.0" x2="221.7" y2="317.0" class="rail"/><line x1="249.7" y1="317.0" x2="386" y2="317.0" class="rail"/>
+<line x1="1.2" y1="267.7" x2="65.8" y2="314.7" class="station"/>
+<line x1="1.2" y1="49.3" x2="65.8" y2="2.3" class="station"/>
+<rect x="221.7" y="317.0" width="28" height="15" class="proc"/>
+<line x1="297.5" y1="0" x2="297.5" y2="317.0" class="startline"/>
+<polygon points="223.5,131.5 176.8,104.5 130.0,131.5 130.0,185.5 176.8,212.5 223.5,185.5" class="reefzone"/>
+<polygon points="209.5,139.6 176.8,120.7 144.0,139.6 144.0,177.4 176.8,196.3 209.5,177.4" class="reef"/>
+<circle cx="145.6" cy="152.0" r="2.3" class="branch"/>
+<text x="135.5" y="153.7" text-anchor="middle" class="t-branch">A</text>
+<circle cx="145.6" cy="165.0" r="2.3" class="branch"/>
+<text x="135.5" y="168.5" text-anchor="middle" class="t-branch">B</text>
+<circle cx="153.5" cy="158.5" r="5" class="alg-hi"/>
+<text x="164.5" y="160.9" text-anchor="middle" class="t-tag">18</text>
+<circle cx="155.6" cy="182.2" r="2.3" class="branch"/>
+<text x="149.7" y="193.1" text-anchor="middle" class="t-branch">C</text>
+<circle cx="166.8" cy="188.7" r="2.3" class="branch"/>
+<text x="162.5" y="200.5" text-anchor="middle" class="t-branch">D</text>
+<circle cx="165.1" cy="178.6" r="5" class="alg-lo"/>
+<text x="170.6" y="171.5" text-anchor="middle" class="t-tag">17</text>
+<circle cx="186.7" cy="188.7" r="2.3" class="branch"/>
+<text x="191.0" y="200.5" text-anchor="middle" class="t-branch">E</text>
+<circle cx="197.9" cy="182.2" r="2.3" class="branch"/>
+<text x="203.8" y="193.1" text-anchor="middle" class="t-branch">F</text>
+<circle cx="188.4" cy="178.6" r="5" class="alg-hi"/>
+<text x="182.9" y="171.5" text-anchor="middle" class="t-tag">22</text>
+<circle cx="207.9" cy="165.0" r="2.3" class="branch"/>
+<text x="218.0" y="168.5" text-anchor="middle" class="t-branch">G</text>
+<circle cx="207.9" cy="152.0" r="2.3" class="branch"/>
+<text x="218.0" y="153.7" text-anchor="middle" class="t-branch">H</text>
+<circle cx="200.0" cy="158.5" r="5" class="alg-lo"/>
+<text x="189.0" y="160.9" text-anchor="middle" class="t-tag">21</text>
+<circle cx="197.9" cy="134.8" r="2.3" class="branch"/>
+<text x="203.8" y="129.1" text-anchor="middle" class="t-branch">I</text>
+<circle cx="186.7" cy="128.3" r="2.3" class="branch"/>
+<text x="191.0" y="121.7" text-anchor="middle" class="t-branch">J</text>
+<circle cx="188.4" cy="138.4" r="5" class="alg-hi"/>
+<text x="182.9" y="150.3" text-anchor="middle" class="t-tag">20</text>
+<circle cx="166.8" cy="128.3" r="2.3" class="branch"/>
+<text x="162.5" y="121.7" text-anchor="middle" class="t-branch">K</text>
+<circle cx="155.6" cy="134.8" r="2.3" class="branch"/>
+<text x="149.7" y="129.1" text-anchor="middle" class="t-branch">L</text>
+<circle cx="165.1" cy="138.4" r="5" class="alg-lo"/>
+<text x="170.6" y="150.3" text-anchor="middle" class="t-tag">19</text>
+<circle cx="48" cy="230.5" r="8.1" class="alg-lo"/><circle cx="48" cy="230.5" r="2.3" class="coral-dot"/>
+<circle cx="48" cy="158.5" r="8.1" class="alg-lo"/><circle cx="48" cy="158.5" r="2.3" class="coral-dot"/>
+<circle cx="48" cy="86.5" r="8.1" class="alg-lo"/><circle cx="48" cy="86.5" r="2.3" class="coral-dot"/>
+<rect x="280.2" y="233.8" width="34.5" height="34.5" rx="2" class="bot r1s"/>
+<rect x="280.2" y="48.8" width="34.5" height="34.5" rx="2" class="bot r2s"/>
+<rect x="280.2" y="141.2" width="34.5" height="34.5" rx="2" class="bot r3s"/>
+<path d="M297.5,251.0 Q246.0,233.0 207.8,209.8" class="r1" marker-end="url(#ar1)"/>
+<path d="M199.8,213.8 Q150.0,255.0 55.6,270.2" class="r1" marker-end="url(#ar1)"/>
+<path d="M53.6,263.2 Q95.0,221.0 142.7,209.8" class="r1" marker-end="url(#ar1)"/>
+<path d="M297.5,66.0 Q246.0,84.0 207.8,107.2" class="r2" marker-end="url(#ar2)"/>
+<path d="M199.8,103.2 Q150.0,62.0 55.6,46.8" class="r2" marker-end="url(#ar2)"/>
+<path d="M53.6,53.8 Q95.0,96.0 142.8,107.2" class="r2" marker-end="url(#ar2)"/>
+<path d="M280.5,158.5 Q262.0,158.5 240.8,158.5" class="r3" marker-end="url(#ar3)"/>
+<path d="M238.8,148.5 Q262.0,121.0 300.0,113.0" class="r3" marker-end="url(#ar3)"/>
+<circle cx="214.8" cy="218.8" r="5.6" class="r1n"/><text x="214.8" y="221.5" text-anchor="middle" class="t-num">1</text>
+<circle cx="65.7" cy="281.2" r="5.6" class="r1n"/><text x="65.7" y="283.9" text-anchor="middle" class="t-num">2</text>
+<circle cx="131.7" cy="214.8" r="5.6" class="r1n"/><text x="131.7" y="217.5" text-anchor="middle" class="t-num">3</text>
+<circle cx="214.8" cy="98.2" r="5.6" class="r2n"/><text x="214.8" y="100.9" text-anchor="middle" class="t-num">1</text>
+<circle cx="65.7" cy="35.8" r="5.6" class="r2n"/><text x="65.7" y="38.5" text-anchor="middle" class="t-num">2</text>
+<circle cx="131.8" cy="102.2" r="5.6" class="r2n"/><text x="131.8" y="104.9" text-anchor="middle" class="t-num">3</text>
+<circle cx="250.8" cy="167.5" r="5.6" class="r3n"/><text x="250.8" y="170.2" text-anchor="middle" class="t-num">1</text>
+<circle cx="304.0" cy="102.0" r="5.6" class="r3n"/><text x="304.0" y="104.7" text-anchor="middle" class="t-num">2</text>
+<text transform="translate(-10,158.5) rotate(-90)" text-anchor="middle" class="t-strong">BLUE ALLIANCE WALL</text>
+<text x="40.0" y="329.0" text-anchor="middle" class="t">Right coral station, tag 12</text>
+<text x="40.0" y="-6.0" text-anchor="middle" class="t">Left coral station, tag 13</text>
+<text x="235.7" y="342.0" text-anchor="middle" class="t">Blue processor, tag 16</text>
+<text x="301.0" y="-8.0" text-anchor="middle" class="t">Starting line, 88 in from reef</text>
+<text x="345.4" y="-19.0" text-anchor="middle" class="t-strong">Barge</text>
+<text x="374.0" y="85.0" text-anchor="start" class="t">Blue net</text>
+<text x="374.0" y="94.0" text-anchor="start" class="t">and cages</text>
+<text x="374.0" y="232.0" text-anchor="start" class="t">Red net</text>
+<text x="374.0" y="241.0" text-anchor="start" class="t">and cages</text>
+<text x="62.0" y="161.1" text-anchor="start" class="t">3 coral, each with</text>
+<text x="62.0" y="170.1" text-anchor="start" class="t">an algae on top</text>
+<line x1="72" y1="335.0" x2="192" y2="335.0" class="scale"/><line x1="72" y1="332.0" x2="72" y2="338.0" class="scale"/><line x1="192" y1="332.0" x2="192" y2="338.0" class="scale"/>
+<text x="132.0" y="346.0" text-anchor="middle" class="t">10 ft</text>
+<text x="0.0" y="361.0" text-anchor="start" class="t-dim">y = 0 on this edge (scoring table side). Field origin is the bottom-left corner; x runs toward the red wall.</text>
+</svg>

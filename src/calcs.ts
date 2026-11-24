@@ -113,7 +113,7 @@ export const calcs: Record<string, CalcDef> = {
   'weight-budget': {
     title: 'Weight budget',
     group: 'Mechanical',
-    page: 'concept',
+    page: 'subsystems/from-concept-to-design',
     inputs: [
       { key: 'drive', label: 'Drivebase', unit: 'lb', value: 37.7, step: 0.1 },
       { key: 'elev', label: 'Elevator', unit: 'lb', value: 31.3, step: 0.1 },

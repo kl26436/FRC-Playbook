@@ -36,6 +36,10 @@ export default defineConfig({
                 "label": "4. Subsystems",
                 "items": [
                         {
+                                "label": "From concept to final design",
+                                "slug": "subsystems/from-concept-to-design"
+                        },
+                        {
                                 "label": "Drivebase",
                                 "slug": "subsystems/drivebase"
                         },

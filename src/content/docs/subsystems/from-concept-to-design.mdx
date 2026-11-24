@@ -1,0 +1,32 @@
+---
+title: "From concept to final design"
+description: "Where the detailed design proved the concept wrong or found something better."
+---
+
+import Calc from '../../../components/Calc.astro';
+
+:::note[Draft]
+First draft, written from the design log.
+:::
+
+[The concept](../../concept/) was a first guess. Detailed design is where each guess gets checked against real parts in CAD. This page lists where the concept changed, before the subsystem pages go through each piece.
+
+## What changed
+
+| What | Concept | Final design | Why it changed |
+| --- | --- | --- | --- |
+| Elevator position | Further forward | Mast moved back, to 4.5 in ahead of centre | The front swerve modules were in the way |
+| Climber | A fork on the left rail | A fork in a bay at the back | The left-rail fork could not do the deep climb. This was found in CAD, before anything was cut |
+| Funnel | Drops on a hinge at the back | Swings up and over to the side | The climber now needs the space at the back |
+| Cameras | Three | One, low in the nose | The reef tags are only 12.1 in off the carpet, so one low camera sees them |
+| Coral and algae sensors | Beam breaks | Distance sensors on the CAN bus | No extra wires up the elevator |
+| L4 pose | Wrist at −50°, pivot at 87 in | Wrist at −53°, pivot at 90.5 in | Worked out from the real travel of the elevator |
+| Weight | 106 lb estimated | 115.7 lb modelled | Fasteners were counted, vendor parts weighed, and parts were added that the concept never had |
+
+## The weight budget
+
+<Calc id="weight-budget" />
+
+The robot is 0.7 lb over the limit and cannot pass inspection at this weight. That is a known miss. The options for fixing it are in [What went wrong](../../what-went-wrong/).
+
+The estimate was 106 lb and the model came out near 116 lb. The difference came from counting fasteners instead of guessing them, real vendor weights, and parts the concept never had: stops, brackets, mounts and springs. Leave room for them.
