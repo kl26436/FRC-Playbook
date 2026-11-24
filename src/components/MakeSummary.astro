@@ -1,0 +1,77 @@
+---
+// Counts for the Make it overview, taken from src/data/parts.json so they cannot drift from the parts list.
+import parts from '../data/parts.json';
+
+interface Props {
+  show: 'machines' | 'issues';
+}
+
+const { show } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const count = (q: string) => (q.startsWith('one left') ? 2 : Number.parseInt(q, 10) || 1);
+
+const machines = [...new Set(parts.map((p) => p.machine))]
+  .map((machine) => {
+    const list = parts.filter((p) => p.machine === machine);
+    return { machine, kinds: list.length, pieces: list.reduce((n, p) => n + count(p.qty), 0) };
+  })
+  .sort((a, b) => b.pieces - a.pieces);
+
+const routed = parts.filter((p) => p.machine === 'CNC router');
+const smallHoles = routed.filter((p) => p.holes.some((h) => h.dia < 0.25));
+const smallCount = smallHoles.reduce((n, p) => n + count(p.qty) * p.holes.filter((h) => h.dia < 0.25).reduce((m, h) => m + h.n, 0), 0);
+const bores = parts.filter((p) => p.holes.some((h) => Math.abs(h.dia - 1.125) < 0.002));
+const steel = parts.filter((p) => p.kind === 'steel plate');
+const poly = parts.filter((p) => p.kind === 'router, polycarbonate' || p.kind === 'hand-cut sheet');
+const link = (p: { slug: string; mark: string }) => `<a href="${base}/parts/${p.slug}/">${p.mark}</a>`;
+const names = (list: { slug: string; mark: string }[]) => list.map(link).join(', ');
+---
+
+{
+  show === 'machines' && (
+    <table>
+      <thead>
+        <tr><th>Made on</th><th>Different parts</th><th>Pieces to make</th></tr>
+      </thead>
+      <tbody>
+        {machines.map((m) => (
+          <tr>
+            <td><a href={`${base}/parts/?machine=${encodeURIComponent(m.machine)}`}>{m.machine}</a></td>
+            <td>{m.kinds}</td>
+            <td>{m.pieces}</td>
+          </tr>
+        ))}
+        <tr>
+          <td><strong>All</strong></td>
+          <td><strong>{parts.length}</strong></td>
+          <td><strong>{machines.reduce((n, m) => n + m.pieces, 0)}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  )
+}
+
+{
+  show === 'issues' && (
+    <ol>
+      <li>
+        <strong>Small holes on the router.</strong> {smallHoles.length} of the {routed.length} router parts have holes smaller than the 1/4 in cutter, about {smallCount} holes in all. Decide once how the shop does them: a tool change to a 1/8 in end mill, or spot on the router and drill on the drill press.
+      </li>
+      <li>
+        <strong>The wrist sprocket needs the small cutter.</strong> The teeth of <Fragment set:html={link(parts.find((p) => p.mark === 'W-104')!)} /> have a 0.065 in radius at the root. A 1/4 in cutter cannot reach that. A 1/8 in end mill just fits.
+      </li>
+      <li>
+        <strong>Two steel parts are not router jobs.</strong> <Fragment set:html={names(steel)} /> are 3/16 in steel, and the ratchet wheel has sharp inside corners. Send them out for laser or waterjet cutting, or plan time on the mill and with a file.
+      </li>
+      <li>
+        <strong>Bearing bores.</strong> {bores.length} parts have a 1.125 in bore for a bearing: <Fragment set:html={names(bores)} />. Cut one test bore in scrap and try a real bearing before cutting any of them.
+      </li>
+      <li>
+        <strong>Polycarbonate.</strong> <Fragment set:html={names(poly)} /> are polycarbonate. Use a sharp single-flute cutter, and never put thread-locker on their screws.
+      </li>
+      <li>
+        <strong>Printed parts drawn around bought parts.</strong> The camera tower, both sensor brackets and the cable chain bracket were modelled from published sizes. Print one and try it on the real part before printing the set.
+      </li>
+    </ol>
+  )
+}

@@ -1,0 +1,67 @@
+Fastener,Size,Where (packages joined),Count in the model
+"#10-32 flat head screw, 82 deg",x 0.5,elevator,3
+#10-32 rivnut,,climber + electronics,4
+#10-32 rivnut,,drivebase + electronics,8
+#10-32 screw,x 0.375,climber,4
+#10-32 screw,x 0.375,climber + drivebase,8
+#10-32 screw,x 0.375,drivebase,9
+#10-32 screw,x 0.375,elevator,12
+#10-32 screw,x 0.375,elevator + wrist,6
+#10-32 screw,x 0.375,funnel,4
+#10-32 screw,x 0.375,wrist,24
+#10-32 screw,x 0.5,climber,16
+#10-32 screw,x 0.5,climber + electronics,4
+#10-32 screw,x 0.5,drivebase,4
+#10-32 screw,x 0.5,drivebase + electronics,8
+#10-32 screw,x 0.5,elevator,39
+#10-32 screw,x 0.5,elevator + wrist,2
+#10-32 screw,x 0.75,climber,4
+#10-32 screw,x 1.25,drivebase,9
+#10-32 screw,x 1.25,drivebase + elevator,6
+#10-32 screw,x 1.25,funnel,4
+#10-32 screw,x 1.5,elevator,20
+#10-32 screw,x 1.5,elevator + wrist,1
+#10-32 screw,x 2.5,elevator + wrist,2
+#10-32 screw + nylock nut,x 0.625,climber,4
+#10-32 screw + nylock nut,x 0.625,wrist,14
+#10-32 screw + nylock nut,x 0.75,climber,2
+#10-32 screw + nylock nut,x 0.75,elevator,2
+#10-32 screw + nylock nut,x 0.75,funnel,1
+#10-32 screw + nylock nut,x 0.875,elevator,4
+#10-32 screw + nylock nut,x 1.5,climber,2
+#10-32 screw + nylock nut,x 1.5,elevator,10
+#10-32 screw + nylock nut,x 1.5,funnel,1
+#10-32 screw + nylock nut,x 1.75,electronics + funnel,2
+#10-32 screw + nylock nut,x 1.75,elevator,17
+#10-32 screw + nylock nut,x 1.75,funnel,1
+#10-32 screw + nylock nut,x 1.75,wrist,3
+#10-32 screw + nylock nut,x 2.25,drivebase + elevator,2
+#10-32 screw + nylock nut,x 2.5,drivebase,24
+#10-32 screw + nylock nut,x 2.5,elevator,8
+#10-32 screw + nylock nut,x 2.75,drivebase,2
+#10-32 screw + nylock nut,x 2.75,elevator,4
+#4-40 screw,x 0.188,climber,2
+#4-40 screw,x 0.25,funnel,1
+#4-40 screw,x 0.25,wrist,4
+#4-40 screw + nylock nut,x 0.5,funnel,1
+#8-32 screw,x 1.5,climber,8
+#8-32 screw,x 2.25,funnel,3
+1/4-20 rivnut,,bumpers + drivebase,8
+1/4-20 screw,x 0.5,bumpers + drivebase,8
+5/32 blind rivet,grip 1/4 to 3/8,climber,12
+5/32 blind rivet,grip 1/4 to 3/8,drivebase + elevator,4
+5/32 blind rivet,grip 1/4 to 3/8,drivebase + funnel,24
+5/32 blind rivet,grip 1/4 to 3/8,elevator,2
+5/32 blind rivet,grip 1/4 to 3/8,elevator + wrist,2
+5/32 blind rivet,grip 1/4 to 3/8,wrist,12
+5/32 blind rivet,grip 1/8 to 1/4,climber,10
+5/32 blind rivet,grip 1/8 to 1/4,climber + drivebase,4
+5/32 blind rivet,grip 1/8 to 1/4,climber + electronics,2
+5/32 blind rivet,grip 1/8 to 1/4,drivebase,49
+5/32 blind rivet,grip 1/8 to 1/4,drivebase + electronics,4
+5/32 blind rivet,grip 1/8 to 1/4,elevator,60
+5/32 blind rivet,grip 1/8 to 1/4,funnel,49
+5/32 blind rivet,grip 1/8 to 1/4,wrist,24
+5/32 blind rivet,grip over 3/8,funnel,8
+5/32 blind rivet,grip to 1/8,climber + drivebase,8
+5/32 blind rivet,grip to 1/8,elevator,4

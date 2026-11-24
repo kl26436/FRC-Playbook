@@ -1,0 +1,129 @@
+---
+// The catalogue of every made part, filterable by subsystem and by the machine that makes it.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import parts from '../../data/parts.json';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const subs = [...new Set(parts.map((p) => p.sub))];
+const machines = [...new Set(parts.map((p) => p.machine))].sort();
+---
+
+<StarlightPage frontmatter={{ title: 'Every part', description: 'Every part the team makes for the robot, with how each one is made.' }}>
+  <p>
+    The robot has {parts.length} different made parts. Pick one to see what it is, how to make it and what to check. Purchased parts are on the <a href={`${base}/downloads/`}>purchase list</a>.
+  </p>
+
+  <div class="filters not-content">
+    <label>
+      <span>Subsystem</span>
+      <select data-filter="sub">
+        <option value="">All</option>
+        {subs.map((s) => <option>{s}</option>)}
+      </select>
+    </label>
+    <label>
+      <span>Made on</span>
+      <select data-filter="machine">
+        <option value="">All</option>
+        {machines.map((m) => <option>{m}</option>)}
+      </select>
+    </label>
+    <label class="grow">
+      <span>Find</span>
+      <input type="search" data-filter="text" placeholder="Part number or name" />
+    </label>
+    <output data-count>{parts.length} parts</output>
+  </div>
+
+  <table class="catalogue">
+    <thead>
+      <tr><th>Part</th><th>Name</th><th>Subsystem</th><th>Make</th><th>Made on</th><th>Stock</th></tr>
+    </thead>
+    <tbody>
+      {
+        parts.map((p) => (
+          <tr data-sub={p.sub} data-machine={p.machine} data-text={`${p.mark} ${p.name}`.toLowerCase()}>
+            <td><a href={`${base}/parts/${p.slug}/`}>{p.mark}</a></td>
+            <td>{p.name}</td>
+            <td>{p.sub}</td>
+            <td>{p.qty}</td>
+            <td>{p.machine}</td>
+            <td>{p.stock}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</StarlightPage>
+
+<script>
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>('.catalogue tbody tr')];
+  const sub = document.querySelector<HTMLSelectElement>('[data-filter="sub"]');
+  const machine = document.querySelector<HTMLSelectElement>('[data-filter="machine"]');
+  const text = document.querySelector<HTMLInputElement>('[data-filter="text"]');
+  const count = document.querySelector<HTMLOutputElement>('[data-count]');
+
+  function apply() {
+    const words = (text?.value ?? '').toLowerCase().trim();
+    let shown = 0;
+    for (const row of rows) {
+      const ok =
+        (!sub?.value || row.dataset.sub === sub.value) &&
+        (!machine?.value || row.dataset.machine === machine.value) &&
+        (!words || (row.dataset.text ?? '').includes(words));
+      row.hidden = !ok;
+      if (ok) shown += 1;
+    }
+    if (count) count.textContent = `${shown} ${shown === 1 ? 'part' : 'parts'}`;
+  }
+
+  // A link such as /parts/?machine=Lathe opens the list already filtered.
+  const query = new URLSearchParams(location.search);
+  if (sub && query.get('sub')) sub.value = query.get('sub') ?? '';
+  if (machine && query.get('machine')) machine.value = query.get('machine') ?? '';
+  for (const el of [sub, machine, text]) el?.addEventListener('input', apply);
+  apply();
+</script>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem 1rem;
+    margin-block: 1.25rem;
+    font-size: var(--sl-text-sm);
+  }
+  .filters label {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .filters .grow {
+    flex: 1 1 12rem;
+  }
+  .filters span {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sl-color-gray-3);
+  }
+  select,
+  input {
+    font: inherit;
+    font-size: 16px;
+    padding: 0.3rem 0.5rem;
+    color: var(--sl-color-white);
+    background: var(--sl-color-black);
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    width: 100%;
+  }
+  output {
+    color: var(--sl-color-gray-3);
+    padding-bottom: 0.4rem;
+  }
+  .catalogue td:first-child {
+    white-space: nowrap;
+    font-weight: 600;
+  }
+</style>

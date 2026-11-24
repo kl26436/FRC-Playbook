@@ -71,7 +71,11 @@ export default defineConfig({
         },
         {
                 "label": "5. Make it",
-                "slug": "make-it"
+                "items": [
+                        { "label": "How parts get made", "slug": "make-it" },
+                        { "label": "Every part", "link": "/parts/" },
+                        { "label": "Cut list", "link": "/parts/cut-list/" }
+                ]
         },
         {
                 "label": "6. Assemble it",

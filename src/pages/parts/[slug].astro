@@ -1,0 +1,289 @@
+---
+// One page per made part, generated from src/data/parts.json.
+// The same page is the printable job sheet: its print styles drop the site chrome and show a QR code back here.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import QRCode from 'qrcode';
+import parts from '../../data/parts.json';
+
+export function getStaticPaths() {
+  return parts.map((part) => ({ params: { slug: part.slug }, props: { part } }));
+}
+
+const { part } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const here = new URL(`${base}/parts/${part.slug}/`, Astro.site).href;
+const qr = await QRCode.toString(here, { type: 'svg', margin: 0, errorCorrectionLevel: 'M' });
+const sheet = `${base}/files/sheets/${part.pdf.replace('.pdf', '')}-${part.page}.jpg`;
+const pdf = `${base}/files/drawings/${part.pdf}#page=${part.page}`;
+const fmt = (n: number) => String(Number(n.toFixed(3)));
+const headings = [
+  { depth: 2, slug: 'how-to-make-it', text: 'How to make it' },
+  { depth: 2, slug: 'check-it', text: 'Check it' },
+  { depth: 2, slug: 'drawing', text: 'Drawing' },
+];
+---
+
+<StarlightPage frontmatter={{ title: `${part.mark} ${part.name}`, description: `How to make ${part.mark}, ${part.name}.` }} headings={headings}>
+  <div class="job">
+    <div class="job-head">
+      <dl class="facts not-content">
+        <div><dt>Subsystem</dt><dd>{part.sub}</dd></div>
+        <div><dt>Make</dt><dd>{part.qty}</dd></div>
+        <div><dt>Made on</dt><dd>{part.machine}</dd></div>
+        {part.stock && <div><dt>Stock</dt><dd>{part.stock}</dd></div>}
+        {part.size && <div><dt>Size</dt><dd>{part.size}</dd></div>}
+      </dl>
+      <div class="qr print-only">
+        <Fragment set:html={qr} />
+        <p>Scan for the drawing and files</p>
+      </div>
+    </div>
+
+    {part.detail && <p class="detail">{part.detail.charAt(0).toUpperCase() + part.detail.slice(1)}.</p>}
+
+    {
+      part.outline && (
+        <figure class="outline">
+          <div set:html={part.outline} />
+          <figcaption>
+            The flat pattern, {fmt(part.w!)} × {fmt(part.h!)} in. Holes drawn in orange are smaller than the 1/4 in cutter.
+          </figcaption>
+        </figure>
+      )
+    }
+
+    {
+      part.holes.length > 0 && (
+        <table class="holes">
+          <thead>
+            <tr><th>Hole</th><th>How many</th><th>Cut with</th><th>Usually for</th></tr>
+          </thead>
+          <tbody>
+            {part.holes.map((h) => (
+              <tr><td>{fmt(h.dia)} in</td><td>{h.n}</td><td>{h.drill}</td><td>{h.use}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      )
+    }
+
+    <h2 id="how-to-make-it">How to make it</h2>
+    <p class="proposed">Proposed steps, worked out from the drawing and the part's shape. Check them with a mentor before cutting.</p>
+    <ol class="steps">
+      {part.steps.map((s) => <li set:html={s.replace(/`([^`]+)`/g, '<code>$1</code>')} />)}
+    </ol>
+
+    <h2 id="check-it">Check it</h2>
+    <ul class="checks">
+      {part.checks.map((c) => <li><span class="box" aria-hidden="true"></span>{c}</li>)}
+      <li><span class="box" aria-hidden="true"></span>Write {part.mark} on the part.</li>
+    </ul>
+
+    <h2 id="drawing" class="no-print">Drawing</h2>
+    <p class="no-print">
+      <a href={pdf}>Open the drawing</a> (sheet {part.page} of the {part.sub.toLowerCase()} set).
+      {part.dxf.map((f) => <span> <a href={`${base}/files/dxf/${f}`} download>Download {f.split('/')[1]}</a>.</span>)}
+    </p>
+    <a class="sheet no-print" href={pdf}><img src={sheet} alt={`Drawing sheet showing ${part.mark}`} loading="lazy" /></a>
+
+    <p class="no-print">
+      <button type="button" class="print-btn" onclick="window.print()">Print this as a job sheet</button>
+    </p>
+  </div>
+</StarlightPage>
+
+<style>
+  .job-head {
+    display: flex;
+    gap: 1.5rem;
+    align-items: start;
+    justify-content: space-between;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.75rem 1.5rem;
+    margin: 0;
+    flex: 1;
+  }
+  .facts dt {
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sl-color-gray-3);
+  }
+  .facts dd {
+    margin: 0;
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+  .detail {
+    color: var(--sl-color-gray-2);
+  }
+  .outline {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #ffffff;
+    color: #0f2029;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+  }
+  .outline :global(svg) {
+    display: block;
+    width: 100%;
+    max-height: 22rem;
+  }
+  .outline :global(.small) {
+    stroke: #cf6a0a;
+  }
+  .outline figcaption {
+    margin-top: 0.75rem;
+    font-size: var(--sl-text-xs);
+    color: #55646e;
+  }
+  .proposed {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .steps li + li {
+    margin-top: 0.5rem;
+  }
+  .checks {
+    list-style: none;
+    padding: 0;
+  }
+  .checks li {
+    display: flex;
+    gap: 0.625rem;
+    align-items: baseline;
+  }
+  .box {
+    flex: none;
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    transform: translateY(0.1rem);
+  }
+  .sheet img {
+    border: 1px solid var(--sl-color-gray-5);
+    background: #ffffff;
+  }
+  .print-btn {
+    font: inherit;
+    padding: 0.375rem 0.875rem;
+    color: var(--sl-color-white);
+    background: transparent;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+  .print-only {
+    display: none;
+  }
+  .qr {
+    width: 6.5rem;
+    flex: none;
+  }
+  .qr p {
+    margin: 0.25rem 0 0;
+    font-size: 7pt;
+    line-height: 1.2;
+    text-align: center;
+  }
+  @media print {
+    .print-only {
+      display: block;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .outline {
+      break-inside: avoid;
+    }
+    .outline :global(svg) {
+      max-height: 14rem;
+    }
+    .foot {
+      margin-top: 1rem;
+      font-size: 8pt;
+    }
+    .job {
+      font-size: 9.5pt;
+      line-height: 1.3;
+    }
+    .facts {
+      gap: 0.3rem 1rem;
+    }
+    .detail {
+      margin: 0.4rem 0 0;
+    }
+    .job h2 {
+      font-size: 13pt;
+      margin: 0.9rem 0 0.3rem;
+    }
+    .outline {
+      margin: 0.6rem 0;
+      padding: 0.5rem;
+    }
+    .outline :global(svg) {
+      max-height: 7rem;
+    }
+    .steps li + li {
+      margin-top: 0.2rem;
+    }
+    .holes :global(td),
+    .holes :global(th) {
+      padding: 0.15rem 0.6rem 0.15rem 0;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Print a part page as a one-page job sheet: no header, sidebar, table of contents or footer. */
+  @page {
+    margin: 0.4in;
+  }
+  @media print {
+    header.header,
+    .sidebar-pane,
+    .right-sidebar-container,
+    mobile-starlight-toc,
+    .pagination-links,
+    footer,
+    starlight-menu-button {
+      display: none !important;
+    }
+    .main-frame,
+    .main-pane {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    :root {
+      --sl-color-white: #000000;
+      --sl-color-gray-2: #222222;
+      --sl-color-gray-3: #444444;
+      --sl-color-black: #ffffff;
+    }
+    body {
+      background: #ffffff !important;
+    }
+    .content-panel {
+      padding: 0.25rem 0 !important;
+      border: 0 !important;
+    }
+    html,
+    body,
+    .page,
+    .main-frame,
+    .main-pane,
+    main {
+      min-height: 0 !important;
+      height: auto !important;
+    }
+    h1#_top {
+      font-size: 18pt !important;
+      margin: 0 !important;
+    }
+  }
+</style>

@@ -1,0 +1,73 @@
+---
+title: "How parts get made"
+description: "From a finished design to parts on the bench: who makes what, on which machine, and what to settle first."
+---
+
+import MakeSummary from '../../components/MakeSummary.astro';
+
+:::note[Draft]
+First draft, worked out from the final CAD package. Nothing here has been cut yet. Every route is a proposal for a mentor to check.
+:::
+
+A finished design is a list of parts somebody has to make. This chapter turns that list into work for the shop: what each part is, which machine makes it, in what order, and how to tell it is right.
+
+## What we decided
+
+- **Every made part has a number.** The letters say which subsystem it belongs to: D drivebase, E elevator, W wrist, C claw, F funnel, CL climber, EL electronics, BU bumpers.
+- **Every part has one page.** It shows what the part is, the steps to make it, what to check, and its drawing. [See every part](../parts/).
+- **Flat parts are cut from files.** Each plate has a flat pattern drawn at full size for the router. Inside corners are drawn at 0.13 in radius so a 1/4 in end mill can cut them.
+- **Two fasteners do most of the work:** #10-32 screws and 5/32 in rivets. That keeps the drill list short.
+
+## What the shop makes
+
+The shop has a CNC router, a manual mill, a lathe, a drill press, saws and 3D printers.
+
+<MakeSummary show="machines" />
+
+Pick a machine in the table to see its parts. The [cut list](../parts/cut-list/) adds up the stock each machine needs.
+
+## How to read a part page
+
+1. **The facts** at the top: how many to make, what from, and on which machine.
+2. **The flat pattern**, for router parts, with every hole listed by size.
+3. **How to make it:** numbered steps, in order.
+4. **Check it:** what must be true before the part leaves the bench.
+5. **Print this as a job sheet** gives one page for the machine, with a code to scan back to the drawing.
+
+## Settle these before cutting
+
+Going through every part turned up six things to decide or test first.
+
+<MakeSummary show="issues" />
+
+## The drills you need
+
+Almost every hole on the robot is one of these.
+
+| Hole | Drill | For |
+| --- | --- | --- |
+| 0.159 in | #21 | Tapping #10-32 |
+| 0.161 in | #20 | 5/32 in rivet |
+| 0.196 in | #9 | A #10 screw passing through |
+| 0.201 in | #7 | Tapping 1/4-20 |
+| 0.257 in | F | A 1/4 in screw passing through |
+| 0.297 in | 19/64 | #10-32 rivnut |
+| 0.391 in | 25/64 | 1/4-20 rivnut |
+
+## How close is close enough?
+
+A drawing gives a size. It does not always say how far off is still fine. Three rules from the drawings cover most parts:
+
+- **Tube length:** the elevator drawing asks for ends cut square to within 0.010 in. The two uprights of one stage must match each other, which matters more than either being exact.
+- **Rivet holes:** drill them through one part, clamp it to its mate, and drill through. The holes then line up whatever the tape measure said.
+- **Bearing bores:** the bearing must press in and not rock. Test the cut in scrap, because a few thousandths decides it.
+
+## Your turn
+
+For a new robot:
+
+- [ ] Give every made part a number and one line saying what it is.
+- [ ] Sort the parts by machine before making any. It shows where the queue will be.
+- [ ] Check every flat pattern against the cutter you own: smallest hole, smallest inside corner, material.
+- [ ] Write the steps for one part of each kind, then reuse them.
+- [ ] Decide what gets checked before a part is called done, and write it on the job sheet.

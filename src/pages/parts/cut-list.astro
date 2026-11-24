@@ -1,0 +1,109 @@
+---
+// What stock to have on hand, worked out from src/data/parts.json.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import parts from '../../data/parts.json';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const count = (q: string) => (q.startsWith('one left') ? 2 : Number.parseInt(q, 10) || 1);
+const firstNumber = (s: string) => Number.parseFloat((s.match(/\d+(?:\.\d+)?/) ?? ['0'])[0]);
+const group = <T,>(items: T[], key: (item: T) => string) => {
+  const out = new Map<string, T[]>();
+  for (const item of items) out.set(key(item), [...(out.get(key(item)) ?? []), item]);
+  return [...out.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+};
+
+const tubes = group(
+  parts.filter((p) => p.kind === 'tube'),
+  (p) => p.stock.replace(/ tube$/, ''),
+);
+const sheets = group(
+  parts.filter((p) => p.kind.startsWith('router') || p.kind === 'steel plate'),
+  (p) => `${p.thick!.toFixed(3)} in ${p.kind === 'router, polycarbonate' ? 'polycarbonate' : p.kind === 'steel plate' ? 'steel' : p.stock.includes('5052') ? '5052 aluminium' : '6061 aluminium'}`,
+);
+const printed = group(
+  parts.filter((p) => p.kind === 'printed'),
+  (p) => (p.stock.toLowerCase().includes('tpu') ? 'TPU 95A' : 'Onyx or a carbon-filled filament'),
+);
+const lathe = parts.filter((p) => p.machine === 'Lathe');
+const headings = [
+  { depth: 2, slug: 'tube', text: 'Tube' },
+  { depth: 2, slug: 'sheet', text: 'Sheet for the router' },
+  { depth: 2, slug: 'bar', text: 'Shaft and bar for the lathe' },
+  { depth: 2, slug: 'printed', text: 'Printed parts' },
+];
+---
+
+<StarlightPage frontmatter={{ title: 'Cut list', description: 'The stock to have on hand before making the robot, grouped by machine.' }} headings={headings}>
+  <p>
+    What to have on the rack before you start, grouped the way the shop is. Every figure is added up from the <a href={`${base}/parts/`}>parts list</a>, so it changes when a part does. Lengths and areas are the parts alone: add room for saw cuts, cutter width and tabs.
+  </p>
+
+  <h2 id="tube">Tube</h2>
+  {
+    tubes.map(([stock, list]) => {
+      const total = list.reduce((sum, p) => sum + count(p.qty) * firstNumber(p.size), 0);
+      return (
+        <>
+          <h3>{stock}, 6061-T6</h3>
+          <p>
+            {list.reduce((n, p) => n + count(p.qty), 0)} pieces, {total.toFixed(1)} in in all ({(total / 12).toFixed(1)} ft).
+          </p>
+          <table>
+            <thead><tr><th>Part</th><th>Name</th><th>Pieces</th><th>Length each</th></tr></thead>
+            <tbody>
+              {list
+                .sort((a, b) => firstNumber(b.size) - firstNumber(a.size))
+                .map((p) => (
+                  <tr><td><a href={`${base}/parts/${p.slug}/`}>{p.mark}</a></td><td>{p.name}</td><td>{count(p.qty)}</td><td>{firstNumber(p.size).toFixed(2)} in</td></tr>
+                ))}
+            </tbody>
+          </table>
+        </>
+      );
+    })
+  }
+
+  <h2 id="sheet">Sheet for the router</h2>
+  {
+    sheets.map(([stock, list]) => {
+      const area = list.reduce((sum, p) => sum + count(p.qty) * p.w! * p.h!, 0);
+      return (
+        <>
+          <h3>{stock}</h3>
+          <p>
+            {list.reduce((n, p) => n + count(p.qty), 0) === 1 ? '1 piece' : `${list.reduce((n, p) => n + count(p.qty), 0)} pieces`}, about {area.toFixed(0)} square inches ({(area / 144).toFixed(1)} square feet) before any spacing.
+          </p>
+          <table>
+            <thead><tr><th>Part</th><th>Name</th><th>Pieces</th><th>Size each</th></tr></thead>
+            <tbody>
+              {list
+                .sort((a, b) => b.w! * b.h! - a.w! * a.h!)
+                .map((p) => (
+                  <tr><td><a href={`${base}/parts/${p.slug}/`}>{p.mark}</a></td><td>{p.name}</td><td>{count(p.qty)}</td><td>{p.w} × {p.h} in</td></tr>
+                ))}
+            </tbody>
+          </table>
+        </>
+      );
+    })
+  }
+
+  <h2 id="bar">Shaft and bar for the lathe</h2>
+  <table>
+    <thead><tr><th>Part</th><th>What it is</th><th>Pieces</th></tr></thead>
+    <tbody>
+      {lathe.map((p) => (
+        <tr><td><a href={`${base}/parts/${p.slug}/`}>{p.mark}</a></td><td>{p.name}{p.stock ? `, ${p.stock}` : ''}{p.size ? `, ${p.size}` : ''}</td><td>{count(p.qty)}</td></tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2 id="printed">Printed parts</h2>
+  {
+    printed.map(([material, list]) => (
+      <p>
+        <strong>{material}:</strong> {list.reduce((n, p) => n + count(p.qty), 0)} pieces across {list.length} different parts. <a href={`${base}/parts/?machine=3D%20printer`}>See them all</a>.
+      </p>
+    ))
+  }
+</StarlightPage>
