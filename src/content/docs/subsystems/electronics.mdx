@@ -1,0 +1,84 @@
+---
+title: "Electronics"
+description: "Where every box sits on the robot and why, before any wire is run."
+---
+
+import RobotViewer from '../../../components/RobotViewer.astro';
+
+:::note[Draft]
+First draft, written from the design log and the electronics drawings (Rev D). Nothing here has been built or wired.
+:::
+
+This page is about where things go. [Wire it](../../wire-it/) will cover what connects to what.
+
+Electronics get the space that is left over, so they are easy to leave until last. On this robot each box was placed in CAD with its real mounting holes, and checked against everything that moves above it.
+
+<RobotViewer title="The electronics in 3D" sub="Electronics" />
+
+Tick Drivebase under the model to see what they sit on.
+
+## What we decided
+
+| Thing | Where it sits | Why there |
+| --- | --- | --- |
+| Power distribution hub, roboRIO, CANivore, small power module | On the belly pan | Everything on the pan is under 3.6 in tall. The stowed claw passes over at 8.5 in |
+| Gyro (Pigeon 2) | Bolted flat to the belly pan, arrow forward | It gives the heading for the whole robot, so it must not rock |
+| Battery | Across the back, between the two climber base tubes | Low and at the rear, and it lifts in over the back rail |
+| Main breaker | On top of the right rail | The button can be reached from the right side of the robot |
+| Radio | On the outside of a funnel post, 13 to 17.5 in up, lights facing out | Its lights can be seen from beside the robot. The metal plate behind it carries its heat away |
+| Camera (Limelight 4) | Low in the nose, on a printed tower, pitched up 12° | The reef tags are only 12.1 in off the carpet |
+
+## Why
+
+- **One camera, not three.** The kickoff plan had two cameras on the mast and one high at the back. One camera low at the front sees the reef tags at scoring distance. That is fewer boxes, wires and pounds.
+- **Sensors on the CAN bus.** The coral and algae sensors share the wires the motors already need, so no extra signal wires run up the elevator.
+- **Two CAN buses.** The drivetrain and gyro are on one. Everything that moves above the frame is on the other. A broken wire in the elevator's cable chain cannot stop the robot driving.
+- **Numbers that mean something.** CAN IDs are grouped by place: the tens digit of a swerve device is its corner, mechanisms are 51 to 58, sensors 61 and 62.
+
+### How the battery is held
+
+It weighs 12.9 lb and it is the one part that is taken out after every match.
+
+- **Behind it:** the back rail.
+- **In front:** a stop angle riveted to the belly pan.
+- **Each side:** the climber's base tubes.
+- **On top:** a 1 in strap with a cam buckle, through two loops.
+
+The belly pan is riveted up into both base tubes under the battery, because the pan is thin and carries the battery's weight there.
+
+### What changed along the way
+
+- **The radio got a plate.** This radio has no screw holes. It is held to an aluminium plate with foam tape and two zip ties, and the plate bolts to the post.
+- **Holes come from the makers' own models.** Each box's hole pattern was read from the vendor's CAD and checked back against it. The worst miss was 0.002 in.
+
+## What is on the robot
+
+There are 24 devices on the two CAN buses, three hobby servos on the roboRIO, and one camera on the network.
+
+| Bus | Devices |
+| --- | --- |
+| Drivetrain bus (CANivore) | 8 swerve motors, 4 wheel-angle sensors, the gyro |
+| Mechanism bus (roboRIO) | 2 elevator motors, the wrist motor, 3 roller motors, 2 climber motors, 2 distance sensors, the power hub |
+| Servos | The funnel latch and two climber pawls |
+
+The full table, with every ID and breaker, is in [Downloads](../../downloads/).
+
+## Not proven yet
+
+- **Nothing is wired.** Wire lengths, the cable chain's size and where each wire is tied down are plans.
+- **A current budget has not been done.** Every motor is on a 40 A breaker, but nobody has added up what the robot draws when several run at once.
+- **One screw is probably too short.** The drawing flags the CANivore's mounting screw to check on the real part.
+- **The roboRIO's direction.** Which way its connectors should face is still open.
+- **The servos share the roboRIO's 6 V supply.** If it sags when they stall, they need their own.
+
+## Your turn
+
+For a new game:
+
+- [ ] Place every box in CAD with its real holes before the mechanisms are finished, not after.
+- [ ] Put the gyro somewhere flat and stiff.
+- [ ] Decide what has to be reached in a hurry: the breaker, the battery, the radio's lights.
+- [ ] Split the CAN bus so that the most fragile wiring cannot take the drivetrain down.
+- [ ] Give CAN IDs a pattern, and set them before the device goes on the robot.
+
+[See every electronics part](../../parts/?sub=Electronics), or get the drawings from [Downloads](../../downloads/).

@@ -4,12 +4,17 @@ description: "The three-stage lift that carries the wrist up to the top of the r
 ---
 
 import Calc from '../../../components/Calc.astro';
+import RobotViewer from '../../../components/RobotViewer.astro';
 
 :::note[Draft]
-First draft, written from the design log. A 3D view of the elevator will be added here.
+First draft, written from the design log and the elevator drawings (Rev H). Nothing here has been built.
 :::
 
 The elevator carries the wrist from just above the frame to the top of the reef. It is the tallest and heaviest mechanism on the robot, so its speed, its motor current and the robot's balance all had to be worked out before anything was built.
+
+<RobotViewer title="The elevator in 3D" sub="Elevator" />
+
+Press L2, L3 or L4 under the model to watch the stages move.
 
 ## What we decided
 
@@ -27,6 +32,18 @@ The elevator carries the wrist from just above the frame to the top of the reef.
 - **An existing pattern.** The layout follows the WCP GreyT three-stage elevator, so the bearing blocks are off-the-shelf parts.
 - **No down-haul** saves a rope run and a tensioner. The cost is that the elevator cannot be driven down faster than it falls.
 - **12:1** gives a free speed of 137.5 in/s, so the elevator can cruise at 110 in/s, 80% of that. With time to speed up and slow down, full travel takes about 1.1 s.
+
+### How one drive moves three stages
+
+Only the first moving stage is driven. The other two are pulled along by it.
+
+1. **Chain lifts the first stage.** A chain on each side runs between a drive sprocket at the bottom of the mast and an idler at the top. The first stage is clamped to it.
+2. **A rope lifts the second stage.** It is anchored at the bottom of the mast, runs up over a pulley at the top of the first stage, and down to the second stage. When the first stage rises 1 in, the pulley rises 1 in and the second stage rises 2 in.
+3. **A rope lifts the carriage** the same way, over a pulley at the top of the second stage. So the carriage rises 3 in.
+
+That is why the speed calculator multiplies by three, and why the holding calculator counts the carriage's weight three times. Each rope ends in an eye bolt with two nuts, which is how it is tightened.
+
+The elevator finds its zero with a magnetic switch at the bottom. Printed rubber pads take the weight when it is down.
 
 ### What changed along the way
 
@@ -80,3 +97,5 @@ For a new game:
 - [ ] Use the holding calculator. Check that holding leaves most of the current limit free for speeding up.
 - [ ] Find the centre of gravity with the elevator fully up, and work out the acceleration limit.
 - [ ] Run it in simulation at full speed before trusting the paper number.
+
+[See every elevator part](../../parts/?sub=Elevator), or get the drawings from [Downloads](../../downloads/).

@@ -1,0 +1,111 @@
+---
+title: "Climber"
+description: "The fork that grabs the deep cage and winds the robot off the floor, and the two redesigns it took to get there."
+---
+
+import Calc from '../../../components/Calc.astro';
+import RobotViewer from '../../../components/RobotViewer.astro';
+
+:::note[Draft]
+First draft, written from the design log and the climber drawings (Rev C). Nothing here has been built, and the climber is the part that most needs a real cage to prove it.
+:::
+
+The deep cage is worth 12 points for a few seconds of work. The climber is a fork across the back of the robot. It lets down, the robot backs onto the cage, and two winches pull the fork back up, which lifts the robot.
+
+<RobotViewer title="The climber in 3D" sub="Climber" pose="climb0" />
+
+Press Climbed to see the fork wind back up. The cage is not drawn.
+
+## What we decided
+
+| Choice | What we picked |
+| --- | --- |
+| Where | A fork on one axle across the back of the robot, behind the elevator |
+| Pivot | 13.5 in behind the robot's centre, 16 in up |
+| Travel | Stowed pointing up, at 90°. Down to level for the cage. Wound back to about 88° to climb |
+| Hard stops | At −2° and 97°, a bolt in each tower plate |
+| Pull | Two ropes, one each side, over a 3.5 in radius track on the fork and onto a 1 in spool |
+| Power | Two Kraken X60 motors, each through a 25:1 planetary gearbox |
+| Holding | A 16-tooth steel ratchet wheel and pawl on each spool. Springs hold the pawls down. Servos lift them |
+| Letting it down | Torsion springs push the fork out of stow, then its own weight takes it to level |
+| Gripping the cage | Rubber sleeves on the fork, and a spring gate each side that snaps shut behind the cage's pipes |
+
+## Why
+
+- **A fork at the back.** The robot backs straight onto the cage. Nothing has to reach out sideways.
+- **Rope on a track.** The track radius is 3.5 in and the spool radius about 0.56 in. That alone is a 6.2:1 reduction, with no extra gears.
+- **A ratchet.** When the match ends, the robot is disabled and the motors stop holding. The pawls keep the robot up.
+- **Springs and gravity for the way down.** The motors only ever have to pull one way.
+- **Two motors.** One on each rope, so the fork is pulled evenly. Using one motor is on the list of ways to save weight.
+
+### The climb, step by step
+
+1. The carriage lifts 1.25 in and the wrist turns level, so the claw leaves the space behind the elevator.
+2. The funnel latch fires and the tray swings open to the right.
+3. The winches wind in a little to take the load off the pawls. The servos lift the pawls. The winches pay out and the fork comes down to level.
+4. The driver backs onto the cage until it sits on the rubber sleeves. The gates snap shut behind its far pipes.
+5. The pawls drop. The winches wind in. The fork turns the cage over the top of the robot, and the robot rises.
+6. The code stops near 88°. The ratchets hold.
+
+Hanging, the robot is estimated to sit 2.5° nose up with its wheels 3.9 in off the carpet. [Driving, aiming and autos](../../code/driving-and-autos/#watch-one-run) has a recording of the code running this sequence.
+
+### What changed along the way
+
+This subsystem was redesigned twice, and both times the problem was found in CAD before anything was cut.
+
+- **The first climber could not climb.** The concept had a fork on the left rail that reached sideways into the cage. Checked in CAD, it could not do the deep climb. The fork moved to the back of the robot, which is also why [the funnel](../funnel/) had to learn to swing away.
+- **The first deploy spring did not exist.** The design needed a torsion spring in a 0.49 in gap between two plates, and nobody sells one that small with enough torque. Three options were weighed:
+
+  | Option | Result |
+  | --- | --- |
+  | Extension springs in the same gap | Rejected. The lever arm is only about 0.8 in, and the springs would run near their stretch limit |
+  | Torsion springs inside the fork, on an axle that does not turn | Picked |
+  | Widen the gap | Rejected. It moves the gearboxes and motors outward, which changes the drivebase and the funnel |
+
+- **The pawls were loose.** Each sat on a spacer that left 0.06 in of side play. Three thin shims under each took that to 0.02 in, so the pawl stays in line with its wheel.
+
+## The math
+
+### What does it take to lift the robot?
+
+<Calc id="climb" />
+
+47 A a motor is more than the 40 A breaker's rating, for the few seconds the climb lasts. Breakers allow that for a short time, but it is one of the numbers to check on a real robot.
+
+### How far can the fork settle?
+
+The ratchet wheel has 16 teeth, so 360 ÷ 16 = 22.5° of spool for each tooth. The fork turns 6.22 times slower than the spool. So the fork can drop back at most 22.5 ÷ 6.22 = **3.6°** before a pawl catches.
+
+### Will the fork come out of stow on its own?
+
+Stowed, the fork leans slightly forward of its pivot, so gravity holds it in. The springs have to beat that.
+
+| At stow | Torque |
+| --- | --- |
+| Gravity holding the fork in | 9.3 lb·in |
+| Two springs pushing it out, 13.3 lb·in each | 26.6 lb·in |
+| Left over to start it moving | 17.3 lb·in |
+
+Past about 66° gravity takes over and the rope controls the speed.
+
+## Not proven yet
+
+The drawing's own list, in its order:
+
+- **The cage is held by friction only.** Rubber sleeves and gates stop it sliding along the fork. Test on a real cage.
+- **Weights are estimates.** The cage is taken as 21 lb. Weigh the robot.
+- **The gearbox.** Check the planetary's load table for 19 N·m at its output.
+- **Springs and gates are untested.** Check that the fork leaves stow by itself as the winch pays out, and that each gate folds back past a 1.315 in pipe and springs shut. Make one gate first.
+- **The stops are not for stalling against.** They can take a current-limited winch. The code must stop at 88°.
+
+## Your turn
+
+For a new game:
+
+- [ ] Work out what the robot hangs from and where its centre of gravity will be. The distance between them sets everything.
+- [ ] Use the calculator to pick a ratio that keeps the current under the breaker rating.
+- [ ] Decide what holds the robot up when it is disabled. Motors do not.
+- [ ] Check in CAD that the mechanism can reach the field element and complete the move, before detailing any part of it.
+- [ ] Before designing around a spring, find one in a catalogue.
+
+[See every climber part](../../parts/?sub=Climber), or get the drawings from [Downloads](../../downloads/).

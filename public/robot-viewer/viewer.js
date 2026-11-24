@@ -301,6 +301,18 @@
     });
     choose(null);
     hint.textContent = J.parts.length + ' parts. Drag to turn, pinch or scroll to zoom, tap a part to name it.';
+    // ?pose=key opens in that pose; ?sub=N opens on one subsystem with the rest hidden
+    var open = POSES[qs.get('pose')];
+    if (open) { var ob = pb.querySelector('[data-pose="' + qs.get('pose') + '"]'); if (ob) ob.click(); }
+    var only = qs.get('sub');
+    if (only !== null && subs[+only]) {
+      only = +only; var lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9], n = 0;
+      subs.forEach(function (_, i) { S[i].visible = i === only; sb.querySelector('[data-sub="' + i + '"]').checked = i === only; });
+      J.parts.forEach(function (q) { if (meshes[q.m].sub !== only) return; n++; for (var k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], q.c[k] - q.r); hi[k] = Math.max(hi[k], q.c[k] + q.r); } });
+      var c = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2], r = Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2;
+      anim = null; tgt.copy(toThree(c)); dist = Math.max(lim.dmin, Math.min(170, r * 2.9)); az = (c[0] < -4 ? 142 : 38) * D2R; el = 18 * D2R; placeCam();
+      hint.textContent = 'Showing only: ' + subs[only] + ' (' + n + ' parts). Tick the other subsystems below to bring them back.';
+    }
   }
 
   function setupPart(J) {

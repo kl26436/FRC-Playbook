@@ -1,0 +1,79 @@
+---
+title: "Funnel"
+description: "The tray that catches coral from the station and slides it into the wrist, and why it has to swing out of the way."
+---
+
+import Calc from '../../../components/Calc.astro';
+import RobotViewer from '../../../components/RobotViewer.astro';
+
+:::note[Draft]
+First draft, written from the design log and the funnel drawings (Rev F). Nothing here has been built.
+:::
+
+The funnel sits at the back of the robot. A coral dropped from the station lands on its tray, the walls turn it end-on, and it slides forward between the elevator rails into the wrist. Nothing in it is powered except one small servo.
+
+<RobotViewer title="The funnel in 3D" sub="Funnel" />
+
+Tick Climber and Elevator under the model, then press Climb ready, to see why the tray has to move.
+
+## What we decided
+
+| Choice | What we picked |
+| --- | --- |
+| Tray | 1/8 in polycarbonate, smooth side up, sloped at 30.5° |
+| Walls | Two polycarbonate walls that close in at 22.5° each side, from 18 in wide at the back to 5.96 in at the front |
+| Frame | Four 1 × 1 in posts: two on the back rail, two on the cross member |
+| For the climb | The tray, walls and cross tubes are one piece, 3.0 lb, hinged on the right posts. It swings 90° up and over to the right |
+| What opens it | Two strands of stretched latex tubing. A servo-driven hook holds it shut |
+| What closes it | A person, in the pit. Once it opens in a match it stays open |
+
+## Why
+
+- **Gravity feeds it.** A slope with no motors has nothing to stall, jam or wire.
+- **Converging walls.** A coral dropped crooked is turned end-on before it reaches the narrow end.
+- **The slope came from the station.** The station drops coral at 35° from 37.44 in up. Over the gap across the bumper the coral's nose falls to 34.7 in, so the tray's back lip is at 34.2 in to catch it.
+- **A step down into the wrist.** The wrist's floor sits 0.32 in below the tray line, so the coral drops onto it and cannot catch on an edge.
+- **It has to leave for the climb.** On a deep climb the cage swings up into the space behind the elevator, where the tray is. The rules also say the robot may not touch the cage's chain, eye bolt or top face. So the tray gets out of the way.
+
+### What changed along the way
+
+- **The climber moved, so the funnel learned to open.** The first concept dropped the funnel on a hinge at the back. When the climber moved to the back of the robot, that space was gone, and the funnel now swings to the side.
+- **The back lip came down 1.5 in.** An earlier layout had it at 35.7 in, and the coral would have hit that edge.
+- **The front edge was cut back 1 in** so the wrist can turn at the L2 height.
+- **An eye bolt was shortened.** The bolt that anchors the tubing touched a climber plate. Cut to 1.25 in of thread, it clears by 0.19 in.
+
+## The math
+
+### Will the coral slide?
+
+A coral slides on its own if the slope is steeper than the friction allows.
+
+<Calc id="slide-friction" />
+
+The friction between a PVC coral and polycarbonate is an assumption until someone measures it. Lay a coral on a sheet of the tray material and lift one end until it slides. The angle gives the number. It makes a good first job for a new student.
+
+### Does it stay legal when it opens?
+
+Open, the tray stands 4.4 in outside the frame, which is 1.2 in past the bumper, and 44.7 in high. The limit on reaching outside the frame is 18 in.
+
+It must be closed and latched when the match starts.
+
+## Not proven yet
+
+The drawing lists these to test, and suggests building the tray in cardboard first and dropping real coral into it:
+
+- **Whether crooked coral straightens** in the walls, and whether it crosses the bumper gap cleanly.
+- **The tubing.** Its length and the number of strands must throw the tray fully open with the robot tilted 10°.
+- **The latch.** The hook's spring has to hold when the robot drives over the edge of the reef. A tray that pops open in a match is a broken intake.
+- **One latch or two.** If the back of the tray lifts when a coral lands, add a second hook.
+
+## Your turn
+
+For a new game:
+
+- [ ] Find where the game piece leaves the field element: its height, its angle and its speed.
+- [ ] Draw its path across the gap to the robot before drawing any robot parts.
+- [ ] Measure the friction with a tilt test, and use the calculator to pick a slope with margin.
+- [ ] Build it in cardboard and try it with real game pieces before cutting plastic.
+
+[See every funnel part](../../parts/?sub=Funnel), or get the drawings from [Downloads](../../downloads/).

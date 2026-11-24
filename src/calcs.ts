@@ -40,6 +40,9 @@ const elevatorShaftTorque = (v: Values) => (elevatorLoad(v) * chainPerTurn(v)) /
 const elevatorMotorTorque = (v: Values) =>
   elevatorShaftTorque(v) / N_M_TO_LB_IN / v.ratio / v.motors / (v.eff / 100); // N·m
 const elevatorHoldAmps = (v: Values) => elevatorMotorTorque(v) / (v.stallTorque / v.stallAmps);
+const wristTorquePerAmp = (v: Values) => (v.stallTorque / v.stallAmps) * v.ratio * N_M_TO_LB_IN * (v.eff / 100);
+const climbRope = (v: Values) => (v.weight * v.lever) / v.ropes / v.track;
+const climbRatio = (v: Values) => (v.track / v.spool) * v.gearbox;
 const cycleSeconds = (v: Values) => (2 * v.dist) / v.speed + v.intake + v.score;
 const weightTotal = (v: Values) =>
   v.drive + v.elev + v.wrist + v.climb + v.funnel + v.elec + v.wiring + v.fasteners;
@@ -279,6 +282,62 @@ export const calcs: Record<string, CalcDef> = {
       'Multiply by 32.17 for feet per second squared.',
     ],
     note: 'Modelled, with battery and bumpers on. The default is the worst case: carriage at the top, wrist level.',
+  },
+
+  'wrist-hold': {
+    title: 'Current to hold the wrist still',
+    group: 'Mechanical',
+    page: 'subsystems/wrist-and-claw',
+    inputs: [
+      { key: 'torque', label: 'Worst holding torque at the pivot', unit: 'lb·in', value: 137, step: 1 },
+      { key: 'ratio', label: 'Overall ratio, motor to wrist', unit: ': 1', value: 60, step: 1 },
+      { key: 'eff', label: 'Efficiency', unit: '%', value: 85, step: 1 },
+      { key: 'stallTorque', label: 'Motor stall torque', unit: 'N·m', value: 7.09, step: 0.01 },
+      { key: 'stallAmps', label: 'Motor stall current', unit: 'A', value: 366, step: 1 },
+    ],
+    outputs: [
+      { label: 'Torque at the wrist for each amp', unit: 'lb·in per A', digits: 2, compute: wristTorquePerAmp },
+      { label: 'Current to hold', unit: 'A', compute: (v) => v.torque / wristTorquePerAmp(v) },
+    ],
+    steps: [
+      'Motor torque per amp = stall torque ÷ stall current.',
+      'At the wrist, that is multiplied by the ratio and the efficiency. (1 N·m = 8.851 lb·in.)',
+      'Current to hold = holding torque ÷ torque per amp.',
+      'The default is the worst case: holding an algae. Try 110 lb·in for an empty wrist and 124 with a coral.',
+    ],
+    note: 'Modelled torque, calculated current. The wrist motor starts with a 40 A limit, so holding uses under half of it.',
+  },
+
+  climb: {
+    title: 'What it takes to lift the robot',
+    group: 'Mechanical',
+    page: 'subsystems/climber',
+    inputs: [
+      { key: 'weight', label: 'Robot weight, with battery and bumpers', unit: 'lb', value: 146.4, step: 0.1 },
+      { key: 'lever', label: 'Fork pivot to the centre of gravity', unit: 'in', value: 14.6, step: 0.1 },
+      { key: 'ropes', label: 'Ropes', unit: '', value: 2, step: 1 },
+      { key: 'track', label: 'Rope track radius on the fork', unit: 'in', value: 3.5, step: 0.1 },
+      { key: 'spool', label: 'Spool radius, to the rope centre', unit: 'in', value: 0.5625, step: 0.01 },
+      { key: 'gearbox', label: 'Gearbox ratio', unit: ': 1', value: 25, step: 1 },
+      { key: 'eff', label: 'Gearbox efficiency', unit: '%', value: 85, step: 1 },
+      { key: 'rpm', label: 'Motor free speed', unit: 'rpm', value: 6000, step: 100 },
+      { key: 'stallTorque', label: 'Motor stall torque', unit: 'N·m', value: 7.09, step: 0.01 },
+      { key: 'stallAmps', label: 'Motor stall current', unit: 'A', value: 366, step: 1 },
+    ],
+    outputs: [
+      { label: 'Torque to turn the fork', unit: 'lb·in', digits: 0, compute: (v) => v.weight * v.lever },
+      { label: 'Pull in each rope', unit: 'lb', digits: 0, compute: climbRope },
+      { label: 'Overall ratio, motor to fork', unit: ': 1', digits: 0, compute: climbRatio },
+      { label: 'Current in each motor', unit: 'A', digits: 0, compute: (v) => (climbRope(v) * v.spool) / N_M_TO_LB_IN / v.gearbox / (v.eff / 100) / (v.stallTorque / v.stallAmps) },
+      { label: 'Fork speed with no load', unit: '°/s', digits: 0, compute: (v) => (v.rpm / climbRatio(v)) * 6 },
+    ],
+    steps: [
+      'Fork torque = robot weight × the distance from the pivot to the centre of gravity.',
+      'Pull in each rope = fork torque ÷ number of ropes ÷ track radius.',
+      'Overall ratio = (track radius ÷ spool radius) × gearbox ratio. A small spool is a big reduction for free.',
+      'Motor torque = rope pull × spool radius ÷ gearbox ratio ÷ efficiency. Current = motor torque ÷ torque per amp.',
+    ],
+    note: 'Modelled weight and lever, calculated loads. The weight is an estimate until a real robot is on a scale. Each motor is on a 40 A breaker with a 60 A limit to start.',
   },
 
   'tag-distance': {

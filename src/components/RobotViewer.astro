@@ -8,12 +8,22 @@ interface Props {
   title: string;
   mode?: 'explore' | 'part' | 'keepout' | 'replay';
   part?: string;
+  /** Open with only this subsystem shown (explore mode). */
+  sub?: 'Drivebase' | 'Elevator' | 'Wrist and claw' | 'Funnel' | 'Climber' | 'Electronics' | 'Bumpers';
+  /** Open in this pose (explore mode): stow, intake, l2, l3, l4, lowalgae, algae, net, climb0, climb1. */
+  pose?: string;
   height?: number;
 }
 
-const { title, mode = 'explore', part, height = mode === 'part' ? 410 : mode === 'replay' ? 400 : 820 } = Astro.props;
+const SUBS = ['Drivebase', 'Elevator', 'Wrist and claw', 'Funnel', 'Climber', 'Electronics', 'Bumpers'];
+
+const { title, mode = 'explore', part, sub, pose, height = mode === 'part' ? 410 : mode === 'replay' ? 400 : 820 } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const src = `${base}/robot-viewer/index.html?mode=${mode}${part ? `&part=${encodeURIComponent(part)}` : ''}`;
+const src =
+  `${base}/robot-viewer/index.html?mode=${mode}` +
+  (part ? `&part=${encodeURIComponent(part)}` : '') +
+  (sub ? `&sub=${SUBS.indexOf(sub)}` : '') +
+  (pose ? `&pose=${pose}` : '');
 ---
 
 <iframe class="robot-viewer not-content" src={src} title={title} loading="lazy" style={`height:${height}px`}></iframe>

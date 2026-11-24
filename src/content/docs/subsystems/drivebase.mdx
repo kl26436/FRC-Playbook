@@ -1,0 +1,76 @@
+---
+title: "Drivebase"
+description: "The swerve frame the rest of the robot bolts to: its size, its tubes, and how fast it goes."
+---
+
+import Calc from '../../../components/Calc.astro';
+import RobotViewer from '../../../components/RobotViewer.astro';
+
+:::note[Draft]
+First draft, written from the design log and the drivebase drawings (Rev F). Nothing here has been built.
+:::
+
+The drivebase is the frame, the four swerve modules and the belly pan. Everything else bolts to it, so its size and its hole patterns were settled first and changed most often.
+
+<RobotViewer title="The drivebase in 3D" sub="Drivebase" />
+
+## What we decided
+
+| Choice | What we picked |
+| --- | --- |
+| Drive | Four SDS MK4i swerve modules, L2 ratio (6.75:1), each with two Kraken X60 motors |
+| Frame size | 28 × 28 in, which is 34.5 in over the bumpers |
+| Frame tube | 2 × 1 in 6061 aluminium, 1/8 in wall, sitting 1.75 to 3.75 in above the carpet |
+| Corners | The rails stop 4 in short of each corner. The module's own plates form the corner |
+| Inside the frame | One cross member for the funnel posts and climber, and a short spine that carries the elevator gearbox |
+| Floor | A belly pan, 0.063 in aluminium, riveted under the tubes |
+
+## Why
+
+- **Swerve.** The game is a string of short trips between the station and the reef. A swerve robot can move in any direction without turning first, so it can line up on a branch while it is still arriving.
+- **28 in.** A reef face is 37.8 in wide and the cages hang 42.9 in apart. A robot that is 34.5 in over its bumpers fits beside a partner at both. The perimeter is 112 in against a limit of 120.
+- **Module plates as corners.** The wheel swings through where a corner tube would be, so the rails stop short and the module's main plate, bottom plate and corner post join them.
+- **A belly pan.** It carries the electronics and the battery, and keeps them off the carpet.
+
+### What changed along the way
+
+- **The elevator moved back.** The front modules were in the way of the mast, so it went to 4.5 in ahead of the robot's centre. This was found on the first day in CAD.
+- **The belly pan got thinner.** It went from 0.090 to 0.063 in, saving 1.4 lb, and then gained 14 lightening pockets where nothing sits on it.
+- **The real module weight went in.** Each module is 4.15 lb, which replaced an estimate.
+- **Holes kept arriving.** Every other subsystem adds holes to the frame: bumper brackets, funnel posts, climber tubes, the camera, the breaker. Sheet 3 of the drawing exists only to list them.
+
+## The math
+
+### How fast does it go?
+
+<Calc id="drive-speed" />
+
+That is the speed with no load. A real robot reaches a little less, and the code limits it further when the elevator is up. [The elevator page](../elevator/) has that calculation.
+
+### How much does it weigh?
+
+| Part of the drivebase | Weight |
+| --- | --- |
+| Four modules, 4.15 lb each | 16.6 lb |
+| Frame aluminium | about 10.6 lb |
+| The whole package, as modelled | 37.7 lb |
+
+The drivebase is a third of the robot. It is also the first place to look for the 0.7 lb the robot is over: thinning the frame tube from 1/8 to 1/16 in wall would save about 3.6 lb. [What went wrong](../../what-went-wrong/) lists the options.
+
+## Not proven yet
+
+- **The hole pattern for the modules.** It was taken from the SDS model. Check the rail length and holes against the SDS frame drawing before cutting.
+- **The module model is not exact.** The file used is the Falcon version with Kraken motors swapped in, so the pinions differ.
+- **The tightest gap is 0.03 in,** between a swerve motor and the inside face of a rail. That is how SDS designed it, but it leaves no room for a rail cut long.
+- **Rivnut drill sizes** on the drawing are typical ones. Check them against the rivnuts you buy.
+
+## Your turn
+
+For a new game:
+
+- [ ] Find what the robot has to fit beside or between, and what the frame perimeter limit is. That sets the frame size.
+- [ ] Pick the drive ratio with the speed calculator. Faster is not always better on a short field.
+- [ ] Draw the modules first and keep everything else out of their way.
+- [ ] Keep one sheet that lists every hole the other subsystems need in the frame.
+
+[See every drivebase part](../../parts/?sub=Drivebase), or get the drawings from [Downloads](../../downloads/).

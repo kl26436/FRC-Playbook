@@ -1,0 +1,86 @@
+---
+title: "Wrist and claw"
+description: "The part that holds the game pieces: a wrist that coral passes straight through, with an algae claw underneath."
+---
+
+import Calc from '../../../components/Calc.astro';
+import RobotViewer from '../../../components/RobotViewer.astro';
+
+:::note[Draft]
+First draft, written from the design log and the wrist and claw drawings (Rev E). Nothing here has been built.
+:::
+
+The wrist rides on the elevator carriage. It takes a coral from the funnel behind it, carries it up, and pushes it out the front onto a branch. The claw hangs under the wrist and grips an algae between two rollers.
+
+<RobotViewer title="The wrist and claw in 3D" sub="Wrist and claw" />
+
+## What we decided
+
+| Choice | What we picked |
+| --- | --- |
+| Coral path | Straight through. Coral enters the back of the wrist and leaves the front |
+| Pivot | Two short stub axles, one each side, so nothing crosses the middle |
+| Wrist drive | One Kraken X60, a 16:1 planetary gearbox, then 16-tooth to 60-tooth chain: 60:1 overall |
+| Knowing the angle | A through-bore encoder on the pivot itself |
+| Coral rollers | Flex wheels on two shafts, driven by one Kraken X44 through belts |
+| Algae claw | Two rollers of flex wheels, 13 in apart, each with its own Kraken X44 |
+| Sensors | Two distance sensors on the CAN bus: one sees a coral in the wrist, one sees an algae in the claw |
+| Range | Hard stops at −93° and +77°. The code uses −90° (stowed, hanging down) to +75° |
+
+## Why
+
+- **Pass-through.** The coral never has to be handed from one mechanism to another. It slides down the funnel, through the elevator and into the wrist in one motion.
+- **Stub axles.** A shaft across the pivot would block the coral's path.
+- **An encoder on the pivot.** Chain has slack. Measuring the wrist itself, not the motor, means the slack does not show up as an angle error.
+- **The claw under the wrist.** It reuses the elevator and the wrist. A separate algae arm would be a whole extra mechanism.
+- **Two claw motors.** Running both rollers the same way throws the ball. That is how the robot scores in the net.
+- **CAN sensors.** No extra signal wires have to run up the elevator.
+
+### What changed along the way
+
+- **Lighter plates.** The side plates and claw plates went from 3/16 to 1/8 in aluminium in the weight pass. A side plate is now 1.11 lb.
+- **The L4 pose.** The concept had the wrist at −50° with the pivot at 87 in. Worked from the real travel, it is −53° at 90.5 in, which uses all of the elevator.
+- **Sprocket holes.** The 60-tooth sprocket's bolt holes were drawn 30° away from their standoffs. They were redrawn to line up. The part itself did not change: 30° is exactly five teeth.
+
+## The math
+
+### How much current does it take to hold the wrist out?
+
+The wrist is heaviest to hold when it is near level and carrying a ball.
+
+| Holding | Worst torque at the pivot | Current |
+| --- | --- | --- |
+| Nothing | 110 lb·in, at +20° | 12.6 A |
+| A coral | 124 lb·in | 14.2 A |
+| An algae | 137 lb·in | 15.6 A |
+
+<Calc id="wrist-hold" />
+
+### Where the wrist is allowed to go
+
+Stowed, the wrist hangs between the elevator rails. It cannot swing out from there without hitting the camera, the gearbox plates or the frame. So the carriage lifts 1.25 in first, and the code holds a table of which angles are safe at which heights. [Moving without hitting anything](../../code/superstructure/) has the table, a chart of it, and the robot to try it on.
+
+## The wiring has to bend
+
+Ten wires cross the pivot, for the three motors and two sensors on the wrist. They run in a free loop, 5.5 in long at mid swing, from an anchor on the carriage to a post on the wrist. The loop is on the left because the belts are on the right.
+
+Below that, everything goes down a cable chain with the wrist motor and encoder wires: eight power wires and seven small ones. The drawing says that is tight in the chain chosen, and names the next size up.
+
+## Not proven yet
+
+- **The claw's grip on a real ball.** Nothing about the grip has been tried on one.
+- **L4.** It uses all the travel and leaves the wrist 53° below level onto a vertical branch. The drawing says to test it early.
+- **The processor pose** is marked marginal on the drawings.
+- **The net.** The rim height was read from a field drawing as 88.9 in. The pose clears that by 3.9 in.
+- **The cable chain** may need to be the next size up.
+
+## Your turn
+
+For a new game:
+
+- [ ] Follow one game piece from where it enters the robot to where it leaves. Count the handoffs, and try to remove one.
+- [ ] Find the worst holding torque, with the heaviest piece, and check the current with the calculator.
+- [ ] Put the angle sensor on the joint, not on the motor.
+- [ ] Sweep the joint through its range at every height in CAD before writing any code.
+
+[See every wrist and claw part](../../parts/?sub=Wrist%20and%20claw), or get the drawings from [Downloads](../../downloads/).
