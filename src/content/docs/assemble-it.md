@@ -6,7 +6,7 @@ description: "Building the robot step by step."
 Building the robot step by step.
 
 :::note[Coming soon]
-This chapter fills in once Robot A's CAD and code are finished.
+This chapter fills in once the CAD and code are finished.
 :::
 
 ## What this chapter will hold

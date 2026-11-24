@@ -1,0 +1,79 @@
+---
+title: "2. Choose what to be good at"
+description: "Turning the game analysis into a short list of things the robot must do well."
+---
+
+import Calc from '../../components/Calc.astro';
+
+:::note[Draft]
+First draft, written from the kickoff analysis. It uses the scoring rules as they were on kickoff day.
+:::
+
+No robot does everything well. This chapter turns [the read of the game](../read-the-game/) into a ranked list, so the design time goes to the things that win matches.
+
+## What we decided
+
+Each job is a **must**, a **should** or a **could**. The robot is designed around the musts. Shoulds are added if they do not hurt a must. Coulds are only taken if they come free.
+
+| # | Job | Rank |
+| --- | --- | --- |
+| 1 | Drive well and never break down | must |
+| 2 | Score on L4 from the coral station | must |
+| 3 | Climb the deep cage | must |
+| 4 | Score a coral in auto, every match | must |
+| 5 | Pull algae off the reef | should |
+| 6 | Score on L2 and L3 | should |
+| 7 | Put algae in the net | could |
+| 8 | Pick coral up off the floor | could |
+
+## Why
+
+- **Drive well.** Cycles are short and contact is legal almost everywhere, so a fast, low, tough swerve base is worth more than any one mechanism.
+- **L4 from the station.** 12 branches, 5 points each, 7 in auto, and no algae in the way. An alliance should fill L4 first.
+- **Deep climb.** 12 points for a few seconds of work. With one parked partner it is the Barge RP.
+- **A coral in auto.** Leaving plus one coral is a ranking point. Three L4 coral in auto is 24 points from one robot: 3 for leaving and 7 for each coral.
+- **Algae off the reef.** This opens 18 branches. Getting the ball off is the valuable part. The first two go in the processor for Coopertition.
+- **L2 and L3.** The same mechanism at lower heights, for the Coral RP and for when L4 is full.
+- **Algae in the net.** 4 points with nothing handed to the opponent, but it needs about 100 in of reach and a trip to the barge.
+- **Floor pickup.** Useful for dropped pieces. Not needed while the stations feed reliably.
+
+### Processor or net?
+
+A processed ball is 6 points for you and a free throw worth 4 for the other alliance's human player. If their thrower is good, the processor nets you 2. The net is a clean 4.
+
+Process two early for Coopertition. After that, net them if the robot can. If it cannot, process them anyway: the processor is next to your reef, and the ball has to leave the reef either way.
+
+### What to watch for
+
+- One defender may cross to your side. The reef zone and barge zone are safe: contact there is a major foul. The coral stations are not protected, so expect a defender at one. There are two stations, so use the other.
+- Some fouls hand the other alliance a ranking point. Knocking a coral off their reef gives them the Coral RP. Touching their cage, or a robot on its cage in the last 20 seconds, gives them the Barge RP.
+
+## The math: where does a cycle's time go?
+
+These distances are from the field drawing, measured robot centre to robot centre.
+
+| Trip | Distance | What it means |
+| --- | --- | --- |
+| Coral station to its two nearest reef faces | 11 to 12 ft | About 2 s each way. Pick-up and release time matter as much as top speed |
+| Coral station to the far faces | 15 to 18 ft | Fill the near faces first |
+| Reef to processor | 8 to 11 ft | A cheap detour from the processor-side faces |
+| Reef back faces to the net | 8 ft | Cheap from the back faces, expensive from a station |
+| Starting line to the back reef face | 71 in | Any robot can drop a preload in under 2 s |
+
+<Calc id="cycle-time" />
+
+With the default numbers, driving is about half the cycle. The other half is handling. Taking half a second off the pick-up saves as much time as raising the average speed from 6 to about 7 ft/s.
+
+## A three-robot plan
+
+Two robots cycle L4 from opposite stations. The third strips algae, runs two to the processor, then fills L2 and L3 or defends.
+
+In qualification matches your partners change every match. Be the robot that can do all three jobs, because somebody has to take the algae off.
+
+## Your turn
+
+- [ ] List every job the game offers a robot.
+- [ ] For each one, write the points, the ranking point it helps, and how hard it is to build.
+- [ ] Mark each job must, should or could. Keep the list of musts short.
+- [ ] Use the cycle time calculator with your own field distances.
+- [ ] Write down what you chose not to do, and why.

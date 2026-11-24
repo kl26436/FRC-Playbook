@@ -1,0 +1,250 @@
+// Every calculator in the playbook is defined once, here.
+// Pages show one with <Calc id="..." />, and the Math reference page lists them all.
+// Default values are the robot's own numbers.
+
+export type Values = Record<string, number>;
+
+export interface CalcInput {
+  key: string;
+  label: string;
+  unit: string;
+  value: number;
+  step?: number;
+}
+
+export interface CalcOutput {
+  label: string;
+  unit: string;
+  digits?: number;
+  compute: (v: Values) => number;
+}
+
+export interface CalcDef {
+  title: string;
+  group: 'Game' | 'Mechanical';
+  page: string; // slug of the page that explains it
+  inputs: CalcInput[];
+  outputs: CalcOutput[];
+  steps: string[];
+  note?: string;
+}
+
+const N_M_TO_LB_IN = 8.851;
+const G_FT_S2 = 32.17;
+
+// Shared pieces, so each formula is written once.
+const chainPerTurn = (v: Values) => v.teeth * v.pitch; // inches of chain per shaft turn
+const elevatorFree = (v: Values) => (v.rpm / v.ratio / 60) * chainPerTurn(v) * v.stages;
+const elevatorLoad = (v: Values) => v.a + 2 * v.b + 3 * v.c;
+const elevatorShaftTorque = (v: Values) => (elevatorLoad(v) * chainPerTurn(v)) / (2 * Math.PI); // lb·in
+const elevatorMotorTorque = (v: Values) =>
+  elevatorShaftTorque(v) / N_M_TO_LB_IN / v.ratio / v.motors / (v.eff / 100); // N·m
+const elevatorHoldAmps = (v: Values) => elevatorMotorTorque(v) / (v.stallTorque / v.stallAmps);
+const cycleSeconds = (v: Values) => (2 * v.dist) / v.speed + v.intake + v.score;
+const weightTotal = (v: Values) =>
+  v.drive + v.elev + v.wrist + v.climb + v.funnel + v.elec + v.wiring + v.fasteners;
+
+export const calcs: Record<string, CalcDef> = {
+  'cycle-value': {
+    title: 'What a scoring cycle is worth',
+    group: 'Game',
+    page: 'read-the-game',
+    inputs: [
+      { key: 'cycle', label: 'Time for one cycle', unit: 's', value: 8, step: 0.5 },
+      { key: 'time', label: 'Time spent cycling', unit: 's', value: 115, step: 5 },
+      { key: 'points', label: 'Points per piece', unit: 'pts', value: 5, step: 1 },
+    ],
+    outputs: [
+      { label: 'Pieces scored', unit: '', digits: 0, compute: (v) => Math.floor(v.time / v.cycle) },
+      { label: 'Points scored', unit: 'pts', digits: 0, compute: (v) => Math.floor(v.time / v.cycle) * v.points },
+      { label: 'Points per second', unit: 'pts/s', digits: 2, compute: (v) => v.points / v.cycle },
+    ],
+    steps: [
+      'Pieces = time spent cycling ÷ time for one cycle, rounded down.',
+      'Points = pieces × points per piece.',
+      'Points per second = points per piece ÷ time for one cycle.',
+    ],
+    note: 'Assumed: an 8 s cycle and 115 s of cycling (teleop is 135 s; this leaves 20 s for the climb).',
+  },
+
+  'cycle-time': {
+    title: 'Cycle time budget',
+    group: 'Game',
+    page: 'choose-what-to-be-good-at',
+    inputs: [
+      { key: 'dist', label: 'Distance, one way', unit: 'ft', value: 11.5, step: 0.5 },
+      { key: 'speed', label: 'Average driving speed', unit: 'ft/s', value: 6, step: 0.5 },
+      { key: 'intake', label: 'Time to pick up', unit: 's', value: 1.5, step: 0.1 },
+      { key: 'score', label: 'Time to line up and score', unit: 's', value: 2.5, step: 0.1 },
+    ],
+    outputs: [
+      { label: 'Driving, both ways', unit: 's', compute: (v) => (2 * v.dist) / v.speed },
+      { label: 'Whole cycle', unit: 's', compute: cycleSeconds },
+      { label: 'Share of the cycle spent driving', unit: '%', digits: 0, compute: (v) => ((2 * v.dist) / v.speed / cycleSeconds(v)) * 100 },
+    ],
+    steps: [
+      'Driving time = 2 × distance ÷ average speed.',
+      'Cycle time = driving time + pick-up time + scoring time.',
+    ],
+    note: 'Assumed: the speed and the two handling times. Average speed is far below top speed, because the robot starts and stops every trip.',
+  },
+
+  'frame-fit': {
+    title: 'Frame size check',
+    group: 'Mechanical',
+    page: 'concept',
+    inputs: [
+      { key: 'len', label: 'Frame length', unit: 'in', value: 28, step: 0.5 },
+      { key: 'wid', label: 'Frame width', unit: 'in', value: 28, step: 0.5 },
+      { key: 'bumper', label: 'Bumper thickness, each side', unit: 'in', value: 3.25, step: 0.25 },
+      { key: 'limit', label: 'Perimeter limit', unit: 'in', value: 120, step: 1 },
+    ],
+    outputs: [
+      { label: 'Frame perimeter', unit: 'in', compute: (v) => 2 * (v.len + v.wid) },
+      { label: 'Room left under the limit', unit: 'in', compute: (v) => v.limit - 2 * (v.len + v.wid) },
+      { label: 'Width with bumpers on', unit: 'in', compute: (v) => v.wid + 2 * v.bumper },
+    ],
+    steps: [
+      'Perimeter = 2 × (length + width).',
+      'Width with bumpers = frame width + 2 × bumper thickness.',
+    ],
+  },
+
+  'weight-budget': {
+    title: 'Weight budget',
+    group: 'Mechanical',
+    page: 'concept',
+    inputs: [
+      { key: 'drive', label: 'Drivebase', unit: 'lb', value: 37.7, step: 0.1 },
+      { key: 'elev', label: 'Elevator', unit: 'lb', value: 31.3, step: 0.1 },
+      { key: 'wrist', label: 'Wrist and claw', unit: 'lb', value: 12.9, step: 0.1 },
+      { key: 'climb', label: 'Climber', unit: 'lb', value: 12.9, step: 0.1 },
+      { key: 'funnel', label: 'Funnel', unit: 'lb', value: 6.9, step: 0.1 },
+      { key: 'elec', label: 'Electronics', unit: 'lb', value: 4.0, step: 0.1 },
+      { key: 'wiring', label: 'Wiring (estimate)', unit: 'lb', value: 4.0, step: 0.1 },
+      { key: 'fasteners', label: 'Fasteners', unit: 'lb', value: 6.0, step: 0.1 },
+      { key: 'limit', label: 'Weight limit', unit: 'lb', value: 115, step: 1 },
+    ],
+    outputs: [
+      { label: 'Robot weight', unit: 'lb', compute: weightTotal },
+      { label: 'Room left under the limit', unit: 'lb', compute: (v) => v.limit - weightTotal(v) },
+    ],
+    steps: [
+      'Robot weight = the sum of every subsystem, plus wiring and fasteners.',
+      'Room left = weight limit − robot weight. A negative number means the robot is over.',
+    ],
+    note: 'Modelled, except wiring, which is an estimate. The rows are rounded, so they add to 115.7 lb; the model total is 115.63 lb. Battery and bumpers do not count toward the limit.',
+  },
+
+  'drive-speed': {
+    title: 'Top driving speed',
+    group: 'Mechanical',
+    page: 'subsystems/drivebase',
+    inputs: [
+      { key: 'rpm', label: 'Motor free speed', unit: 'rpm', value: 6000, step: 100 },
+      { key: 'ratio', label: 'Gear ratio (motor turns per wheel turn)', unit: ': 1', value: 6.75, step: 0.01 },
+      { key: 'wheel', label: 'Wheel diameter', unit: 'in', value: 3.947, step: 0.001 },
+    ],
+    outputs: [
+      { label: 'Wheel speed', unit: 'rpm', digits: 0, compute: (v) => v.rpm / v.ratio },
+      { label: 'Top speed, no load', unit: 'ft/s', compute: (v) => ((v.rpm / v.ratio) * Math.PI * v.wheel) / 12 / 60 },
+    ],
+    steps: [
+      'Wheel speed = motor speed ÷ gear ratio.',
+      'Distance per wheel turn = π × wheel diameter.',
+      'Speed = wheel speed × distance per turn, changed from inches per minute to feet per second (÷ 12, ÷ 60).',
+    ],
+    note: 'Calculated. The wheel diameter is from the model; measure the real wheel.',
+  },
+
+  'elevator-speed': {
+    title: 'Elevator speed',
+    group: 'Mechanical',
+    page: 'subsystems/elevator',
+    inputs: [
+      { key: 'rpm', label: 'Motor free speed', unit: 'rpm', value: 6000, step: 100 },
+      { key: 'ratio', label: 'Gearbox ratio', unit: ': 1', value: 12, step: 0.5 },
+      { key: 'teeth', label: 'Sprocket teeth', unit: 'teeth', value: 22, step: 1 },
+      { key: 'pitch', label: 'Chain pitch', unit: 'in', value: 0.25, step: 0.125 },
+      { key: 'stages', label: 'Carriage travel per inch of first stage', unit: '×', value: 3, step: 1 },
+      { key: 'cruise', label: 'Cruise speed, share of free speed', unit: '%', value: 80, step: 5 },
+      { key: 'travel', label: 'Carriage travel', unit: 'in', value: 66, step: 1 },
+    ],
+    outputs: [
+      { label: 'Chain moved per shaft turn', unit: 'in', compute: chainPerTurn },
+      { label: 'Carriage free speed', unit: 'in/s', compute: elevatorFree },
+      { label: 'Cruise speed', unit: 'in/s', digits: 0, compute: (v) => (elevatorFree(v) * v.cruise) / 100 },
+      { label: 'Full travel at cruise', unit: 's', digits: 2, compute: (v) => v.travel / ((elevatorFree(v) * v.cruise) / 100) },
+    ],
+    steps: [
+      'Shaft speed = motor speed ÷ gearbox ratio, then ÷ 60 for turns per second.',
+      'Chain per shaft turn = sprocket teeth × chain pitch.',
+      'First-stage speed = shaft speed × chain per turn.',
+      'Carriage speed = first-stage speed × 3, because each stage rides on the one below it.',
+      'Cruise speed = free speed × the share you choose. Travel time = travel ÷ cruise speed, plus time to speed up and slow down.',
+    ],
+    note: 'Calculated.',
+  },
+
+  'elevator-hold': {
+    title: 'Current and voltage to hold the elevator still',
+    group: 'Mechanical',
+    page: 'subsystems/elevator',
+    inputs: [
+      { key: 'a', label: 'Weight moving with stage A', unit: 'lb', value: 5.71, step: 0.01 },
+      { key: 'b', label: 'Weight moving with stage B', unit: 'lb', value: 4.68, step: 0.01 },
+      { key: 'c', label: 'Carriage, wrist and claw', unit: 'lb', value: 19.83, step: 0.01 },
+      { key: 'teeth', label: 'Sprocket teeth', unit: 'teeth', value: 22, step: 1 },
+      { key: 'pitch', label: 'Chain pitch', unit: 'in', value: 0.25, step: 0.125 },
+      { key: 'ratio', label: 'Gearbox ratio', unit: ': 1', value: 12, step: 0.5 },
+      { key: 'motors', label: 'Motors', unit: '', value: 2, step: 1 },
+      { key: 'eff', label: 'Gearbox efficiency', unit: '%', value: 85, step: 1 },
+      { key: 'stallTorque', label: 'Motor stall torque', unit: 'N·m', value: 7.09, step: 0.01 },
+      { key: 'stallAmps', label: 'Motor stall current', unit: 'A', value: 366, step: 1 },
+    ],
+    outputs: [
+      { label: 'Load felt at the drive', unit: 'lbf', compute: elevatorLoad },
+      { label: 'Torque on the drive shaft', unit: 'lb·in', compute: elevatorShaftTorque },
+      { label: 'Torque from each motor', unit: 'N·m', digits: 2, compute: elevatorMotorTorque },
+      { label: 'Current in each motor', unit: 'A', digits: 0, compute: elevatorHoldAmps },
+      { label: 'Voltage to hold (a starting kG)', unit: 'V', digits: 2, compute: (v) => elevatorHoldAmps(v) * (12 / v.stallAmps) },
+    ],
+    steps: [
+      'Load at the drive = stage A weight × 1 + stage B weight × 2 + carriage weight × 3. A stage that moves twice as far for the same chain travel pulls back twice as hard.',
+      'Shaft torque = load × sprocket radius. The radius is chain per turn ÷ 2π.',
+      'Torque per motor = shaft torque ÷ gearbox ratio ÷ number of motors ÷ efficiency. (1 N·m = 8.851 lb·in.)',
+      'Current = torque per motor ÷ the motor\'s torque per amp, which is stall torque ÷ stall current.',
+      'Voltage = current × winding resistance, which is 12 V ÷ stall current.',
+    ],
+    note: 'Calculated from modelled weights. Fasteners and game pieces are not included. The real kG comes from tuning; this says where to start.',
+  },
+
+  'slide-friction': {
+    title: 'Will it slide on its own?',
+    group: 'Mechanical',
+    page: 'subsystems/funnel',
+    inputs: [{ key: 'angle', label: 'Slope of the tray', unit: '°', value: 30.5, step: 0.5 }],
+    outputs: [
+      { label: 'Highest friction coefficient that still slides', unit: '', digits: 2, compute: (v) => Math.tan((v.angle * Math.PI) / 180) },
+    ],
+    steps: ['A piece slides on its own when the friction coefficient is less than tan(slope).'],
+    note: 'The friction between a coral and the tray is assumed. Measure it with a tilt test: raise one end of the tray material until the coral starts to slide, then take tan of that angle.',
+  },
+
+  'tip-accel': {
+    title: 'How hard can it accelerate before it tips?',
+    group: 'Mechanical',
+    page: 'subsystems/elevator',
+    inputs: [{ key: 'angle', label: 'Tip angle, worst side', unit: '°', value: 27.5, step: 0.5 }],
+    outputs: [
+      { label: 'Largest safe acceleration', unit: 'g', digits: 2, compute: (v) => Math.tan((v.angle * Math.PI) / 180) },
+      { label: 'The same, in feet per second squared', unit: 'ft/s²', compute: (v) => Math.tan((v.angle * Math.PI) / 180) * G_FT_S2 },
+    ],
+    steps: [
+      'Tip angle is the angle between straight down and the line from the centre of gravity to the wheel contact line.',
+      'Largest safe acceleration, in g = tan(tip angle).',
+      'Multiply by 32.17 for feet per second squared.',
+    ],
+    note: 'Modelled, with battery and bumpers on. The default is the worst case: carriage at the top, wrist level.',
+  },
+};

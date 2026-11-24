@@ -6,7 +6,7 @@ description: "The misses, the fixes and the things still open."
 The misses, the fixes and the things still open.
 
 :::note[Coming soon]
-This chapter fills in once Robot A's CAD and code are finished.
+This chapter fills in once the CAD and code are finished.
 :::
 
 ## What this chapter will hold

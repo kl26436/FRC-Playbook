@@ -6,7 +6,7 @@ description: "How the robot code is organised and tested."
 How the robot code is organised and tested.
 
 :::note[Coming soon]
-This chapter fills in once Robot A's CAD and code are finished.
+This chapter fills in once the CAD and code are finished.
 :::
 
 ## What this chapter will hold

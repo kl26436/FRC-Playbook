@@ -1,0 +1,26 @@
+---
+// Lists every calculator from src/calcs.ts, grouped, each with a link to the page that explains it.
+import { calcs } from '../calcs';
+import Calc from './Calc.astro';
+
+const groups = ['Game', 'Mechanical'] as const;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+{
+  groups.map((group) => (
+    <>
+      <h2>{group}</h2>
+      {Object.entries(calcs)
+        .filter(([, def]) => def.group === group)
+        .map(([id, def]) => (
+          <>
+            <Calc id={id} />
+            <p>
+              <a href={`${base}/${def.page}/`}>Where this is used</a>
+            </p>
+          </>
+        ))}
+    </>
+  ))
+}

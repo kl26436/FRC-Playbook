@@ -1,6 +1,6 @@
 # FRC-Playbook
 
-The Team 4206 playbook site: how one robot, Robot A, went from kickoff analysis to design, manufacturing, assembly, wiring and code, written so students can repeat the process on a new game.
+The Team 4206 playbook site: how one robot went from kickoff analysis to design, manufacturing, assembly, wiring and code, written so students can repeat the process on a new game.
 
 Live at https://kl26436.github.io/FRC-Playbook/
 

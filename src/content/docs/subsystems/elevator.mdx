@@ -1,0 +1,80 @@
+---
+title: "Elevator"
+description: "The three-stage lift that carries the wrist up to the top of the reef."
+---
+
+import Calc from '../../../components/Calc.astro';
+
+:::note[Draft]
+First draft, written from the design log. A 3D view of the elevator will be added here.
+:::
+
+The elevator carries the wrist from just above the frame to the top of the reef. It is the tallest and heaviest mechanism on the robot, so its speed, its motor current and the robot's balance all had to be worked out before anything was built.
+
+## What we decided
+
+| Choice | What we picked |
+| --- | --- |
+| Type | Three stages that slide inside each other, each moving 22 in |
+| Travel | The carriage moves 66 in. The wrist pivot goes from 24.5 in to 90.5 in off the floor |
+| Structure | 2 × 1 in aluminium tube with 1/16 in walls, on WCP bearing blocks |
+| Drive | Two Kraken X60 motors through a 12:1 gearbox, turning 22-tooth sprockets for #25 chain |
+| Coming down | Gravity. There is no cable pulling it down |
+
+## Why
+
+- **Three stages.** The robot has to start under 42 in tall and still place a coral on L4, 72 in up, so the lift has to more than double its own height.
+- **An existing pattern.** The layout follows the WCP GreyT three-stage elevator, so the bearing blocks are off-the-shelf parts.
+- **No down-haul** saves a rope run and a tensioner. The cost is that the elevator cannot be driven down faster than it falls.
+- **12:1** gives a free speed of 137.5 in/s. Cruising at 80% of that crosses the full travel in about 0.6 s.
+
+### What changed along the way
+
+- The mast moved back, to 4.5 in ahead of the robot's centre, because the front swerve modules were in the way.
+- The inside corners of the plates were opened to a 0.13 in radius so a 1/4 in end mill can cut them.
+- The diagonal brace was riveted to the upright. Before that it was bolted at the foot and only touched the upright at the top, so it carried no load.
+
+## The math
+
+### How fast does it go?
+
+<Calc id="elevator-speed" />
+
+### How much current does it take to hold still?
+
+Holding a load in the air takes current even when nothing is moving. If holding takes most of what the motor is allowed, nothing is left to speed up.
+
+<Calc id="elevator-hold" />
+
+The motors are limited to 60 A each to start with. Holding takes about 19 A, so roughly two thirds of the limit is left for speeding up.
+
+### How hard can the robot accelerate with the elevator up?
+
+Raising the elevator raises the robot's centre of gravity, and a tall robot tips more easily.
+
+| Pose | Centre of gravity height | Largest safe acceleration |
+| --- | --- | --- |
+| Stowed | 9.6 in | 1.07 g |
+| Carriage halfway, wrist level | 15.7 in | 0.71 g |
+| Carriage at the top, wrist level | 21.5 in | 0.52 g |
+
+<Calc id="tip-accel" />
+
+So the code limits how hard the robot can accelerate whenever the carriage is high.
+
+## What went wrong
+
+**The code runs the elevator at 65 in/s, not the 110 in/s it was designed for.** At 110 in/s in simulation, the motion controller did not slow down in time and the carriage hit the top stop. A fix has been proposed and not yet tried.
+
+The lesson: a mechanism can be fast enough on paper and still be held back by how it is controlled. Check both.
+
+## Your turn
+
+For a new game:
+
+- [ ] Find the lowest and highest point the mechanism has to reach, and the starting height limit. That sets the number of stages.
+- [ ] Weigh, or model, everything that rides on each stage.
+- [ ] Use the speed calculator to pick a gear ratio. Aim to cruise at about 80% of free speed.
+- [ ] Use the holding calculator. Check that holding leaves most of the current limit free for speeding up.
+- [ ] Find the centre of gravity with the elevator fully up, and work out the acceleration limit.
+- [ ] Run it in simulation at full speed before trusting the paper number.

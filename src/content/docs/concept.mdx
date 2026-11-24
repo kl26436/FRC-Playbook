@@ -1,0 +1,68 @@
+---
+title: "3. Concept"
+description: "Picking the overall shape of the robot before any detailed design."
+---
+
+import Calc from '../../components/Calc.astro';
+
+:::note[Draft]
+First draft, written from the kickoff analysis and the design log.
+:::
+
+A concept is the robot in one paragraph and one sketch: what the big pieces are and how a game piece moves through them. It comes before any detailed design, and it should cover every must on [the priority list](../choose-what-to-be-good-at/).
+
+## What we decided
+
+A swerve base with a three-stage elevator. On top of the elevator is a wrist that coral passes straight through. Coral drops into a funnel at the back of the robot and leaves from the front, so the robot runs between station and reef without turning its mechanism around. An algae claw hangs under the wrist, and a climber at the back takes the deep cage. This is the layout as it ended up. The table further down shows what changed from the first concept.
+
+| Piece | Job |
+| --- | --- |
+| Swerve drivebase, 28 × 28 in | Drive well and never break down |
+| Three-stage elevator | Reach every level of the reef, up to L4 |
+| Pass-through wrist | Hold a coral and place it on a branch |
+| Algae claw under the wrist | Pull algae off the reef |
+| Funnel at the back | Take coral from the station |
+| Climber | Deep cage |
+
+## Why
+
+The game rewards short trips between the station and the reef (about 11 ft each way) and scoring on L4. One elevator reaches every level, and a pass-through wrist means the robot never has to turn around. That one layout covers every must and should on the list.
+
+**The frame is 28 × 28 in** because a reef face is 37.8 in wide and the cages hang 42.9 in apart. A robot that is 34.5 in wide with its bumpers on fits beside a partner at both.
+
+### Options we did not take
+
+- **A floor-feeder robot.** The stations feed reliably, and a floor pickup adds weight.
+- **A separate arm for algae.** A claw under the wrist reuses the elevator that is already there.
+
+## What changed after the concept
+
+A concept is a first guess. These are the places where the detailed design proved it wrong or found something better.
+
+| What | Concept | Final design | Why it changed |
+| --- | --- | --- | --- |
+| Elevator position | Further forward | Mast moved back, to 4.5 in ahead of centre | The front swerve modules were in the way |
+| Climber | A fork on the left rail | A fork in a bay at the back | The left-rail fork could not do the deep climb. This was found in CAD, before anything was cut |
+| Funnel | Fixed | Hinged, swings out of the way | The climber needed the space at the back |
+| Cameras | Three | One, low in the nose | The reef tags are only 12.1 in off the carpet, so one low camera sees them |
+| Coral and algae sensors | Beam breaks | Distance sensors on the CAN bus | No extra wires up the elevator |
+| L4 pose | Wrist at −50°, pivot at 87 in | Wrist at −53°, pivot at 90.5 in | Worked out from the real travel of the elevator |
+| Weight | 106 lb estimated | 115.6 lb modelled | Fasteners were counted, vendor parts weighed, and parts were added that the concept never had |
+
+## The math: will it fit, and will it make weight?
+
+Two limits shape every concept: the frame perimeter and the weight.
+
+<Calc id="frame-fit" />
+
+<Calc id="weight-budget" />
+
+The robot is 0.6 lb over the limit and cannot pass inspection at this weight. That is a known miss. The options for fixing it are in [What went wrong](../what-went-wrong/).
+
+## Your turn
+
+- [ ] Write the concept in one paragraph. If it takes two, it is not one concept yet.
+- [ ] Sketch how a game piece gets in, where it is held and how it gets out.
+- [ ] Check the concept against every must. Change the concept, not the list.
+- [ ] Write down at least two options you did not take, and the reason.
+- [ ] Start a weight budget on day one, and add a line for fasteners and wiring.

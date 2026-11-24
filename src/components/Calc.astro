@@ -1,0 +1,186 @@
+---
+// One calculator, looked up by id in src/calcs.ts.
+import { calcs } from '../calcs';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const def = calcs[id];
+if (!def) throw new Error(`Unknown calculator: ${id}`);
+
+const values = Object.fromEntries(def.inputs.map((i) => [i.key, i.value]));
+const show = (n: number, digits: number) => (Number.isFinite(n) ? n.toFixed(digits) : '?');
+---
+
+<div class="calc not-content" data-calc={id}>
+  <p class="calc-title">{def.title}</p>
+  <div class="calc-grid">
+    <fieldset>
+      <legend>Your numbers</legend>
+      {
+        def.inputs.map((i) => (
+          <label>
+            <span>{i.label}</span>
+            <span class="calc-field">
+              <input type="number" inputmode="decimal" data-key={i.key} data-default={i.value} value={i.value} step={i.step ?? 'any'} />
+              <span class="calc-unit">{i.unit}</span>
+            </span>
+          </label>
+        ))
+      }
+      <button type="button" data-reset>Reset to the robot's numbers</button>
+    </fieldset>
+    <div class="calc-out" aria-live="polite">
+      <p class="calc-legend">Result</p>
+      {
+        def.outputs.map((o, n) => (
+          <p>
+            <span>{o.label}</span>
+            <strong>
+              <output data-out={n}>{show(o.compute(values), o.digits ?? 1)}</output> {o.unit}
+            </strong>
+          </p>
+        ))
+      }
+    </div>
+  </div>
+  <p class="calc-legend">How it is worked out</p>
+  <ol class="calc-steps">
+    {def.steps.map((s) => <li>{s}</li>)}
+  </ol>
+  {def.note && <p class="calc-note">{def.note}</p>}
+</div>
+
+<script>
+  import { calcs } from '../calcs';
+
+  for (const box of document.querySelectorAll<HTMLElement>('.calc[data-calc]')) {
+    const def = calcs[box.dataset.calc ?? ''];
+    if (!def) continue;
+    const inputs = [...box.querySelectorAll<HTMLInputElement>('input[data-key]')];
+    const update = () => {
+      const v: Record<string, number> = {};
+      for (const el of inputs) v[el.dataset.key ?? ''] = Number.parseFloat(el.value);
+      def.outputs.forEach((o, n) => {
+        const out = box.querySelector(`output[data-out="${n}"]`);
+        if (!out) return;
+        const value = o.compute(v);
+        out.textContent = Number.isFinite(value) ? value.toFixed(o.digits ?? 1) : '?';
+      });
+    };
+    for (const el of inputs) el.addEventListener('input', update);
+    box.querySelector('[data-reset]')?.addEventListener('click', () => {
+      for (const el of inputs) el.value = el.dataset.default ?? '';
+      update();
+    });
+  }
+</script>
+
+<style>
+  .calc {
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 4px solid var(--sl-color-accent);
+    background: var(--sl-color-gray-7, var(--sl-color-gray-6));
+    padding: 1rem 1.25rem;
+    margin-block: 1.5rem;
+    border-radius: 0.375rem;
+  }
+  .calc-title {
+    font-size: var(--sl-text-h4);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    margin: 0 0 0.75rem;
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  legend,
+  .calc-legend {
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sl-color-gray-3);
+    margin: 0 0 0.5rem;
+    padding: 0;
+  }
+  label {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: var(--sl-text-sm);
+  }
+  .calc-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  input {
+    width: 6.5rem;
+    padding: 0.25rem 0.5rem;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--sl-color-white);
+    background: var(--sl-color-black);
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+  }
+  .calc-unit {
+    min-width: 2.5rem;
+    color: var(--sl-color-gray-3);
+  }
+  button {
+    justify-self: start;
+    margin-top: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    font: inherit;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-white);
+    background: transparent;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+  .calc-out p {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    margin: 0 0 0.375rem;
+    font-size: var(--sl-text-sm);
+  }
+  .calc-out strong {
+    color: var(--sl-color-white);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .calc-steps {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: var(--sl-text-sm);
+  }
+  .calc-steps li + li {
+    margin-top: 0.25rem;
+  }
+  .calc > .calc-legend {
+    margin-top: 1rem;
+  }
+  .calc-note {
+    margin: 0.75rem 0 0;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+</style>
