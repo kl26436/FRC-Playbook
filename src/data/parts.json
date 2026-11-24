@@ -149,31 +149,31 @@
    {
     "dia": 0.125,
     "n": 4,
-    "drill": "1/8",
+    "drill": "1/8 drill",
     "use": "small screw or pilot"
    },
    {
     "dia": 0.161,
     "n": 51,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 2,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.266,
     "n": 2,
-    "drill": "H",
+    "drill": "H drill",
     "use": "clearance for a 1/4 screw"
    },
    {
     "dia": 0.297,
     "n": 14,
-    "drill": "19/64",
+    "drill": "19/64 drill",
     "use": "#10-32 rivnut"
    }
   ],
@@ -186,8 +186,8 @@
    "Stock: 0.063 in 5052 aluminium sheet, at least 28.8 \u00d7 28.8 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `D-201_belly_pan_0.063.dxf` in the router software. It is drawn in inches at full size.",
    "This sheet is thin and will lift. Hold it down across its whole area, not only at the edges.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 4 \u00d7 0.125 in (1/8), 51 \u00d7 0.161 in (#20), 2 \u00d7 0.196 in (#9).",
-   "Cut the larger holes with the 1/4 in end mill: 2 \u00d7 0.266 in, 14 \u00d7 0.297 in.",
+   "Drill the small holes first, on the router, using its tool changer: 4 \u00d7 0.125 in with the 1/8 drill, 51 \u00d7 0.161 in with the #20 drill, 2 \u00d7 0.196 in with the #9 drill, 2 \u00d7 0.266 in with the H drill, 14 \u00d7 0.297 in with the 19/64 drill.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -195,7 +195,7 @@
    "Overall size 27.8 \u00d7 27.8 in.",
    "Hole count: 73."
   ],
-  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-1.162 -28.962 30.124 30.124\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.1069\" stroke-linecap=\"round\"><line x1=\"0.000\" y1=\"-20.300\" x2=\"0.000\" y2=\"-7.500\"/><line x1=\"0.000\" y1=\"-7.500\" x2=\"7.370\" y2=\"-7.500\"/><line x1=\"7.370\" y1=\"-20.300\" x2=\"0.000\" y2=\"-20.300\"/><path d=\"M7.500,-7.370 A0.130,0.130 0 0 0 7.370,-7.500\"/><path d=\"M7.370,-20.300 A0.130,0.130 0 0 0 7.500,-20.430\"/><line x1=\"7.500\" y1=\"-7.370\" x2=\"7.500\" y2=\"-0.000\"/><line x1=\"7.500\" y1=\"-27.800\" x2=\"7.500\" y2=\"-20.430\"/><line x1=\"7.500\" y1=\"-0.000\" x2=\"20.300\" y2=\"-0.000\"/><line x1=\"20.300\" y1=\"-27.800\" x2=\"7.500\" y2=\"-27.800\"/><line x1=\"20.300\" y1=\"-0.000\" x2=\"20.300\" y2=\"-7.370\"/><line x1=\"20.300\" y1=\"-20.430\" x2=\"20.300\" y2=\"-27.800\"/><path d=\"M20.430,-7.500 A0.130,0.130 0 0 0 20.300,-7.370\"/><path d=\"M20.300,-20.430 A0.130,0.130 0 0 0 20.430,-20.300\"/><line x1=\"20.430\" y1=\"-7.500\" x2=\"27.800\" y2=\"-7.500\"/><line x1=\"27.800\" y1=\"-20.300\" x2=\"20.430\" y2=\"-20.300\"/><line x1=\"27.800\" y1=\"-7.500\" x2=\"27.800\" y2=\"-20.300\"/><circle cx=\"7.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><circle cx=\"8.300\" cy=\"-1.350\" r=\"0.148\"/><circle cx=\"9.900\" cy=\"-1.900\" r=\"0.081\" class=\"small\"/><circle cx=\"11.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><circle cx=\"13.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><path d=\"M10.900,-1.700 A0.300,0.300 0 0 0 11.200,-1.400\"/><line x1=\"14.100\" y1=\"-1.400\" x2=\"11.200\" y2=\"-1.400\"/><line x1=\"10.900\" y1=\"-1.700\" x2=\"10.900\" y2=\"-4.600\"/><path d=\"M14.100,-1.400 A0.300,0.300 0 0 0 14.400,-1.700\"/><path d=\"M11.200,-4.900 A0.300,0.300 0 0 0 10.900,-4.600\"/><line x1=\"14.400\" y1=\"-4.600\" x2=\"14.400\" y2=\"-1.700\"/><line x1=\"11.200\" y1=\"-4.900\" x2=\"14.100\" y2=\"-4.900\"/><path d=\"M14.400,-4.600 A0.300,0.300 0 0 0 14.100,-4.900\"/><circle cx=\"9.900\" cy=\"-3.900\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-5.900\" r=\"0.081\" class=\"small\"/><path d=\"M10.900,-5.700 A0.300,0.300 0 0 0 11.200,-5.400\"/><line x1=\"10.900\" y1=\"-5.700\" x2=\"10.900\" y2=\"-6.600\"/><line x1=\"12.100\" y1=\"-5.400\" x2=\"11.200\" y2=\"-5.400\"/><path d=\"M11.200,-6.900 A0.300,0.300 0 0 0 10.900,-6.600\"/><path d=\"M12.100,-5.400 A0.300,0.300 0 0 0 12.400,-5.700\"/><line x1=\"11.200\" y1=\"-6.900\" x2=\"12.100\" y2=\"-6.900\"/><line x1=\"12.400\" y1=\"-6.600\" x2=\"12.400\" y2=\"-5.700\"/><path d=\"M12.400,-6.600 A0.300,0.300 0 0 0 12.100,-6.900\"/><circle cx=\"0.400\" cy=\"-7.900\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-9.900\" r=\"0.081\" class=\"small\"/><circle cx=\"1.900\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"4.400\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"6.900\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-11.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.600\" cy=\"-10.900\" r=\"0.081\" class=\"small\"/><path d=\"M5.400,-10.950 A0.300,0.300 0 0 0 5.700,-10.650\"/><line x1=\"5.400\" y1=\"-10.950\" x2=\"5.400\" y2=\"-11.850\"/><line x1=\"6.600\" y1=\"-10.650\" x2=\"5.700\" y2=\"-10.650\"/><path d=\"M5.700,-12.150 A0.300,0.300 0 0 0 5.400,-11.850\"/><path d=\"M6.600,-10.650 A0.300,0.300 0 0 0 6.900,-10.950\"/><line x1=\"5.700\" y1=\"-12.150\" x2=\"6.600\" y2=\"-12.150\"/><line x1=\"6.900\" y1=\"-11.850\" x2=\"6.900\" y2=\"-10.950\"/><path d=\"M6.900,-11.850 A0.300,0.300 0 0 0 6.600,-12.150\"/><circle cx=\"4.600\" cy=\"-12.900\" r=\"0.081\" class=\"small\"/><circle cx=\"5.450\" cy=\"-13.150\" r=\"0.148\"/><circle cx=\"9.900\" cy=\"-7.900\" r=\"0.081\" class=\"small\"/><circle cx=\"8.400\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-9.900\" r=\"0.081\" class=\"small\"/><circle cx=\"13.319\" cy=\"-7.477\" r=\"0.148\"/><path d=\"M7.400,-10.950 A0.300,0.300 0 0 0 7.700,-10.650\"/><line x1=\"7.400\" y1=\"-10.950\" x2=\"7.400\" y2=\"-11.850\"/><line x1=\"8.600\" y1=\"-10.650\" x2=\"7.700\" y2=\"-10.650\"/><path d=\"M7.700,-12.150 A0.300,0.300 0 0 0 7.400,-11.850\"/><path d=\"M8.600,-10.650 A0.300,0.300 0 0 0 8.900,-10.950\"/><line x1=\"7.700\" y1=\"-12.150\" x2=\"8.600\" y2=\"-12.150\"/><line x1=\"8.900\" y1=\"-11.850\" x2=\"8.900\" y2=\"-10.950\"/><path d=\"M8.900,-11.850 A0.300,0.300 0 0 0 8.600,-12.150\"/><circle cx=\"9.900\" cy=\"-11.900\" r=\"0.081\" class=\"small\"/><circle cx=\"8.450\" cy=\"-13.150\" r=\"0.148\"/><circle cx=\"9.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><circle cx=\"13.319\" cy=\"-13.677\" r=\"0.148\"/><circle cx=\"15.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><circle cx=\"15.900\" cy=\"-1.350\" r=\"0.148\"/><path d=\"M14.900,-2.450 A0.300,0.300 0 0 0 15.200,-2.150\"/><line x1=\"14.900\" y1=\"-2.450\" x2=\"14.900\" y2=\"-3.850\"/><line x1=\"16.600\" y1=\"-2.150\" x2=\"15.200\" y2=\"-2.150\"/><path d=\"M15.200,-4.150 A0.300,0.300 0 0 0 14.900,-3.850\"/><path d=\"M16.600,-2.150 A0.300,0.300 0 0 0 16.900,-2.450\"/><line x1=\"15.200\" y1=\"-4.150\" x2=\"16.600\" y2=\"-4.150\"/><line x1=\"16.900\" y1=\"-3.850\" x2=\"16.900\" y2=\"-2.450\"/><path d=\"M16.900,-3.850 A0.300,0.300 0 0 0 16.600,-4.150\"/><circle cx=\"19.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><path d=\"M14.650,-5.700 A0.300,0.300 0 0 0 14.950,-5.400\"/><line x1=\"14.650\" y1=\"-5.700\" x2=\"14.650\" y2=\"-7.100\"/><line x1=\"16.350\" y1=\"-5.400\" x2=\"14.950\" y2=\"-5.400\"/><path d=\"M14.950,-7.400 A0.300,0.300 0 0 0 14.650,-7.100\"/><path d=\"M16.350,-5.400 A0.300,0.300 0 0 0 16.650,-5.700\"/><line x1=\"14.950\" y1=\"-7.400\" x2=\"16.350\" y2=\"-7.400\"/><line x1=\"16.650\" y1=\"-7.100\" x2=\"16.650\" y2=\"-5.700\"/><path d=\"M16.650,-7.100 A0.300,0.300 0 0 0 16.350,-7.400\"/><circle cx=\"20.400\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><path d=\"M19.900,-8.700 A0.300,0.300 0 0 0 20.200,-8.400\"/><line x1=\"23.100\" y1=\"-8.400\" x2=\"20.200\" y2=\"-8.400\"/><line x1=\"19.900\" y1=\"-8.700\" x2=\"19.900\" y2=\"-11.600\"/><path d=\"M23.100,-8.400 A0.300,0.300 0 0 0 23.400,-8.700\"/><path d=\"M20.200,-11.900 A0.300,0.300 0 0 0 19.900,-11.600\"/><line x1=\"23.400\" y1=\"-11.600\" x2=\"23.400\" y2=\"-8.700\"/><line x1=\"20.200\" y1=\"-11.900\" x2=\"23.100\" y2=\"-11.900\"/><path d=\"M23.400,-11.600 A0.300,0.300 0 0 0 23.100,-11.900\"/><circle cx=\"27.400\" cy=\"-7.900\" r=\"0.081\" class=\"small\"/><path d=\"M23.900,-8.700 A0.300,0.300 0 0 0 24.200,-8.400\"/><line x1=\"26.100\" y1=\"-8.400\" x2=\"24.200\" y2=\"-8.400\"/><line x1=\"23.900\" y1=\"-8.700\" x2=\"23.900\" y2=\"-10.600\"/><path d=\"M26.100,-8.400 A0.300,0.300 0 0 0 26.400,-8.700\"/><path d=\"M24.200,-10.900 A0.300,0.300 0 0 0 23.900,-10.600\"/><line x1=\"26.400\" y1=\"-10.600\" x2=\"26.400\" y2=\"-8.700\"/><line x1=\"24.200\" y1=\"-10.900\" x2=\"26.100\" y2=\"-10.900\"/><path d=\"M26.400,-10.600 A0.300,0.300 0 0 0 26.100,-10.900\"/><circle cx=\"27.400\" cy=\"-9.900\" r=\"0.081\" class=\"small\"/><circle cx=\"21.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><path d=\"M23.900,-11.700 A0.300,0.300 0 0 0 24.200,-11.400\"/><line x1=\"23.900\" y1=\"-11.700\" x2=\"23.900\" y2=\"-12.600\"/><line x1=\"25.100\" y1=\"-11.400\" x2=\"24.200\" y2=\"-11.400\"/><path d=\"M24.200,-12.900 A0.300,0.300 0 0 0 23.900,-12.600\"/><path d=\"M25.100,-11.400 A0.300,0.300 0 0 0 25.400,-11.700\"/><line x1=\"24.200\" y1=\"-12.900\" x2=\"25.100\" y2=\"-12.900\"/><line x1=\"25.400\" y1=\"-12.600\" x2=\"25.400\" y2=\"-11.700\"/><path d=\"M25.400,-12.600 A0.300,0.300 0 0 0 25.100,-12.900\"/><circle cx=\"27.400\" cy=\"-11.900\" r=\"0.081\" class=\"small\"/><circle cx=\"24.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><circle cx=\"27.400\" cy=\"-12.350\" r=\"0.098\" class=\"small\"/><circle cx=\"25.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-15.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.600\" cy=\"-14.900\" r=\"0.081\" class=\"small\"/><circle cx=\"5.450\" cy=\"-14.650\" r=\"0.148\"/><circle cx=\"4.600\" cy=\"-16.900\" r=\"0.081\" class=\"small\"/><path d=\"M5.400,-15.700 A0.300,0.300 0 0 0 5.700,-15.400\"/><line x1=\"5.400\" y1=\"-15.700\" x2=\"5.400\" y2=\"-16.600\"/><line x1=\"6.600\" y1=\"-15.400\" x2=\"5.700\" y2=\"-15.400\"/><path d=\"M5.700,-16.900 A0.300,0.300 0 0 0 5.400,-16.600\"/><path d=\"M6.600,-15.400 A0.300,0.300 0 0 0 6.900,-15.700\"/><line x1=\"5.700\" y1=\"-16.900\" x2=\"6.600\" y2=\"-16.900\"/><line x1=\"6.900\" y1=\"-16.600\" x2=\"6.900\" y2=\"-15.700\"/><path d=\"M6.900,-16.600 A0.300,0.300 0 0 0 6.600,-16.900\"/><circle cx=\"0.400\" cy=\"-17.900\" r=\"0.081\" class=\"small\"/><circle cx=\"1.900\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-19.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.400\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"6.900\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"8.450\" cy=\"-14.650\" r=\"0.148\"/><path d=\"M7.400,-15.700 A0.300,0.300 0 0 0 7.700,-15.400\"/><line x1=\"7.400\" y1=\"-15.700\" x2=\"7.400\" y2=\"-16.600\"/><line x1=\"8.600\" y1=\"-15.400\" x2=\"7.700\" y2=\"-15.400\"/><path d=\"M7.700,-16.900 A0.300,0.300 0 0 0 7.400,-16.600\"/><path d=\"M8.600,-15.400 A0.300,0.300 0 0 0 8.900,-15.700\"/><line x1=\"7.700\" y1=\"-16.900\" x2=\"8.600\" y2=\"-16.900\"/><line x1=\"8.900\" y1=\"-16.600\" x2=\"8.900\" y2=\"-15.700\"/><path d=\"M8.900,-16.600 A0.300,0.300 0 0 0 8.600,-16.900\"/><circle cx=\"9.900\" cy=\"-15.900\" r=\"0.081\" class=\"small\"/><circle cx=\"11.615\" cy=\"-15.230\" r=\"0.062\" class=\"small\"/><circle cx=\"12.755\" cy=\"-15.230\" r=\"0.062\" class=\"small\"/><circle cx=\"11.615\" cy=\"-16.370\" r=\"0.062\" class=\"small\"/><circle cx=\"12.755\" cy=\"-16.370\" r=\"0.062\" class=\"small\"/><circle cx=\"8.400\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-17.900\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-19.900\" r=\"0.081\" class=\"small\"/><circle cx=\"10.919\" cy=\"-17.854\" r=\"0.148\"/><circle cx=\"9.900\" cy=\"-21.900\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-23.900\" r=\"0.081\" class=\"small\"/><circle cx=\"8.300\" cy=\"-26.450\" r=\"0.148\"/><circle cx=\"7.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-25.900\" r=\"0.081\" class=\"small\"/><circle cx=\"10.919\" cy=\"-26.354\" r=\"0.148\"/><circle cx=\"11.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"13.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"14.825\" cy=\"-14.800\" r=\"0.133\"/><circle cx=\"13.925\" cy=\"-16.400\" r=\"0.133\"/><circle cx=\"14.919\" cy=\"-17.854\" r=\"0.148\"/><circle cx=\"27.400\" cy=\"-15.450\" r=\"0.098\" class=\"small\"/><path d=\"M23.900,-15.200 A0.300,0.300 0 0 0 24.200,-14.900\"/><line x1=\"26.100\" y1=\"-14.900\" x2=\"24.200\" y2=\"-14.900\"/><line x1=\"23.900\" y1=\"-15.200\" x2=\"23.900\" y2=\"-17.100\"/><path d=\"M26.100,-14.900 A0.300,0.300 0 0 0 26.400,-15.200\"/><path d=\"M24.200,-17.400 A0.300,0.300 0 0 0 23.900,-17.100\"/><line x1=\"26.400\" y1=\"-17.100\" x2=\"26.400\" y2=\"-15.200\"/><line x1=\"24.200\" y1=\"-17.400\" x2=\"26.100\" y2=\"-17.400\"/><path d=\"M26.400,-17.100 A0.300,0.300 0 0 0 26.100,-17.400\"/><circle cx=\"27.400\" cy=\"-15.900\" r=\"0.081\" class=\"small\"/><path d=\"M19.900,-16.200 A0.300,0.300 0 0 0 20.200,-15.900\"/><line x1=\"23.100\" y1=\"-15.900\" x2=\"20.200\" y2=\"-15.900\"/><line x1=\"19.900\" y1=\"-16.200\" x2=\"19.900\" y2=\"-19.100\"/><path d=\"M23.100,-15.900 A0.300,0.300 0 0 0 23.400,-16.200\"/><path d=\"M20.200,-19.400 A0.300,0.300 0 0 0 19.900,-19.100\"/><line x1=\"23.400\" y1=\"-19.100\" x2=\"23.400\" y2=\"-16.200\"/><line x1=\"20.200\" y1=\"-19.400\" x2=\"23.100\" y2=\"-19.400\"/><path d=\"M23.400,-19.100 A0.300,0.300 0 0 0 23.100,-19.400\"/><path d=\"M23.900,-18.200 A0.300,0.300 0 0 0 24.200,-17.900\"/><line x1=\"23.900\" y1=\"-18.200\" x2=\"23.900\" y2=\"-19.100\"/><line x1=\"25.100\" y1=\"-17.900\" x2=\"24.200\" y2=\"-17.900\"/><path d=\"M24.200,-19.400 A0.300,0.300 0 0 0 23.900,-19.100\"/><path d=\"M25.100,-17.900 A0.300,0.300 0 0 0 25.400,-18.200\"/><line x1=\"24.200\" y1=\"-19.400\" x2=\"25.100\" y2=\"-19.400\"/><line x1=\"25.400\" y1=\"-19.100\" x2=\"25.400\" y2=\"-18.200\"/><path d=\"M25.400,-19.100 A0.300,0.300 0 0 0 25.100,-19.400\"/><circle cx=\"27.400\" cy=\"-17.900\" r=\"0.081\" class=\"small\"/><circle cx=\"27.400\" cy=\"-19.900\" r=\"0.081\" class=\"small\"/><circle cx=\"14.919\" cy=\"-26.354\" r=\"0.148\"/><circle cx=\"15.900\" cy=\"-26.450\" r=\"0.148\"/><circle cx=\"15.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"19.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/></svg>"
+  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-1.162 -28.962 30.124 30.124\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.1069\" stroke-linecap=\"round\"><line x1=\"0.000\" y1=\"-20.300\" x2=\"0.000\" y2=\"-7.500\"/><line x1=\"0.000\" y1=\"-7.500\" x2=\"7.370\" y2=\"-7.500\"/><line x1=\"7.370\" y1=\"-20.300\" x2=\"0.000\" y2=\"-20.300\"/><path d=\"M7.500,-7.370 A0.130,0.130 0 0 0 7.370,-7.500\"/><path d=\"M7.370,-20.300 A0.130,0.130 0 0 0 7.500,-20.430\"/><line x1=\"7.500\" y1=\"-7.370\" x2=\"7.500\" y2=\"-0.000\"/><line x1=\"7.500\" y1=\"-27.800\" x2=\"7.500\" y2=\"-20.430\"/><line x1=\"7.500\" y1=\"-0.000\" x2=\"20.300\" y2=\"-0.000\"/><line x1=\"20.300\" y1=\"-27.800\" x2=\"7.500\" y2=\"-27.800\"/><line x1=\"20.300\" y1=\"-0.000\" x2=\"20.300\" y2=\"-7.370\"/><line x1=\"20.300\" y1=\"-20.430\" x2=\"20.300\" y2=\"-27.800\"/><path d=\"M20.430,-7.500 A0.130,0.130 0 0 0 20.300,-7.370\"/><path d=\"M20.300,-20.430 A0.130,0.130 0 0 0 20.430,-20.300\"/><line x1=\"20.430\" y1=\"-7.500\" x2=\"27.800\" y2=\"-7.500\"/><line x1=\"27.800\" y1=\"-20.300\" x2=\"20.430\" y2=\"-20.300\"/><line x1=\"27.800\" y1=\"-7.500\" x2=\"27.800\" y2=\"-20.300\"/><circle cx=\"7.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><circle cx=\"8.300\" cy=\"-1.350\" r=\"0.148\" class=\"small\"/><circle cx=\"9.900\" cy=\"-1.900\" r=\"0.081\" class=\"small\"/><circle cx=\"11.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><circle cx=\"13.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><path d=\"M10.900,-1.700 A0.300,0.300 0 0 0 11.200,-1.400\"/><line x1=\"14.100\" y1=\"-1.400\" x2=\"11.200\" y2=\"-1.400\"/><line x1=\"10.900\" y1=\"-1.700\" x2=\"10.900\" y2=\"-4.600\"/><path d=\"M14.100,-1.400 A0.300,0.300 0 0 0 14.400,-1.700\"/><path d=\"M11.200,-4.900 A0.300,0.300 0 0 0 10.900,-4.600\"/><line x1=\"14.400\" y1=\"-4.600\" x2=\"14.400\" y2=\"-1.700\"/><line x1=\"11.200\" y1=\"-4.900\" x2=\"14.100\" y2=\"-4.900\"/><path d=\"M14.400,-4.600 A0.300,0.300 0 0 0 14.100,-4.900\"/><circle cx=\"9.900\" cy=\"-3.900\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-5.900\" r=\"0.081\" class=\"small\"/><path d=\"M10.900,-5.700 A0.300,0.300 0 0 0 11.200,-5.400\"/><line x1=\"10.900\" y1=\"-5.700\" x2=\"10.900\" y2=\"-6.600\"/><line x1=\"12.100\" y1=\"-5.400\" x2=\"11.200\" y2=\"-5.400\"/><path d=\"M11.200,-6.900 A0.300,0.300 0 0 0 10.900,-6.600\"/><path d=\"M12.100,-5.400 A0.300,0.300 0 0 0 12.400,-5.700\"/><line x1=\"11.200\" y1=\"-6.900\" x2=\"12.100\" y2=\"-6.900\"/><line x1=\"12.400\" y1=\"-6.600\" x2=\"12.400\" y2=\"-5.700\"/><path d=\"M12.400,-6.600 A0.300,0.300 0 0 0 12.100,-6.900\"/><circle cx=\"0.400\" cy=\"-7.900\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-9.900\" r=\"0.081\" class=\"small\"/><circle cx=\"1.900\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"4.400\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"6.900\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-11.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.600\" cy=\"-10.900\" r=\"0.081\" class=\"small\"/><path d=\"M5.400,-10.950 A0.300,0.300 0 0 0 5.700,-10.650\"/><line x1=\"5.400\" y1=\"-10.950\" x2=\"5.400\" y2=\"-11.850\"/><line x1=\"6.600\" y1=\"-10.650\" x2=\"5.700\" y2=\"-10.650\"/><path d=\"M5.700,-12.150 A0.300,0.300 0 0 0 5.400,-11.850\"/><path d=\"M6.600,-10.650 A0.300,0.300 0 0 0 6.900,-10.950\"/><line x1=\"5.700\" y1=\"-12.150\" x2=\"6.600\" y2=\"-12.150\"/><line x1=\"6.900\" y1=\"-11.850\" x2=\"6.900\" y2=\"-10.950\"/><path d=\"M6.900,-11.850 A0.300,0.300 0 0 0 6.600,-12.150\"/><circle cx=\"4.600\" cy=\"-12.900\" r=\"0.081\" class=\"small\"/><circle cx=\"5.450\" cy=\"-13.150\" r=\"0.148\" class=\"small\"/><circle cx=\"9.900\" cy=\"-7.900\" r=\"0.081\" class=\"small\"/><circle cx=\"8.400\" cy=\"-9.825\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-9.900\" r=\"0.081\" class=\"small\"/><circle cx=\"13.319\" cy=\"-7.477\" r=\"0.148\" class=\"small\"/><path d=\"M7.400,-10.950 A0.300,0.300 0 0 0 7.700,-10.650\"/><line x1=\"7.400\" y1=\"-10.950\" x2=\"7.400\" y2=\"-11.850\"/><line x1=\"8.600\" y1=\"-10.650\" x2=\"7.700\" y2=\"-10.650\"/><path d=\"M7.700,-12.150 A0.300,0.300 0 0 0 7.400,-11.850\"/><path d=\"M8.600,-10.650 A0.300,0.300 0 0 0 8.900,-10.950\"/><line x1=\"7.700\" y1=\"-12.150\" x2=\"8.600\" y2=\"-12.150\"/><line x1=\"8.900\" y1=\"-11.850\" x2=\"8.900\" y2=\"-10.950\"/><path d=\"M8.900,-11.850 A0.300,0.300 0 0 0 8.600,-12.150\"/><circle cx=\"9.900\" cy=\"-11.900\" r=\"0.081\" class=\"small\"/><circle cx=\"8.450\" cy=\"-13.150\" r=\"0.148\" class=\"small\"/><circle cx=\"9.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><circle cx=\"13.319\" cy=\"-13.677\" r=\"0.148\" class=\"small\"/><circle cx=\"15.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><circle cx=\"15.900\" cy=\"-1.350\" r=\"0.148\" class=\"small\"/><path d=\"M14.900,-2.450 A0.300,0.300 0 0 0 15.200,-2.150\"/><line x1=\"14.900\" y1=\"-2.450\" x2=\"14.900\" y2=\"-3.850\"/><line x1=\"16.600\" y1=\"-2.150\" x2=\"15.200\" y2=\"-2.150\"/><path d=\"M15.200,-4.150 A0.300,0.300 0 0 0 14.900,-3.850\"/><path d=\"M16.600,-2.150 A0.300,0.300 0 0 0 16.900,-2.450\"/><line x1=\"15.200\" y1=\"-4.150\" x2=\"16.600\" y2=\"-4.150\"/><line x1=\"16.900\" y1=\"-3.850\" x2=\"16.900\" y2=\"-2.450\"/><path d=\"M16.900,-3.850 A0.300,0.300 0 0 0 16.600,-4.150\"/><circle cx=\"19.900\" cy=\"-0.400\" r=\"0.081\" class=\"small\"/><path d=\"M14.650,-5.700 A0.300,0.300 0 0 0 14.950,-5.400\"/><line x1=\"14.650\" y1=\"-5.700\" x2=\"14.650\" y2=\"-7.100\"/><line x1=\"16.350\" y1=\"-5.400\" x2=\"14.950\" y2=\"-5.400\"/><path d=\"M14.950,-7.400 A0.300,0.300 0 0 0 14.650,-7.100\"/><path d=\"M16.350,-5.400 A0.300,0.300 0 0 0 16.650,-5.700\"/><line x1=\"14.950\" y1=\"-7.400\" x2=\"16.350\" y2=\"-7.400\"/><line x1=\"16.650\" y1=\"-7.100\" x2=\"16.650\" y2=\"-5.700\"/><path d=\"M16.650,-7.100 A0.300,0.300 0 0 0 16.350,-7.400\"/><circle cx=\"20.400\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><path d=\"M19.900,-8.700 A0.300,0.300 0 0 0 20.200,-8.400\"/><line x1=\"23.100\" y1=\"-8.400\" x2=\"20.200\" y2=\"-8.400\"/><line x1=\"19.900\" y1=\"-8.700\" x2=\"19.900\" y2=\"-11.600\"/><path d=\"M23.100,-8.400 A0.300,0.300 0 0 0 23.400,-8.700\"/><path d=\"M20.200,-11.900 A0.300,0.300 0 0 0 19.900,-11.600\"/><line x1=\"23.400\" y1=\"-11.600\" x2=\"23.400\" y2=\"-8.700\"/><line x1=\"20.200\" y1=\"-11.900\" x2=\"23.100\" y2=\"-11.900\"/><path d=\"M23.400,-11.600 A0.300,0.300 0 0 0 23.100,-11.900\"/><circle cx=\"27.400\" cy=\"-7.900\" r=\"0.081\" class=\"small\"/><path d=\"M23.900,-8.700 A0.300,0.300 0 0 0 24.200,-8.400\"/><line x1=\"26.100\" y1=\"-8.400\" x2=\"24.200\" y2=\"-8.400\"/><line x1=\"23.900\" y1=\"-8.700\" x2=\"23.900\" y2=\"-10.600\"/><path d=\"M26.100,-8.400 A0.300,0.300 0 0 0 26.400,-8.700\"/><path d=\"M24.200,-10.900 A0.300,0.300 0 0 0 23.900,-10.600\"/><line x1=\"26.400\" y1=\"-10.600\" x2=\"26.400\" y2=\"-8.700\"/><line x1=\"24.200\" y1=\"-10.900\" x2=\"26.100\" y2=\"-10.900\"/><path d=\"M26.400,-10.600 A0.300,0.300 0 0 0 26.100,-10.900\"/><circle cx=\"27.400\" cy=\"-9.900\" r=\"0.081\" class=\"small\"/><circle cx=\"21.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><path d=\"M23.900,-11.700 A0.300,0.300 0 0 0 24.200,-11.400\"/><line x1=\"23.900\" y1=\"-11.700\" x2=\"23.900\" y2=\"-12.600\"/><line x1=\"25.100\" y1=\"-11.400\" x2=\"24.200\" y2=\"-11.400\"/><path d=\"M24.200,-12.900 A0.300,0.300 0 0 0 23.900,-12.600\"/><path d=\"M25.100,-11.400 A0.300,0.300 0 0 0 25.400,-11.700\"/><line x1=\"24.200\" y1=\"-12.900\" x2=\"25.100\" y2=\"-12.900\"/><line x1=\"25.400\" y1=\"-12.600\" x2=\"25.400\" y2=\"-11.700\"/><path d=\"M25.400,-12.600 A0.300,0.300 0 0 0 25.100,-12.900\"/><circle cx=\"27.400\" cy=\"-11.900\" r=\"0.081\" class=\"small\"/><circle cx=\"24.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><circle cx=\"27.400\" cy=\"-12.350\" r=\"0.098\" class=\"small\"/><circle cx=\"25.900\" cy=\"-13.900\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-15.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.600\" cy=\"-14.900\" r=\"0.081\" class=\"small\"/><circle cx=\"5.450\" cy=\"-14.650\" r=\"0.148\" class=\"small\"/><circle cx=\"4.600\" cy=\"-16.900\" r=\"0.081\" class=\"small\"/><path d=\"M5.400,-15.700 A0.300,0.300 0 0 0 5.700,-15.400\"/><line x1=\"5.400\" y1=\"-15.700\" x2=\"5.400\" y2=\"-16.600\"/><line x1=\"6.600\" y1=\"-15.400\" x2=\"5.700\" y2=\"-15.400\"/><path d=\"M5.700,-16.900 A0.300,0.300 0 0 0 5.400,-16.600\"/><path d=\"M6.600,-15.400 A0.300,0.300 0 0 0 6.900,-15.700\"/><line x1=\"5.700\" y1=\"-16.900\" x2=\"6.600\" y2=\"-16.900\"/><line x1=\"6.900\" y1=\"-16.600\" x2=\"6.900\" y2=\"-15.700\"/><path d=\"M6.900,-16.600 A0.300,0.300 0 0 0 6.600,-16.900\"/><circle cx=\"0.400\" cy=\"-17.900\" r=\"0.081\" class=\"small\"/><circle cx=\"1.900\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"0.400\" cy=\"-19.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.400\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"6.900\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"8.450\" cy=\"-14.650\" r=\"0.148\" class=\"small\"/><path d=\"M7.400,-15.700 A0.300,0.300 0 0 0 7.700,-15.400\"/><line x1=\"7.400\" y1=\"-15.700\" x2=\"7.400\" y2=\"-16.600\"/><line x1=\"8.600\" y1=\"-15.400\" x2=\"7.700\" y2=\"-15.400\"/><path d=\"M7.700,-16.900 A0.300,0.300 0 0 0 7.400,-16.600\"/><path d=\"M8.600,-15.400 A0.300,0.300 0 0 0 8.900,-15.700\"/><line x1=\"7.700\" y1=\"-16.900\" x2=\"8.600\" y2=\"-16.900\"/><line x1=\"8.900\" y1=\"-16.600\" x2=\"8.900\" y2=\"-15.700\"/><path d=\"M8.900,-16.600 A0.300,0.300 0 0 0 8.600,-16.900\"/><circle cx=\"9.900\" cy=\"-15.900\" r=\"0.081\" class=\"small\"/><circle cx=\"11.615\" cy=\"-15.230\" r=\"0.062\" class=\"small\"/><circle cx=\"12.755\" cy=\"-15.230\" r=\"0.062\" class=\"small\"/><circle cx=\"11.615\" cy=\"-16.370\" r=\"0.062\" class=\"small\"/><circle cx=\"12.755\" cy=\"-16.370\" r=\"0.062\" class=\"small\"/><circle cx=\"8.400\" cy=\"-17.975\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-17.900\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-19.900\" r=\"0.081\" class=\"small\"/><circle cx=\"10.919\" cy=\"-17.854\" r=\"0.148\" class=\"small\"/><circle cx=\"9.900\" cy=\"-21.900\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-23.900\" r=\"0.081\" class=\"small\"/><circle cx=\"8.300\" cy=\"-26.450\" r=\"0.148\" class=\"small\"/><circle cx=\"7.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"9.900\" cy=\"-25.900\" r=\"0.081\" class=\"small\"/><circle cx=\"10.919\" cy=\"-26.354\" r=\"0.148\" class=\"small\"/><circle cx=\"11.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"13.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"14.825\" cy=\"-14.800\" r=\"0.133\" class=\"small\"/><circle cx=\"13.925\" cy=\"-16.400\" r=\"0.133\" class=\"small\"/><circle cx=\"14.919\" cy=\"-17.854\" r=\"0.148\" class=\"small\"/><circle cx=\"27.400\" cy=\"-15.450\" r=\"0.098\" class=\"small\"/><path d=\"M23.900,-15.200 A0.300,0.300 0 0 0 24.200,-14.900\"/><line x1=\"26.100\" y1=\"-14.900\" x2=\"24.200\" y2=\"-14.900\"/><line x1=\"23.900\" y1=\"-15.200\" x2=\"23.900\" y2=\"-17.100\"/><path d=\"M26.100,-14.900 A0.300,0.300 0 0 0 26.400,-15.200\"/><path d=\"M24.200,-17.400 A0.300,0.300 0 0 0 23.900,-17.100\"/><line x1=\"26.400\" y1=\"-17.100\" x2=\"26.400\" y2=\"-15.200\"/><line x1=\"24.200\" y1=\"-17.400\" x2=\"26.100\" y2=\"-17.400\"/><path d=\"M26.400,-17.100 A0.300,0.300 0 0 0 26.100,-17.400\"/><circle cx=\"27.400\" cy=\"-15.900\" r=\"0.081\" class=\"small\"/><path d=\"M19.900,-16.200 A0.300,0.300 0 0 0 20.200,-15.900\"/><line x1=\"23.100\" y1=\"-15.900\" x2=\"20.200\" y2=\"-15.900\"/><line x1=\"19.900\" y1=\"-16.200\" x2=\"19.900\" y2=\"-19.100\"/><path d=\"M23.100,-15.900 A0.300,0.300 0 0 0 23.400,-16.200\"/><path d=\"M20.200,-19.400 A0.300,0.300 0 0 0 19.900,-19.100\"/><line x1=\"23.400\" y1=\"-19.100\" x2=\"23.400\" y2=\"-16.200\"/><line x1=\"20.200\" y1=\"-19.400\" x2=\"23.100\" y2=\"-19.400\"/><path d=\"M23.400,-19.100 A0.300,0.300 0 0 0 23.100,-19.400\"/><path d=\"M23.900,-18.200 A0.300,0.300 0 0 0 24.200,-17.900\"/><line x1=\"23.900\" y1=\"-18.200\" x2=\"23.900\" y2=\"-19.100\"/><line x1=\"25.100\" y1=\"-17.900\" x2=\"24.200\" y2=\"-17.900\"/><path d=\"M24.200,-19.400 A0.300,0.300 0 0 0 23.900,-19.100\"/><path d=\"M25.100,-17.900 A0.300,0.300 0 0 0 25.400,-18.200\"/><line x1=\"24.200\" y1=\"-19.400\" x2=\"25.100\" y2=\"-19.400\"/><line x1=\"25.400\" y1=\"-19.100\" x2=\"25.400\" y2=\"-18.200\"/><path d=\"M25.400,-19.100 A0.300,0.300 0 0 0 25.100,-19.400\"/><circle cx=\"27.400\" cy=\"-17.900\" r=\"0.081\" class=\"small\"/><circle cx=\"27.400\" cy=\"-19.900\" r=\"0.081\" class=\"small\"/><circle cx=\"14.919\" cy=\"-26.354\" r=\"0.148\" class=\"small\"/><circle cx=\"15.900\" cy=\"-26.450\" r=\"0.148\" class=\"small\"/><circle cx=\"15.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/><circle cx=\"19.900\" cy=\"-27.400\" r=\"0.081\" class=\"small\"/></svg>"
  },
  {
   "mark": "D-301",
@@ -372,7 +372,7 @@
    {
     "dia": 0.161,
     "n": 8,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    }
   ],
@@ -384,7 +384,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 3.57 \u00d7 6.45 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-104_brace_foot_gusset_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 8 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 8 \u00d7 0.161 in with the #20 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -595,13 +595,13 @@
    {
     "dia": 0.161,
     "n": 6,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 2,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -613,7 +613,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.4 \u00d7 4 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-203_chain_bracket_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 6 \u00d7 0.161 in (#20), 2 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 6 \u00d7 0.161 in with the #20 drill, 2 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -670,13 +670,13 @@
    {
     "dia": 0.159,
     "n": 3,
-    "drill": "#21",
+    "drill": "#21 drill",
     "use": "tap drill for #10-32: check the drawing for which holes are tapped"
    },
    {
     "dia": 0.196,
     "n": 3,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -688,7 +688,8 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.95 \u00d7 3.7 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-206_cap_plate_stage_A_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 3 \u00d7 0.159 in (#21), 3 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 3 \u00d7 0.159 in with the #21 drill, 3 \u00d7 0.196 in with the #9 drill.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -811,13 +812,13 @@
    {
     "dia": 0.159,
     "n": 3,
-    "drill": "#21",
+    "drill": "#21 drill",
     "use": "tap drill for #10-32: check the drawing for which holes are tapped"
    },
    {
     "dia": 0.196,
     "n": 3,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -829,7 +830,8 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.95 \u00d7 3.7 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-306_cap_plate_stage_B_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 3 \u00d7 0.159 in (#21), 3 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 3 \u00d7 0.159 in with the #21 drill, 3 \u00d7 0.196 in with the #9 drill.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -981,25 +983,25 @@
    {
     "dia": 0.159,
     "n": 2,
-    "drill": "#21",
+    "drill": "#21 drill",
     "use": "tap drill for #10-32: check the drawing for which holes are tapped"
    },
    {
     "dia": 0.196,
     "n": 8,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.201,
     "n": 1,
-    "drill": "#7",
+    "drill": "#7 drill",
     "use": "tap drill for 1/4-20, or a free fit for a #10 screw: check the drawing"
    },
    {
     "dia": 1.5,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    }
   ],
@@ -1011,7 +1013,7 @@
   "steps": [
    "Stock: 0.25 in 6061 aluminium sheet, at least 3 \u00d7 7 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-403_pivot_plate_0.250.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 2 \u00d7 0.159 in (#21), 8 \u00d7 0.196 in (#9), 1 \u00d7 0.201 in (#7).",
+   "Drill the small holes first, on the router, using its tool changer: 2 \u00d7 0.159 in with the #21 drill, 8 \u00d7 0.196 in with the #9 drill, 1 \u00d7 0.201 in with the #7 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.5 in.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
@@ -1069,7 +1071,7 @@
    {
     "dia": 0.196,
     "n": 4,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -1081,7 +1083,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6.1 \u00d7 2 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-406_cable_chain_arm_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 4 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 4 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -1141,13 +1143,13 @@
    {
     "dia": 0.161,
     "n": 6,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 1.125,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -1159,7 +1161,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6 \u00d7 3.4 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-502_shaft_bearing_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 6 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 6 \u00d7 0.161 in with the #20 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
@@ -1189,13 +1191,13 @@
    {
     "dia": 0.161,
     "n": 6,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 1.125,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -1207,7 +1209,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6 \u00d7 4 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-503_idler_plate_outer_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 6 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 6 \u00d7 0.161 in with the #20 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
@@ -1237,25 +1239,25 @@
    {
     "dia": 0.196,
     "n": 10,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.6,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    },
    {
     "dia": 0.76,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    },
    {
     "dia": 1.125,
     "n": 2,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -1268,7 +1270,7 @@
   "steps": [
    "Stock: 0.25 in 6061 aluminium sheet, at least 6.4 \u00d7 7.68 in for each part. Make one left and one right.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-504-L_gearbox_plate_0.250.dxf` and `E-504-R_gearbox_plate_0.250.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 10 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 10 \u00d7 0.196 in with the #9 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 0.6 in, 1 \u00d7 0.76 in, 2 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole.",
@@ -1330,13 +1332,13 @@
    {
     "dia": 0.161,
     "n": 6,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 1.125,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -1348,7 +1350,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6 \u00d7 3.25 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-506_idler_plate_inner_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 6 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 6 \u00d7 0.161 in with the #20 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
@@ -1588,13 +1590,13 @@
    {
     "dia": 0.196,
     "n": 6,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 1.5,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    }
   ],
@@ -1606,10 +1608,9 @@
   "steps": [
    "Stock: 0.09 in 6061 aluminium sheet, at least 5.75 \u00d7 5.75 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `W-104_60T_25_sprocket_0.090.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 6 \u00d7 0.196 in (#9).",
-   "The smallest inside radius on this part is 0.065 in, which a 1/4 in cutter cannot reach. Cut those features with the 1/8 in end mill too.",
+   "Drill the small holes first, on the router, using its tool changer: 6 \u00d7 0.196 in with the #9 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.5 in.",
-   "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
+   "Cut the outline last, with the 1/8 in end mill, leaving tabs so the part cannot move. Its smallest inside radius is 0.065 in, which the 1/4 in cutter cannot reach.",
    "Break the tabs and deburr every edge and hole."
   ],
   "checks": [
@@ -1636,13 +1637,13 @@
    {
     "dia": 0.196,
     "n": 4,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 1.0,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    }
   ],
@@ -1654,8 +1655,9 @@
   "steps": [
    "Stock: 0.25 in 6061 aluminium sheet, at least 5.7 \u00d7 3.4 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `W-105_wrist_drive_plate_0.250.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 4 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 4 \u00d7 0.196 in with the #9 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1 in.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -1712,19 +1714,19 @@
    {
     "dia": 0.196,
     "n": 13,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.76,
     "n": 2,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    },
    {
     "dia": 1.125,
     "n": 2,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -1736,8 +1738,9 @@
   "steps": [
    "Stock: 0.125 in 6061 aluminium sheet, at least 12.4 \u00d7 13.89 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `C-101_claw_plate_0.125.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 13 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 13 \u00d7 0.196 in with the #9 drill.",
    "Cut the larger holes with the 1/4 in end mill: 2 \u00d7 0.76 in, 2 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -1916,25 +1919,25 @@
    {
     "dia": 0.161,
     "n": 8,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 22,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.76,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    },
    {
     "dia": 1.125,
     "n": 2,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -1946,8 +1949,9 @@
   "steps": [
    "Stock: 0.125 in 6061 aluminium sheet, at least 20.1 \u00d7 8.25 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `W-201_side_plate_0.125.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 8 \u00d7 0.161 in (#20), 22 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 8 \u00d7 0.161 in with the #20 drill, 22 \u00d7 0.196 in with the #9 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 0.76 in, 2 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -1976,7 +1980,7 @@
    {
     "dia": 0.161,
     "n": 20,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    }
   ],
@@ -1989,7 +1993,7 @@
    "Stock: 0.125 in polycarbonate sheet, at least 17.9 \u00d7 10.19 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `W-202_floor_0.125_polycarbonate.dxf` in the router software. It is drawn in inches at full size.",
    "Polycarbonate melts if the cutter rubs. Use a sharp single-flute cutter and keep the feed up.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 20 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 20 \u00d7 0.161 in with the #20 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -2374,19 +2378,19 @@
    {
     "dia": 0.159,
     "n": 2,
-    "drill": "#21",
+    "drill": "#21 drill",
     "use": "tap drill for #10-32: check the drawing for which holes are tapped"
    },
    {
     "dia": 0.196,
     "n": 2,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 1.25,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    }
   ],
@@ -2398,7 +2402,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 3.4 \u00d7 3.3 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `W-302_encoder_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 2 \u00d7 0.159 in (#21), 2 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 2 \u00d7 0.159 in with the #21 drill, 2 \u00d7 0.196 in with the #9 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.25 in.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
@@ -2621,7 +2625,7 @@
    {
     "dia": 0.161,
     "n": 8,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    }
   ],
@@ -2633,7 +2637,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 2.5 \u00d7 5.5 in for each part. Make 6.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-105_foot_gusset_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 8 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 8 \u00d7 0.161 in with the #20 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -2721,13 +2725,13 @@
    {
     "dia": 0.161,
     "n": 4,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 1,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -2739,7 +2743,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 2.5 \u00d7 4.5 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-110_mid_pivot_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 4 \u00d7 0.161 in (#20), 1 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 4 \u00d7 0.161 in with the #20 drill, 1 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -2767,13 +2771,13 @@
    {
     "dia": 0.161,
     "n": 8,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 2,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -2785,7 +2789,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.45 \u00d7 4.3 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-111_rear_pivot_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 8 \u00d7 0.161 in (#20), 2 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 8 \u00d7 0.161 in with the #20 drill, 2 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -2813,13 +2817,13 @@
    {
     "dia": 0.161,
     "n": 3,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 1,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -2831,7 +2835,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 2.8 \u00d7 7.4 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-112_drop_link_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 3 \u00d7 0.161 in (#20), 1 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 3 \u00d7 0.161 in with the #20 drill, 1 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -2859,19 +2863,19 @@
    {
     "dia": 0.094,
     "n": 1,
-    "drill": "3/32",
+    "drill": "3/32 drill",
     "use": "pin or small screw"
    },
    {
     "dia": 0.116,
     "n": 1,
-    "drill": "#32",
+    "drill": "#32 drill",
     "use": "small screw"
    },
    {
     "dia": 0.196,
     "n": 1,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -2883,7 +2887,7 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 2.4 \u00d7 4.05 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-113_latch_hook_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 1 \u00d7 0.094 in (3/32), 1 \u00d7 0.116 in (#32), 1 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 1 \u00d7 0.094 in with the 3/32 drill, 1 \u00d7 0.116 in with the #32 drill, 1 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -2998,13 +3002,13 @@
    {
     "dia": 0.161,
     "n": 14,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 4,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    }
   ],
@@ -3017,7 +3021,7 @@
    "Stock: 0.125 in polycarbonate sheet, at least 15.51 \u00d7 19 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-201_tray_0.125_polycarbonate.dxf` in the router software. It is drawn in inches at full size.",
    "Polycarbonate melts if the cutter rubs. Use a sharp single-flute cutter and keep the feed up.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 14 \u00d7 0.161 in (#20), 4 \u00d7 0.196 in (#9).",
+   "Drill the small holes first, on the router, using its tool changer: 14 \u00d7 0.161 in with the #20 drill, 4 \u00d7 0.196 in with the #9 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -3046,7 +3050,7 @@
    {
     "dia": 0.161,
     "n": 7,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    }
   ],
@@ -3059,7 +3063,7 @@
    "Stock: 0.125 in polycarbonate sheet, at least 19.34 \u00d7 5.12 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `F-202_wall_0.125_polycarbonate.dxf` in the router software. It is drawn in inches at full size.",
    "Polycarbonate melts if the cutter rubs. Use a sharp single-flute cutter and keep the feed up.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 7 \u00d7 0.161 in (#20).",
+   "Drill the small holes first, on the router, using its tool changer: 7 \u00d7 0.161 in with the #20 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -3117,31 +3121,31 @@
    {
     "dia": 0.161,
     "n": 7,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.177,
     "n": 4,
-    "drill": "#16",
+    "drill": "#16 drill",
     "use": "servo screw"
    },
    {
     "dia": 0.196,
     "n": 7,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.257,
     "n": 2,
-    "drill": "F",
+    "drill": "F drill",
     "use": "clearance for a 1/4 screw"
    },
    {
     "dia": 1.125,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bearing bore: test the fit in scrap first"
    }
   ],
@@ -3153,8 +3157,9 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 8.7 \u00d7 17.1 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `CL-101_tower_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 7 \u00d7 0.161 in (#20), 4 \u00d7 0.177 in (#16), 7 \u00d7 0.196 in (#9).",
-   "Cut the larger holes with the 1/4 in end mill: 2 \u00d7 0.257 in, 1 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
+   "Drill the small holes first, on the router, using its tool changer: 7 \u00d7 0.161 in with the #20 drill, 4 \u00d7 0.177 in with the #16 drill, 7 \u00d7 0.196 in with the #9 drill, 2 \u00d7 0.257 in with the F drill.",
+   "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -3163,7 +3168,7 @@
    "Hole count: 21.",
    "A bearing presses into each 1.125 in bore without rocking."
   ],
-  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.694 -16.794 9.088 17.488\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0619\" stroke-linecap=\"round\"><path d=\"M1.000,-1.670 A0.130,0.130 0 1 0 0.870,-1.800\"/><line x1=\"1.000\" y1=\"-1.670\" x2=\"1.000\" y2=\"-0.000\"/><line x1=\"1.000\" y1=\"-0.000\" x2=\"7.700\" y2=\"-0.000\"/><line x1=\"7.700\" y1=\"-0.000\" x2=\"7.700\" y2=\"-2.650\"/><line x1=\"7.700\" y1=\"-2.650\" x2=\"6.250\" y2=\"-7.650\"/><line x1=\"6.250\" y1=\"-7.650\" x2=\"5.650\" y2=\"-9.250\"/><line x1=\"5.650\" y1=\"-9.250\" x2=\"2.616\" y2=\"-13.918\"/><path d=\"M2.595,-13.989 A0.130,0.130 0 0 0 2.616,-13.918\"/><line x1=\"2.595\" y1=\"-13.989\" x2=\"2.600\" y2=\"-15.800\"/><line x1=\"2.600\" y1=\"-15.800\" x2=\"2.350\" y2=\"-16.100\"/><line x1=\"2.350\" y1=\"-16.100\" x2=\"1.850\" y2=\"-16.100\"/><line x1=\"1.850\" y1=\"-16.100\" x2=\"0.500\" y2=\"-15.300\"/><line x1=\"0.500\" y1=\"-15.300\" x2=\"0.000\" y2=\"-14.800\"/><line x1=\"0.000\" y1=\"-14.800\" x2=\"0.000\" y2=\"-1.800\"/><line x1=\"0.000\" y1=\"-1.800\" x2=\"0.870\" y2=\"-1.800\"/><circle cx=\"1.500\" cy=\"-0.300\" r=\"0.098\" class=\"small\"/><circle cx=\"1.500\" cy=\"-0.800\" r=\"0.098\" class=\"small\"/><circle cx=\"1.500\" cy=\"-1.300\" r=\"0.098\" class=\"small\"/><circle cx=\"0.300\" cy=\"-2.350\" r=\"0.081\" class=\"small\"/><circle cx=\"0.700\" cy=\"-2.350\" r=\"0.081\" class=\"small\"/><circle cx=\"2.800\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><line x1=\"0.900\" y1=\"-3.380\" x2=\"0.900\" y2=\"-10.920\"/><path d=\"M1.030,-11.050 A0.130,0.130 0 0 0 0.900,-10.920\"/><line x1=\"1.030\" y1=\"-11.050\" x2=\"1.916\" y2=\"-11.050\"/><path d=\"M2.045,-10.937 A0.130,0.130 0 0 0 1.916,-11.050\"/><line x1=\"2.045\" y1=\"-10.937\" x2=\"2.400\" y2=\"-8.250\"/><line x1=\"2.400\" y1=\"-8.250\" x2=\"2.400\" y2=\"-3.380\"/><path d=\"M2.270,-3.250 A0.130,0.130 0 0 0 2.400,-3.380\"/><line x1=\"2.270\" y1=\"-3.250\" x2=\"1.030\" y2=\"-3.250\"/><path d=\"M0.900,-3.380 A0.130,0.130 0 0 0 1.030,-3.250\"/><circle cx=\"2.700\" cy=\"-5.450\" r=\"0.098\" class=\"small\"/><circle cx=\"3.110\" cy=\"-6.339\" r=\"0.098\" class=\"small\"/><circle cx=\"4.000\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"5.200\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"6.400\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"7.200\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.560\" cy=\"-5.950\" r=\"0.562\"/><circle cx=\"5.267\" cy=\"-5.243\" r=\"0.098\" class=\"small\"/><circle cx=\"3.853\" cy=\"-6.657\" r=\"0.098\" class=\"small\"/><circle cx=\"4.451\" cy=\"-7.603\" r=\"0.088\" class=\"small\"/><circle cx=\"4.851\" cy=\"-7.603\" r=\"0.088\" class=\"small\"/><circle cx=\"1.213\" cy=\"-11.861\" r=\"0.129\"/><path d=\"M0.771,-14.014 A0.273,0.273 0 0 0 0.771,-14.086\"/><line x1=\"0.771\" y1=\"-14.014\" x2=\"0.667\" y2=\"-13.834\"/><path d=\"M0.604,-13.798 A0.273,0.273 0 0 0 0.667,-13.834\"/><line x1=\"0.604\" y1=\"-13.798\" x2=\"0.396\" y2=\"-13.798\"/><path d=\"M0.333,-13.834 A0.273,0.273 0 0 0 0.396,-13.798\"/><line x1=\"0.333\" y1=\"-13.834\" x2=\"0.229\" y2=\"-14.014\"/><path d=\"M0.229,-14.086 A0.273,0.273 0 0 0 0.229,-14.014\"/><line x1=\"0.229\" y1=\"-14.086\" x2=\"0.333\" y2=\"-14.266\"/><path d=\"M0.396,-14.303 A0.273,0.273 0 0 0 0.333,-14.266\"/><line x1=\"0.396\" y1=\"-14.303\" x2=\"0.604\" y2=\"-14.303\"/><path d=\"M0.667,-14.266 A0.273,0.273 0 0 0 0.604,-14.303\"/><line x1=\"0.667\" y1=\"-14.266\" x2=\"0.771\" y2=\"-14.086\"/><circle cx=\"2.107\" cy=\"-15.698\" r=\"0.129\"/><circle cx=\"4.451\" cy=\"-9.543\" r=\"0.088\" class=\"small\"/><circle cx=\"4.851\" cy=\"-9.543\" r=\"0.088\" class=\"small\"/></svg>"
+  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.694 -16.794 9.088 17.488\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0619\" stroke-linecap=\"round\"><path d=\"M1.000,-1.670 A0.130,0.130 0 1 0 0.870,-1.800\"/><line x1=\"1.000\" y1=\"-1.670\" x2=\"1.000\" y2=\"-0.000\"/><line x1=\"1.000\" y1=\"-0.000\" x2=\"7.700\" y2=\"-0.000\"/><line x1=\"7.700\" y1=\"-0.000\" x2=\"7.700\" y2=\"-2.650\"/><line x1=\"7.700\" y1=\"-2.650\" x2=\"6.250\" y2=\"-7.650\"/><line x1=\"6.250\" y1=\"-7.650\" x2=\"5.650\" y2=\"-9.250\"/><line x1=\"5.650\" y1=\"-9.250\" x2=\"2.616\" y2=\"-13.918\"/><path d=\"M2.595,-13.989 A0.130,0.130 0 0 0 2.616,-13.918\"/><line x1=\"2.595\" y1=\"-13.989\" x2=\"2.600\" y2=\"-15.800\"/><line x1=\"2.600\" y1=\"-15.800\" x2=\"2.350\" y2=\"-16.100\"/><line x1=\"2.350\" y1=\"-16.100\" x2=\"1.850\" y2=\"-16.100\"/><line x1=\"1.850\" y1=\"-16.100\" x2=\"0.500\" y2=\"-15.300\"/><line x1=\"0.500\" y1=\"-15.300\" x2=\"0.000\" y2=\"-14.800\"/><line x1=\"0.000\" y1=\"-14.800\" x2=\"0.000\" y2=\"-1.800\"/><line x1=\"0.000\" y1=\"-1.800\" x2=\"0.870\" y2=\"-1.800\"/><circle cx=\"1.500\" cy=\"-0.300\" r=\"0.098\" class=\"small\"/><circle cx=\"1.500\" cy=\"-0.800\" r=\"0.098\" class=\"small\"/><circle cx=\"1.500\" cy=\"-1.300\" r=\"0.098\" class=\"small\"/><circle cx=\"0.300\" cy=\"-2.350\" r=\"0.081\" class=\"small\"/><circle cx=\"0.700\" cy=\"-2.350\" r=\"0.081\" class=\"small\"/><circle cx=\"2.800\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><line x1=\"0.900\" y1=\"-3.380\" x2=\"0.900\" y2=\"-10.920\"/><path d=\"M1.030,-11.050 A0.130,0.130 0 0 0 0.900,-10.920\"/><line x1=\"1.030\" y1=\"-11.050\" x2=\"1.916\" y2=\"-11.050\"/><path d=\"M2.045,-10.937 A0.130,0.130 0 0 0 1.916,-11.050\"/><line x1=\"2.045\" y1=\"-10.937\" x2=\"2.400\" y2=\"-8.250\"/><line x1=\"2.400\" y1=\"-8.250\" x2=\"2.400\" y2=\"-3.380\"/><path d=\"M2.270,-3.250 A0.130,0.130 0 0 0 2.400,-3.380\"/><line x1=\"2.270\" y1=\"-3.250\" x2=\"1.030\" y2=\"-3.250\"/><path d=\"M0.900,-3.380 A0.130,0.130 0 0 0 1.030,-3.250\"/><circle cx=\"2.700\" cy=\"-5.450\" r=\"0.098\" class=\"small\"/><circle cx=\"3.110\" cy=\"-6.339\" r=\"0.098\" class=\"small\"/><circle cx=\"4.000\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"5.200\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"6.400\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"7.200\" cy=\"-0.900\" r=\"0.081\" class=\"small\"/><circle cx=\"4.560\" cy=\"-5.950\" r=\"0.562\"/><circle cx=\"5.267\" cy=\"-5.243\" r=\"0.098\" class=\"small\"/><circle cx=\"3.853\" cy=\"-6.657\" r=\"0.098\" class=\"small\"/><circle cx=\"4.451\" cy=\"-7.603\" r=\"0.088\" class=\"small\"/><circle cx=\"4.851\" cy=\"-7.603\" r=\"0.088\" class=\"small\"/><circle cx=\"1.213\" cy=\"-11.861\" r=\"0.129\" class=\"small\"/><path d=\"M0.771,-14.014 A0.273,0.273 0 0 0 0.771,-14.086\"/><line x1=\"0.771\" y1=\"-14.014\" x2=\"0.667\" y2=\"-13.834\"/><path d=\"M0.604,-13.798 A0.273,0.273 0 0 0 0.667,-13.834\"/><line x1=\"0.604\" y1=\"-13.798\" x2=\"0.396\" y2=\"-13.798\"/><path d=\"M0.333,-13.834 A0.273,0.273 0 0 0 0.396,-13.798\"/><line x1=\"0.333\" y1=\"-13.834\" x2=\"0.229\" y2=\"-14.014\"/><path d=\"M0.229,-14.086 A0.273,0.273 0 0 0 0.229,-14.014\"/><line x1=\"0.229\" y1=\"-14.086\" x2=\"0.333\" y2=\"-14.266\"/><path d=\"M0.396,-14.303 A0.273,0.273 0 0 0 0.333,-14.266\"/><line x1=\"0.396\" y1=\"-14.303\" x2=\"0.604\" y2=\"-14.303\"/><path d=\"M0.667,-14.266 A0.273,0.273 0 0 0 0.604,-14.303\"/><line x1=\"0.667\" y1=\"-14.266\" x2=\"0.771\" y2=\"-14.086\"/><circle cx=\"2.107\" cy=\"-15.698\" r=\"0.129\" class=\"small\"/><circle cx=\"4.451\" cy=\"-9.543\" r=\"0.088\" class=\"small\"/><circle cx=\"4.851\" cy=\"-9.543\" r=\"0.088\" class=\"small\"/></svg>"
  },
  {
   "mark": "CL-102",
@@ -3276,25 +3281,25 @@
    {
     "dia": 0.161,
     "n": 4,
-    "drill": "#20",
+    "drill": "#20 drill",
     "use": "5/32 rivet"
    },
    {
     "dia": 0.196,
     "n": 10,
-    "drill": "#9",
+    "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
    {
     "dia": 0.201,
     "n": 1,
-    "drill": "#7",
+    "drill": "#7 drill",
     "use": "tap drill for 1/4-20, or a free fit for a #10 screw: check the drawing"
    },
    {
     "dia": 0.625,
     "n": 1,
-    "drill": "1/4 end mill",
+    "drill": "1/4 in end mill",
     "use": "bore or pilot"
    }
   ],
@@ -3306,8 +3311,9 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 17.9 \u00d7 9.87 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `CL-201_arm_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 4 \u00d7 0.161 in (#20), 10 \u00d7 0.196 in (#9), 1 \u00d7 0.201 in (#7).",
+   "Drill the small holes first, on the router, using its tool changer: 4 \u00d7 0.161 in with the #20 drill, 10 \u00d7 0.196 in with the #9 drill, 1 \u00d7 0.201 in with the #7 drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 0.625 in.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -3366,7 +3372,7 @@
    {
     "dia": 0.201,
     "n": 1,
-    "drill": "#7",
+    "drill": "#7 drill",
     "use": "tap drill for 1/4-20, or a free fit for a #10 screw: check the drawing"
    }
   ],
@@ -3378,7 +3384,8 @@
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 1.6 \u00d7 2.99 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `CL-203_gate_finger_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 1 \u00d7 0.201 in (#7).",
+   "Drill the small holes first, on the router, using its tool changer: 1 \u00d7 0.201 in with the #7 drill.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -3659,7 +3666,7 @@
   "sub": "Climber",
   "qty": "2",
   "kind": "steel plate",
-  "machine": "Send out, or mill and file",
+  "machine": "Manual mill",
   "stock": "3/16 steel",
   "size": "1.50 OD, 16 teeth",
   "detail": "ratchet wheel 3/16 in steel, 16 teeth, 1.50 OD, 1/2 hex bore, on the spool shaft between the tower and the gearbox",
@@ -3673,14 +3680,17 @@
   "pdf": "robotA_climber_revC_drawings.pdf",
   "page": 2,
   "steps": [
-   "Stock: 0.188 in steel plate, at least 2 \u00d7 2 in for each part. Make 2.",
-   "This part is steel and has sharp inside corners, so it is not a job for the router. Send the flat pattern `CL-303_ratchet_wheel_0.188_steel.dxf` out for laser or waterjet cutting.",
-   "If it has to be made in the shop: rough it out on the bandsaw, mill the straight edges, and file the corners to the drawing.",
-   "Deburr every edge."
+   "Stock: 3/16 in mild steel plate. The drawing says mild steel is strong enough. Make 2.",
+   "Saw a round blank a little over 1.50 in across, then bring it to 1.50 in on the lathe or the mill.",
+   "On the mill, cut the 1/2 in hex in the centre with a 1/8 in end mill, one flat at a time on a rotary table. The rounded corners it leaves fit ThunderHex shaft.",
+   "Hold the blank by its hex on a rotary table or dividing head and cut the 16 teeth, turning 22.5\u00b0 between teeth. Each tooth is 0.15 in deep.",
+   "A cutter lying flat on the wheel leaves a rounded corner at the root of each tooth. Stand the wheel on edge so the corner of the end mill cuts the root, or file each root square.",
+   "Deburr."
   ],
   "checks": [
-   "Overall size 1.5 \u00d7 1.5 in.",
-   "It fits its mating part and moves freely: see the drawing."
+   "It slides onto the ThunderHex spool shaft without play.",
+   "It turns freely inside the two gearbox spacers: they sit 1.00 in from the shaft.",
+   "The pawl tip seats flat on a tooth face."
   ],
   "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.110 -1.610 1.720 1.720\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0058\" stroke-linecap=\"round\"><line x1=\"0.057\" y1=\"-0.463\" x2=\"0.326\" y2=\"-0.326\"/><line x1=\"0.196\" y1=\"-0.520\" x2=\"0.057\" y2=\"-0.463\"/><line x1=\"0.326\" y1=\"-0.326\" x2=\"0.220\" y2=\"-0.220\"/><line x1=\"0.000\" y1=\"-0.750\" x2=\"0.196\" y2=\"-0.520\"/><line x1=\"0.220\" y1=\"-0.220\" x2=\"0.520\" y2=\"-0.196\"/><line x1=\"0.150\" y1=\"-0.750\" x2=\"0.000\" y2=\"-0.750\"/><line x1=\"0.520\" y1=\"-0.196\" x2=\"0.463\" y2=\"-0.057\"/><line x1=\"0.057\" y1=\"-1.037\" x2=\"0.150\" y2=\"-0.750\"/><line x1=\"0.463\" y1=\"-0.057\" x2=\"0.750\" y2=\"-0.150\"/><line x1=\"0.196\" y1=\"-0.980\" x2=\"0.057\" y2=\"-1.037\"/><line x1=\"0.750\" y1=\"-0.150\" x2=\"0.750\" y2=\"-0.000\"/><line x1=\"0.220\" y1=\"-1.280\" x2=\"0.196\" y2=\"-0.980\"/><line x1=\"0.750\" y1=\"-0.000\" x2=\"0.980\" y2=\"-0.196\"/><line x1=\"0.326\" y1=\"-1.174\" x2=\"0.220\" y2=\"-1.280\"/><line x1=\"0.980\" y1=\"-0.196\" x2=\"1.037\" y2=\"-0.057\"/><line x1=\"0.463\" y1=\"-1.443\" x2=\"0.326\" y2=\"-1.174\"/><line x1=\"1.037\" y1=\"-0.057\" x2=\"1.174\" y2=\"-0.326\"/><line x1=\"0.520\" y1=\"-1.304\" x2=\"0.463\" y2=\"-1.443\"/><line x1=\"1.174\" y1=\"-0.326\" x2=\"1.280\" y2=\"-0.220\"/><line x1=\"0.750\" y1=\"-1.500\" x2=\"0.520\" y2=\"-1.304\"/><line x1=\"1.280\" y1=\"-0.220\" x2=\"1.304\" y2=\"-0.520\"/><line x1=\"0.750\" y1=\"-1.350\" x2=\"0.750\" y2=\"-1.500\"/><line x1=\"1.304\" y1=\"-0.520\" x2=\"1.443\" y2=\"-0.463\"/><line x1=\"1.037\" y1=\"-1.443\" x2=\"0.750\" y2=\"-1.350\"/><line x1=\"1.443\" y1=\"-0.463\" x2=\"1.350\" y2=\"-0.750\"/><line x1=\"0.980\" y1=\"-1.304\" x2=\"1.037\" y2=\"-1.443\"/><line x1=\"1.350\" y1=\"-0.750\" x2=\"1.500\" y2=\"-0.750\"/><line x1=\"1.280\" y1=\"-1.280\" x2=\"0.980\" y2=\"-1.304\"/><line x1=\"1.500\" y1=\"-0.750\" x2=\"1.304\" y2=\"-0.980\"/><line x1=\"1.174\" y1=\"-1.174\" x2=\"1.280\" y2=\"-1.280\"/><line x1=\"1.304\" y1=\"-0.980\" x2=\"1.443\" y2=\"-1.037\"/><line x1=\"1.443\" y1=\"-1.037\" x2=\"1.174\" y2=\"-1.174\"/><line x1=\"0.896\" y1=\"-1.003\" x2=\"1.043\" y2=\"-0.750\"/><line x1=\"0.604\" y1=\"-1.003\" x2=\"0.896\" y2=\"-1.003\"/><line x1=\"0.457\" y1=\"-0.750\" x2=\"0.604\" y2=\"-1.003\"/><line x1=\"0.604\" y1=\"-0.497\" x2=\"0.457\" y2=\"-0.750\"/><line x1=\"0.896\" y1=\"-0.497\" x2=\"0.604\" y2=\"-0.497\"/><line x1=\"1.043\" y1=\"-0.750\" x2=\"0.896\" y2=\"-0.497\"/></svg>"
  },
@@ -3691,7 +3701,7 @@
   "sub": "Climber",
   "qty": "2",
   "kind": "steel plate",
-  "machine": "Send out, or mill and file",
+  "machine": "Manual mill",
   "stock": "3/16 steel",
   "size": "0.60 x 2.25",
   "detail": "pawl 3/16 in steel, 0.60 x 2.25, spring loaded onto the ratchet wheel, lifted by the servo through link CL-307",
@@ -3702,20 +3712,20 @@
    {
     "dia": 0.094,
     "n": 1,
-    "drill": "3/32",
+    "drill": "3/32 drill",
     "use": "pin or small screw"
    },
    {
     "dia": 0.124,
     "n": 1,
-    "drill": "1/8",
+    "drill": "1/8 drill",
     "use": "pin"
    },
    {
     "dia": 0.32,
     "n": 1,
-    "drill": "5/16",
-    "use": "pivot"
+    "drill": "P drill",
+    "use": "pivot: it must turn freely on its 5/16 spacer"
    }
   ],
   "dxf": [
@@ -3724,17 +3734,17 @@
   "pdf": "robotA_climber_revC_drawings.pdf",
   "page": 4,
   "steps": [
-   "Stock: 0.188 in steel plate, at least 2.3 \u00d7 2.3 in for each part. Make 2.",
-   "This part is steel and has sharp inside corners, so it is not a job for the router. Send the flat pattern `CL-304_pawl_0.188_steel.dxf` out for laser or waterjet cutting.",
-   "If it has to be made in the shop: rough it out on the bandsaw, mill the straight edges, and file the corners to the drawing.",
-   "Deburr every edge.",
-   "Drill the small holes on the drill press: 1 \u00d7 0.094 in (3/32 drill), 1 \u00d7 0.124 in (1/8 drill)."
+   "Stock: 3/16 in mild steel. Make 2, each 0.60 \u00d7 2.25 in.",
+   "Saw a blank and mill its edges to the outline on the drawing.",
+   "Drill the holes on the mill: 1 \u00d7 0.094 in (3/32 drill), 1 \u00d7 0.124 in (1/8 drill), 1 \u00d7 0.32 in (P drill). The 0.320 in hole is the pivot.",
+   "File the tip square, so it seats on a tooth face.",
+   "Deburr, and put a drop of oil on the pivot at assembly."
   ],
   "checks": [
-   "Overall size 1.8 \u00d7 1.8 in.",
-   "It fits its mating part and moves freely: see the drawing."
+   "It swings freely on its 5/16 in spacer.",
+   "The tip seats flat on a tooth of the ratchet wheel CL-303."
   ],
-  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.122 -1.925 2.047 2.047\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0069\" stroke-linecap=\"round\"><line x1=\"1.803\" y1=\"-0.170\" x2=\"1.605\" y2=\"-0.226\"/><line x1=\"1.605\" y1=\"-0.226\" x2=\"0.813\" y2=\"-1.414\"/><line x1=\"1.683\" y1=\"-0.049\" x2=\"1.803\" y2=\"-0.170\"/><line x1=\"0.813\" y1=\"-1.414\" x2=\"0.283\" y2=\"-1.803\"/><line x1=\"1.379\" y1=\"-0.000\" x2=\"1.683\" y2=\"-0.049\"/><line x1=\"0.283\" y1=\"-1.803\" x2=\"0.000\" y2=\"-1.520\"/><line x1=\"0.389\" y1=\"-0.990\" x2=\"1.379\" y2=\"-0.000\"/><line x1=\"0.000\" y1=\"-1.520\" x2=\"0.389\" y2=\"-0.990\"/><circle cx=\"0.813\" cy=\"-0.990\" r=\"0.160\"/><circle cx=\"0.431\" cy=\"-1.174\" r=\"0.047\" class=\"small\"/><circle cx=\"0.318\" cy=\"-1.485\" r=\"0.062\" class=\"small\"/></svg>"
+  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.122 -1.925 2.047 2.047\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0069\" stroke-linecap=\"round\"><line x1=\"1.803\" y1=\"-0.170\" x2=\"1.605\" y2=\"-0.226\"/><line x1=\"1.605\" y1=\"-0.226\" x2=\"0.813\" y2=\"-1.414\"/><line x1=\"1.683\" y1=\"-0.049\" x2=\"1.803\" y2=\"-0.170\"/><line x1=\"0.813\" y1=\"-1.414\" x2=\"0.283\" y2=\"-1.803\"/><line x1=\"1.379\" y1=\"-0.000\" x2=\"1.683\" y2=\"-0.049\"/><line x1=\"0.283\" y1=\"-1.803\" x2=\"0.000\" y2=\"-1.520\"/><line x1=\"0.389\" y1=\"-0.990\" x2=\"1.379\" y2=\"-0.000\"/><line x1=\"0.000\" y1=\"-1.520\" x2=\"0.389\" y2=\"-0.990\"/><circle cx=\"0.813\" cy=\"-0.990\" r=\"0.160\" class=\"small\"/><circle cx=\"0.431\" cy=\"-1.174\" r=\"0.047\" class=\"small\"/><circle cx=\"0.318\" cy=\"-1.485\" r=\"0.062\" class=\"small\"/></svg>"
  },
  {
   "mark": "CL-305",
@@ -4013,7 +4023,7 @@
    {
     "dia": 0.201,
     "n": 2,
-    "drill": "#7",
+    "drill": "#7 drill",
     "use": "tap drill for 1/4-20, or a free fit for a #10 screw: check the drawing"
    }
   ],
@@ -4025,7 +4035,8 @@
   "steps": [
    "Stock: 0.125 in 6061 aluminium sheet, at least 3.4 \u00d7 7.2 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `EL-RAD-P_radio_plate_0.125_6061.dxf` in the router software. It is drawn in inches at full size.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 2 \u00d7 0.201 in (#7).",
+   "Drill the small holes first, on the router, using its tool changer: 2 \u00d7 0.201 in with the #7 drill.",
+   "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],
@@ -4053,13 +4064,13 @@
    {
     "dia": 0.125,
     "n": 4,
-    "drill": "1/8",
+    "drill": "1/8 drill",
     "use": "small screw or pilot"
    },
    {
     "dia": 0.201,
     "n": 2,
-    "drill": "#7",
+    "drill": "#7 drill",
     "use": "tap drill for 1/4-20, or a free fit for a #10 screw: check the drawing"
    }
   ],
@@ -4072,7 +4083,7 @@
    "Stock: 0.125 in polycarbonate sheet, at least 2.6 \u00d7 7.7 in for each part. Make 1.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `EL-RIO-P_roborio_adapter_plate_0.125_polycarbonate.dxf` in the router software. It is drawn in inches at full size.",
    "Polycarbonate melts if the cutter rubs. Use a sharp single-flute cutter and keep the feed up.",
-   "Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: 4 \u00d7 0.125 in (1/8), 2 \u00d7 0.201 in (#7).",
+   "Drill the small holes first, on the router, using its tool changer: 4 \u00d7 0.125 in with the 1/8 drill, 2 \u00d7 0.201 in with the #7 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
    "Break the tabs and deburr every edge and hole."
   ],

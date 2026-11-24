@@ -2,17 +2,19 @@
 import json, re, math, os, glob, subprocess, collections, sys
 PKG = '/mnt/user-data/uploads/RobotA_final_2026-11-23/1_cad_package_rev3.2'
 SITE = '/home/claude/frc-playbook'
-merged = [p for p in json.load(open('/home/claude/gen/parts/merged.json')) if p['mark'] and not p['mark'].startswith('REV-') and p['src'] and p['mark'] != 'B-103']
+MERGED = '/home/claude/gen/parts/merged.json'
+merged = [p for p in json.load(open(MERGED)) if p['mark'] and not p['mark'].startswith('REV-') and p['src'] and p['mark'] != 'B-103']
 
 DRILL = {0.094: ('3/32', 'pin or small screw'), 0.116: ('#32', 'small screw'), 0.124: ('1/8', 'pin'), 0.125: ('1/8', 'small screw or pilot'),
          0.159: ('#21', 'tap drill for #10-32: check the drawing for which holes are tapped'), 0.161: ('#20', '5/32 rivet'),
          0.177: ('#16', 'servo screw'), 0.196: ('#9', 'clearance for a #10 screw'), 0.201: ('#7', 'tap drill for 1/4-20, or a free fit for a #10 screw: check the drawing'),
-         0.257: ('F', 'clearance for a 1/4 screw'), 0.266: ('H', 'clearance for a 1/4 screw'), 0.297: ('19/64', '#10-32 rivnut'), 0.32: ('5/16', 'pivot'),
-         0.391: ('25/64', '1/4-20 rivnut')}
+         0.257: ('F', 'clearance for a 1/4 screw'), 0.266: ('H', 'clearance for a 1/4 screw'), 0.297: ('19/64', '#10-32 rivnut'),
+         0.32: ('P', 'pivot: it must turn freely on its 5/16 spacer'), 0.391: ('25/64', '1/4-20 rivnut')}
+DRILLED_BELOW = 0.375   # holes smaller than this are drilled; larger ones are cut with the 1/4 in end mill
 def hole_use(d):
-    if d in DRILL: return DRILL[d]
-    if abs(d - 1.125) < 0.002: return ('1/4 end mill', 'bearing bore: test the fit in scrap first')
-    if d >= 0.25: return ('1/4 end mill', 'bore or pilot')
+    if d in DRILL: return (DRILL[d][0] + ' drill', DRILL[d][1])
+    if abs(d - 1.125) < 0.002: return ('1/4 in end mill', 'bearing bore: test the fit in scrap first')
+    if d >= DRILLED_BELOW: return ('1/4 in end mill', 'bore or pilot')
     return ('drill to size', '')
 
 def kind_of(p):
@@ -37,7 +39,7 @@ def kind_of(p):
     if re.search(r'chain clamp', name): return 'printed'
     return 'other'
 
-MACHINE = {'router, aluminium': 'CNC router', 'router, polycarbonate': 'CNC router', 'steel plate': 'Send out, or mill and file', 'printed': '3D printer',
+MACHINE = {'router, aluminium': 'CNC router', 'router, polycarbonate': 'CNC router', 'steel plate': 'Manual mill', 'printed': '3D printer',
            'tube': 'Saw and mill', 'angle': 'Saw and drill press', 'shaft': 'Lathe', 'turned': 'Lathe', 'flat bar': 'Saw and drill press',
            'hand-cut sheet': 'Bandsaw and drill press', 'plywood': 'Saw and router', 'soft goods': 'Hand tools', 'other': 'Hand tools'}
 
@@ -48,31 +50,44 @@ def route(p, kind):
     q = qty_text(p['qty'] or (str(p['printed']['qty']) if p['printed'] else str(p.get('model_qty') or 1)))
     name = p['name']; steps = []; checks = []
     if kind.startswith('router') or kind == 'steel plate':
-        d = p['dxf'][0]; small = [(dia, n) for dia, n in d['holes'] if dia < 0.25]; big = [(dia, n) for dia, n in d['holes'] if dia >= 0.25]
+        d = p['dxf'][0]; small = [(dia, n) for dia, n in d['holes'] if dia < DRILLED_BELOW]; big = [(dia, n) for dia, n in d['holes'] if dia >= DRILLED_BELOW]
         mat = {'router, aluminium': '6061 aluminium', 'router, polycarbonate': 'polycarbonate', 'steel plate': 'steel'}[kind]
         if '5052' in p['stock']: mat = '5052 aluminium'
         files = ' and '.join(f"`{x['file']}`" for x in p['dxf'])
-        if kind == 'steel plate':
-            steps = [f"Stock: {fnum(d['thick'])} in steel plate, at least {fnum(d['w'] + 0.5)} × {fnum(d['h'] + 0.5)} in for each part. Make {q}.",
-                     f"This part is steel{' and has sharp inside corners' if d['sharp'] else ''}, so it is not a job for the router. Send the flat pattern {files} out for laser or waterjet cutting.",
-                     "If it has to be made in the shop: rough it out on the bandsaw, mill the straight edges, and file the corners to the drawing.",
-                     "Deburr every edge."]
-            if small: steps.append("Drill the small holes on the drill press: " + ', '.join(f"{n} × {fnum(dia)} in ({hole_use(dia)[0]} drill)" for dia, n in small) + ".")
-            checks = [f"Overall size {fnum(d['w'])} × {fnum(d['h'])} in.", "It fits its mating part and moves freely: see the drawing."]
+        if kind == 'steel plate' and p['mark'] == 'CL-303':
+            steps = [f"Stock: 3/16 in mild steel plate. The drawing says mild steel is strong enough. Make {q}.",
+                     "Saw a round blank a little over 1.50 in across, then bring it to 1.50 in on the lathe or the mill.",
+                     "On the mill, cut the 1/2 in hex in the centre with a 1/8 in end mill, one flat at a time on a rotary table. The rounded corners it leaves fit ThunderHex shaft.",
+                     "Hold the blank by its hex on a rotary table or dividing head and cut the 16 teeth, turning 22.5° between teeth. Each tooth is 0.15 in deep.",
+                     "A cutter lying flat on the wheel leaves a rounded corner at the root of each tooth. Stand the wheel on edge so the corner of the end mill cuts the root, or file each root square.",
+                     "Deburr."]
+            checks = ["It slides onto the ThunderHex spool shaft without play.", "It turns freely inside the two gearbox spacers: they sit 1.00 in from the shaft.", "The pawl tip seats flat on a tooth face."]
+        elif kind == 'steel plate':
+            steps = [f"Stock: 3/16 in mild steel. Make {q}, each 0.60 × 2.25 in.",
+                     "Saw a blank and mill its edges to the outline on the drawing.",
+                     "Drill the holes on the mill: " + ', '.join(f"{n} × {fnum(dia)} in ({hole_use(dia)[0]})" for dia, n in d['holes']) + ". The 0.320 in hole is the pivot.",
+                     "File the tip square, so it seats on a tooth face.",
+                     "Deburr, and put a drop of oil on the pivot at assembly."]
+            checks = ["It swings freely on its 5/16 in spacer.", "The tip seats flat on a tooth of the ratchet wheel CL-303."]
         else:
             steps = [f"Stock: {fnum(d['thick'])} in {mat} sheet, at least {fnum(d['w'] + 1)} × {fnum(d['h'] + 1)} in for each part. Make {q}.",
                      f"Fix the sheet flat to the spoilboard. Load the flat pattern {files} in the router software. It is drawn in inches at full size."]
             if d['thick'] <= 0.07: steps.append("This sheet is thin and will lift. Hold it down across its whole area, not only at the edges.")
             if kind == 'router, polycarbonate': steps.append("Polycarbonate melts if the cutter rubs. Use a sharp single-flute cutter and keep the feed up.")
             if small:
-                steps.append("Cut the small holes first. They are smaller than the 1/4 in cutter, so use a 1/8 in end mill, or spot them on the router and drill them on the drill press: "
-                             + ', '.join(f"{n} × {fnum(dia)} in ({hole_use(dia)[0]})" for dia, n in small) + ".")
-            if d['min_arc'] is not None and d['min_arc'] < 0.125:
-                steps.append(f"The smallest inside radius on this part is {fnum(d['min_arc'])} in, which a 1/4 in cutter cannot reach. Cut those features with the 1/8 in end mill too.")
+                steps.append("Drill the small holes first, on the router, using its tool changer: "
+                             + ', '.join(f"{n} × {fnum(dia)} in with the {hole_use(dia)[0]}" for dia, n in small) + ".")
+            fine = d['min_arc'] is not None and d['min_arc'] < 0.125
             if big:
                 steps.append("Cut the larger holes with the 1/4 in end mill: " + ', '.join(f"{n} × {fnum(dia)} in" for dia, n in big) + "."
                              + (" For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it." if any(abs(dia - 1.125) < 0.002 for dia, _ in big) else ""))
-            steps += ["Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.", "Break the tabs and deburr every edge and hole."]
+            if d['min_arc'] is not None and not fine:
+                steps.append("Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.")
+            if fine:
+                steps.append(f"Cut the outline last, with the 1/8 in end mill, leaving tabs so the part cannot move. Its smallest inside radius is {fnum(d['min_arc'])} in, which the 1/4 in cutter cannot reach.")
+            else:
+                steps.append("Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.")
+            steps.append("Break the tabs and deburr every edge and hole.")
             if len(p['dxf']) > 1: steps.append("The left and right parts are different files. Mark each one L or R as it comes off the router.")
             checks = [f"Overall size {fnum(d['w'])} × {fnum(d['h'])} in.", f"Hole count: {sum(n for _, n in d['holes'])}."]
             if any(abs(dia - 1.125) < 0.002 for dia, _ in d['holes']): checks.append("A bearing presses into each 1.125 in bore without rocking.")
@@ -142,7 +157,7 @@ def outline_svg(p):
                 el.append(f'<line x1="{a.x:.3f}" y1="{-a.y:.3f}" x2="{b.x:.3f}" y2="{-b.y:.3f}"/>')
             elif t == 'CIRCLE':
                 c, r = e.dxf.center, e.dxf.radius; xs += [c.x - r, c.x + r]; ys += [c.y - r, c.y + r]
-                cls = ' class="small"' if r * 2 < 0.25 else ''
+                cls = ' class="small"' if r * 2 < DRILLED_BELOW else ''
                 el.append(f'<circle cx="{c.x:.3f}" cy="{-c.y:.3f}" r="{r:.3f}"{cls}/>')
             elif t == 'ARC':
                 c, r = e.dxf.center, e.dxf.radius; a0, a1 = math.radians(e.dxf.start_angle), math.radians(e.dxf.end_angle)

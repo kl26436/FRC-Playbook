@@ -3,7 +3,7 @@
 import parts from '../data/parts.json';
 
 interface Props {
-  show: 'machines' | 'issues';
+  show: 'machines' | 'issues' | 'tools';
 }
 
 const { show } = Astro.props;
@@ -18,8 +18,22 @@ const machines = [...new Set(parts.map((p) => p.machine))]
   .sort((a, b) => b.pieces - a.pieces);
 
 const routed = parts.filter((p) => p.machine === 'CNC router');
-const smallHoles = routed.filter((p) => p.holes.some((h) => h.dia < 0.25));
-const smallCount = smallHoles.reduce((n, p) => n + count(p.qty) * p.holes.filter((h) => h.dia < 0.25).reduce((m, h) => m + h.n, 0), 0);
+const DRILLED_BELOW = 0.375;
+const drilled = routed.reduce((n, p) => n + count(p.qty) * p.holes.filter((h) => h.dia < DRILLED_BELOW).reduce((m, h) => m + h.n, 0), 0);
+const holesOf = (dia: number) => routed.reduce((n, p) => n + count(p.qty) * p.holes.filter((h) => Math.abs(h.dia - dia) < 0.0005).reduce((m, h) => m + h.n, 0), 0);
+const partsWith = (dia: number) => routed.filter((p) => p.holes.some((h) => Math.abs(h.dia - dia) < 0.0005)).length;
+const pockets = [
+  { tool: '1/4 in end mill', job: 'Outlines, cut-outs, bearing bores and every hole 3/8 in or larger', note: `all ${routed.length} router parts` },
+  { tool: '1/8 in end mill', job: 'The wrist sprocket teeth, and any odd hole', note: 'W-104' },
+  ...[
+    { dia: 0.161, tool: '#20 drill', job: '5/32 in rivets' },
+    { dia: 0.196, tool: '#9 drill', job: '#10 screws passing through' },
+    { dia: 0.159, tool: '#21 drill', job: 'Tapping #10-32' },
+    { dia: 0.297, tool: '19/64 drill', job: '#10-32 rivnuts in the belly pan' },
+    { dia: 0.201, tool: '#7 drill', job: 'Tapping 1/4-20, or a free fit for a #10 screw' },
+  ].map((d) => ({ tool: d.tool, job: d.job, note: `${holesOf(d.dia)} holes on ${partsWith(d.dia)} ${partsWith(d.dia) === 1 ? 'part' : 'parts'}` })),
+  { tool: 'Spare', job: 'Swap in what the job needs: the single-flute cutter for polycarbonate, or a drill only one or two parts need (1/8, #16, F, H, 3/32, #32)', note: '' },
+];
 const bores = parts.filter((p) => p.holes.some((h) => Math.abs(h.dia - 1.125) < 0.002));
 const steel = parts.filter((p) => p.kind === 'steel plate');
 const poly = parts.filter((p) => p.kind === 'router, polycarbonate' || p.kind === 'hand-cut sheet');
@@ -52,16 +66,31 @@ const names = (list: { slug: string; mark: string }[]) => list.map(link).join(',
 }
 
 {
+  show === 'tools' && (
+    <table>
+      <thead>
+        <tr><th>Pocket</th><th>Tool</th><th>Used for</th><th>How much</th></tr>
+      </thead>
+      <tbody>
+        {pockets.map((p, i) => (
+          <tr><td>{i + 1}</td><td>{p.tool}</td><td>{p.job}</td><td>{p.note}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
+{
   show === 'issues' && (
     <ol>
       <li>
-        <strong>Small holes on the router.</strong> {smallHoles.length} of the {routed.length} router parts have holes smaller than the 1/4 in cutter, about {smallCount} holes in all. Decide once how the shop does them: a tool change to a 1/8 in end mill, or spot on the router and drill on the drill press.
+        <strong>Holes are drilled on the router.</strong> The router parts have about {drilled} holes smaller than 3/8 in, which the 1/4 in cutter cannot make. The router's tool changer drills them with the right bit, so no part needs a second trip to the drill press. The tool table below covers it.
       </li>
       <li>
         <strong>The wrist sprocket needs the small cutter.</strong> The teeth of <Fragment set:html={link(parts.find((p) => p.mark === 'W-104')!)} /> have a 0.065 in radius at the root. A 1/4 in cutter cannot reach that. A 1/8 in end mill just fits.
       </li>
       <li>
-        <strong>Two steel parts are not router jobs.</strong> <Fragment set:html={names(steel)} /> are 3/16 in steel, and the ratchet wheel has sharp inside corners. Send them out for laser or waterjet cutting, or plan time on the mill and with a file.
+        <strong>Two steel parts are made on the mill.</strong> <Fragment set:html={names(steel)} /> are 3/16 in mild steel, which is not a router job. The ratchet wheel needs a rotary table or dividing head for its 16 teeth and its hex hole. Confirm the shop has one before starting.
       </li>
       <li>
         <strong>Bearing bores.</strong> {bores.length} parts have a 1.125 in bore for a bearing: <Fragment set:html={names(bores)} />. Cut one test bore in scrap and try a real bearing before cutting any of them.
