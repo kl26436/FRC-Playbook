@@ -486,7 +486,7 @@ def resolve():
                     if p['g'] in groups_seen: continue
                     groups_seen.add(p['g'])
                 if p['k'] and p['k'] in made: key = ('made', p['k'])
-                else: key = ('bought', re.sub(r'\s*\[vendor model\]|\s*\(vendor model\)', '', re.split(r'[,:(]| x \d', p['l'])[0]).strip()[:48])
+                else: key = ('bought', re.sub(r'\s*\[vendor model\]|\s*\(vendor model\)', '', re.split(r',|:(?!\d)|\(| x \d', p['l'])[0]).strip()[:48])
                 listed[key] = listed.get(key, 0) + 1
             pl = [dict(k=k[1], n=c, name=made[k[1]]['name'], slug=made[k[1]]['slug']) if k[0] == 'made' else dict(name=k[1], n=c) for k, c in listed.items()]
             kinds = collections.Counter(F['kinds'][F['items'][fi][0]] for fi in fast[n])

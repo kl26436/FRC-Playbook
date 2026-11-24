@@ -29,15 +29,21 @@ Four steps, in this order. Each prints a short check when it finishes.
     python3 tools/vendor_tessellate.py <file.step> <cache>/<name>.npz [tolerance] [smallest face] [names to leave out or recolour]
     # 2. Put every vendor model where it sits on the robot
     python3 tools/make_vendor_parts.py <cache> <folder of vendor STEP files> <CAD source folder> <cache>/placed.npz [robotA_mesh.json]
+    # 2b. The climber's motors, gearboxes and servos, already placed in the tower hardware file
+    python3 tools/make_climber_vendor_parts.py <2_onshape_imports/climber_hw_tower.step> <cache>/climber_placed.npz
     # 3. The robot: public/robot-viewer/robot.bin and robot.json
-    python3 tools/make_viewer_data.py [robotA_mesh.json] --vendor=<cache>/placed.npz
+    python3 tools/make_viewer_data.py [robotA_mesh.json] --vendor=<cache>/placed.npz,<cache>/climber_placed.npz
     # 4. The fasteners, then the assembly steps
-    python3 tools/make_fastener_data.py [robotA_detail_fasteners.step] --vendor=<cache>/placed.npz
+    python3 tools/make_fastener_data.py [robotA_detail_fasteners.step] --vendor=<cache>/placed.npz,<cache>/climber_placed.npz
     python3 tools/assembly/steps.py
 
 - The CAD mesh export draws the swerve modules, their motors, the electronics and the camera as outline shapes. Steps 1 and 2
   swap in the makers' own models: SDS MK4i, WCP Kraken X60, REV power hub and Mini Power Module, NI roboRIO, CTRE CANivore
   and Pigeon, the AndyMark breaker, the Vivid-Hosting radio and the Limelight 4. Leave `--vendor` off to build without them.
+- The package's climber STEP draws each climber motor as a plain cylinder and each gearbox and servo as a box. The real
+  models (Kraken X60, REV MAXPlanetary 25:1, REV Smart Robot Servo) are in `climber_hw_tower.step`, already in place, so
+  step 2b lifts them out of there. In that file both sides are named "climber right"; the script names each side from
+  where the model actually sits.
 - `make_vendor_parts.py` uses the same placements as the CAD source (`assembly/vendor_place.py`). It prints how far each
   electronics model's mounting holes land from the holes we drill. All were within 0.002 in. The roboRIO and the breaker
   fit either way round, so the model cannot say which way their connectors face.

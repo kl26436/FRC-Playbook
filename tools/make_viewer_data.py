@@ -6,7 +6,7 @@ Output: public/robot-viewer/robot.bin  int16 positions (step q inches), then ind
         public/robot-viewer/robot.json meshes, parts, made-part lookup
 
 Meshes are regrouped by subsystem as well as motion group and colour, so the viewer can hide or pull apart a subsystem.
-Run: python3 tools/make_viewer_data.py <path to robotA_mesh.json> [--vendor=<placed.npz>] [--out=<folder>]
+Run: python3 tools/make_viewer_data.py <path to robotA_mesh.json> [--vendor=<placed.npz>[,<more.npz>]] [--out=<folder>]
 
 --vendor swaps the real vendor models (placed by make_vendor_parts.py) in for the outline shapes the CAD export
 used for the swerve modules, their motors, the electronics and the camera. A vendor model in several colours
@@ -82,7 +82,11 @@ for p in J['parts']:
 
 # ---- the real vendor models, in place of the stand-in shapes ----
 if OPT.get('vendor'):
-    D = np.load(OPT['vendor']); meta = json.loads(str(D['meta']))
+    D, meta = {}, []                                       # one or more files, joined with commas
+    for path in OPT['vendor'].split(','):
+        d = np.load(path); m0 = json.loads(str(d['meta']))
+        for i in range(len(m0)): D[f'v{len(meta) + i}'] = d[f'v{i}']; D[f't{len(meta) + i}'] = d[f't{i}']
+        meta += m0
     gone = [re.compile(m['replaces']) for m in meta if m['replaces']]
     before = len(parts); parts = [q for q in parts if not any(rx.search(q['label']) for rx in gone)]
     extra, gid, seen = [POS], {}, collections.Counter(m['label'] for m in meta)

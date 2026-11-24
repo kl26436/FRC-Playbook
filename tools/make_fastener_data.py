@@ -66,12 +66,17 @@ if OPT.get('vendor'):
     GEO = tempfile.mkdtemp()
     subprocess.run([sys.executable, os.path.join(HERE, 'make_viewer_data.py')] + ([OPT['mesh']] if OPT.get('mesh') else []) + ['--out=' + GEO], check=True, stdout=subprocess.DEVNULL)
     new = json.load(open(os.path.join(OUT, 'robot.json')))['parts']
-    swaps = [(re.compile(m['replaces']), m['label']) for m in json.loads(str(np.load(OPT['vendor'])['meta'])) if m['replaces']]
+    swaps = []                                             # (pattern, label, centre of the placed model)
+    for path in OPT['vendor'].split(','):
+        d = np.load(path)
+        for i, m in enumerate(json.loads(str(d['meta']))):
+            if m['replaces']: swaps.append((re.compile(m['replaces']), m['label'], d[f'v{i}'].mean(axis=0)))
     where = collections.defaultdict(list)
     for i, p in enumerate(new): where[p['l']].append(i)
     REMAP = []
     for p in json.load(open(os.path.join(GEO, 'robot.json')))['parts']:
-        to = next((lab for rx, lab in swaps if rx.search(p['l'])), None)
+        hits = [(np.linalg.norm(c - np.array(p['c'])), lab) for rx, lab, c in swaps if rx.search(p['l'])]      # left and right share a pattern: take the nearer
+        to = min(hits)[1] if hits else None
         if to: REMAP.append(where[to][0])                 # a swapped shape: the first piece of the vendor model
         else:                                             # an unchanged part: same label, same place
             hit = [i for i in where[p['l']] if new[i]['c'] == p['c'] and new[i]['nt'] == p['nt']]
