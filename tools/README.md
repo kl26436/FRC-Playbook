@@ -92,3 +92,11 @@ method before rebuilding, and update the commit named in each page's note.
   `src/data/control.json`. The Setpoints and control page draws its chart, its gain tables and its model from that file.
 - `replay-recorder/` holds the test that records the runs played back on One button to score and How the camera finds
   the robot. Its README says how to record, and why the copies in this repo carry a caveat.
+
+## The field in the replays
+
+`public/robot-viewer/field.js` builds the blue half of the field from boxes, tubes and balls: the reef, both coral
+stations, the processor, the barge with its cages and nets, the walls and the tape. Plan positions are the ones in
+`src/assets/field-map.svg`; the reef, station, net and cage sections are the ones `tools/render/render_final.py` uses.
+In replay mode the viewer keeps the robot at the origin and moves the field under it. The page (`AutoReplay.astro`)
+posts the robot's place, what it holds, what it has scored or dropped, and for the camera recordings the tag in view.

@@ -31,6 +31,7 @@ a { color: var(--accent); }
 #view { display: block; width: 100%; height: clamp(340px, 62vh, 620px); touch-action: pan-y; cursor: grab; }
 .mode-part #view { height: 340px; }
 .mode-replay #view { height: 400px; }
+.mode-replay.has-field #view { height: clamp(300px, 60vw, 560px); }
 .mode-keepout #view { height: clamp(300px, 46vh, 460px); }
 .mode-assemble #view { height: 360px; }
 @media (max-width: 520px) { .mode-assemble #view { height: 250px; } }
@@ -142,6 +143,7 @@ body:not(.mode-keepout) .keepwrap { display: block; }
 </div>
 
 <script src="../concept-viewer/three.min.js"></script>
+<script src="field.js"></script>
 <script src="viewer.js"></script>
 </body>
 </html>

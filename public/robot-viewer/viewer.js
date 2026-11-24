@@ -92,8 +92,10 @@
   // ---- camera: orbit a target ----
   var tgt = new T.Vector3(0, 22, 0), az = 38 * D2R, el = 18 * D2R, dist = 125, anim = null;
   var lim = { dmin: 40, dmax: 420, emin: -0.05, ymin: 0, ymax: 110 };
+  var yaw = 0;                      // the replay's field view turns the camera with the robot, so the field stays put
   function placeCam() {
-    camera.position.set(tgt.x + dist * Math.cos(el) * Math.cos(az), tgt.y + dist * Math.sin(el), tgt.z + dist * Math.cos(el) * Math.sin(az));
+    var a = az + yaw;
+    camera.position.set(tgt.x + dist * Math.cos(el) * Math.cos(a), tgt.y + dist * Math.sin(el), tgt.z + dist * Math.cos(el) * Math.sin(a));
     camera.lookAt(tgt); dirty = true;
   }
   function setView(a, e, d, to, ms) {
@@ -461,10 +463,124 @@
   }
 
   // ---- replay: the page that embeds this one sends each pose ----
+  // A pose with no place (the climb) shows the robot alone. A pose with x, y and heading puts the robot on the
+  // field from field.js: the robot stays at the origin and the field is moved under it, which is the same picture.
   function setupReplay() {
+    var IN_PER_M = 39.3701, CAM = [13.63, 0, 9.58];          // the Limelight's lens, in robot coordinates
+    // Follow keeps one direction for a whole run, chosen from its path by bestSide(), so the view never swings.
+    var VIEWS = { follow: { az: 60, el: 34, dist: 240 }, field: { az: 90, el: 46, dist: 640 } }, FIELD_TGT = [178, 150, 18];
+    var F = null, fieldG = null, last = null, blend = 0, camMode = 'follow', keys = {};
+    var held, heldAlgae, ghost, sight, sightMat = {}, path = null, pieces = { scored: [], dropped: [], netted: [] }, litTag = null;
+    function buildField() {
+      if (F || !window.buildField) return !!F;
+      F = window.buildField(T, floorMat); fieldG = F.group; fieldG.matrixAutoUpdate = false; root.add(fieldG);
+      // what the claw is holding rides on the wrist, placed along it as in the ray-traced pictures
+      var wrist = GG[2].wrist;
+      held = F.makeCoral(); held.position.set(PIV_W[0], 0, PIV_W[2] - 11); wrist.add(held);
+      heldAlgae = F.makeAlgae(); heldAlgae.position.set(PIV_W[0] - 12.3, 0, PIV_W[2] - 14.15); wrist.add(heldAlgae);
+      // where the code thinks the robot is: the bumper outline
+      ghost = new T.Group();
+      ghost.add(new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(34.5, 34.5, 5)), new T.LineBasicMaterial({ color: 0x4f86ff })));
+      var fillMat = F.mat(0x4f86ff, { transparent: true, opacity: 0.16, depthWrite: false }); ghost.add(new T.Mesh(new T.BoxGeometry(34.5, 34.5, 5), fillMat));
+      fieldG.add(ghost);
+      sightMat = { used: F.mat(0x1fbf75, { emissive: 0x0c5a36 }), refused: F.mat(0xe0453a, { emissive: 0x6b1712 }), idle: F.mat(0x9aa3ab) };
+      sight = new T.Mesh(new T.CylinderGeometry(0.45, 0.45, 1, 8), sightMat.idle); fieldG.add(sight);
+      camera.far = 6000; camera.updateProjectionMatrix();
+      return true;
+    }
+    // Swap between the robot on the field and the robot alone (the climb has no place on the field).
+    function showField(on) {
+      if (!fieldG || fieldG.visible === on && document.body.classList.contains('has-field') === on) return;
+      fieldG.visible = on; floor.visible = grid.visible = !on; document.body.classList.toggle('has-field', on);
+      lim.dmin = on ? 70 : 40; lim.dmax = on ? 1100 : 420; lim.emin = on ? 0.06 : -0.05;
+      hint.textContent = on ? 'Drag to look round. Scroll or pinch to zoom.' : 'The robot at this moment in the run. Drag to turn it.';
+      if (!on) { held.visible = heldAlgae.visible = false; yaw = 0; last = null; sun.position.set(80, 160, 120); fill.position.set(-120, 60, -90); }
+    }
+    // Rebuild a set of loose game pieces only when the list the page sent has changed.
+    function sync(name, list, make) {
+      var k = JSON.stringify(list || []); if (keys[name] === k) return; keys[name] = k;
+      pieces[name].forEach(function (o) { o.parent.remove(o); }); pieces[name] = [];
+      (list || []).forEach(function (item) { var o = make(item); if (o) pieces[name].push(o); });
+    }
+    function placeField() {
+      if (!last) return;
+      var c = Math.cos(-last.h), s = Math.sin(-last.h), fx = FIELD_TGT[0] - last.px, fy = FIELD_TGT[1] - last.py;
+      // the camera looks at the robot (follow) or at a fixed spot on the field (field), or part way while it changes
+      tgt.set((fx * c - fy * s) * blend, 30 * (1 - blend) + FIELD_TGT[2] * blend, -(fx * s + fy * c) * blend);
+      yaw = last.h;
+      sun.position.set(144 * Math.cos(0.98 + last.h), 160, 144 * Math.sin(0.98 + last.h)); fill.position.set(150 * Math.cos(-2.5 + last.h), 60, 150 * Math.sin(-2.5 + last.h));
+      placeCam();
+    }
+    // The side to watch a run from: the direction, round the robot, from which the reef, the barge and the coral
+    // station walls are in the way for the least time. Ties go to the scoring-table side, where a crowd would sit.
+    function bestSide(pts) {
+      var REEF = [176.75, 158.5], WALLS = [[1.2, 49.3, 65.8, 2.3], [1.2, 267.7, 65.8, 314.7]], best = -60, low = 1e9;
+      function crosses(ax, ay, bx, by, w) {
+        var d = (bx - ax) * (w[3] - w[1]) - (by - ay) * (w[2] - w[0]); if (Math.abs(d) < 1e-9) return false;
+        var t = ((w[0] - ax) * (w[3] - w[1]) - (w[1] - ay) * (w[2] - w[0])) / d, u = ((w[0] - ax) * (by - ay) - (w[1] - ay) * (bx - ax)) / d;
+        return t > 0 && t < 1 && u > 0 && u < 1;
+      }
+      for (var deg = -180; deg < 180; deg += 10) {
+        var cx = Math.cos(deg * D2R), cy = Math.sin(deg * D2R), cost = Math.abs(deg + 60) / 3600;
+        for (var i = 0; i < pts.length; i++) {
+          var x = pts[i].x, y = pts[i].y, along = (REEF[0] - x) * cx + (REEF[1] - y) * cy, off = Math.abs((REEF[0] - x) * cy - (REEF[1] - y) * cx);
+          if (along > 0 && along < 200 && off < 46) cost += 1;                                   // looking through the reef
+          if (x < 330 && x + 200 * cx > 330) cost += 1;                                          // or from behind the barge
+          if (crosses(x, y, x + 70 * cx, y + 70 * cy, WALLS[0]) || crosses(x, y, x + 70 * cx, y + 70 * cy, WALLS[1])) cost += 1;   // or a station wall
+        }
+        if (cost < low) { low = cost; best = deg; }
+      }
+      return best;
+    }
+    function setCam(mode, ms) {
+      camMode = mode; var v = VIEWS[mode], a0 = az, e0 = el, d0 = dist, b0 = blend, b1 = mode === 'field' ? 1 : 0, t0 = performance.now();
+      var a1 = v.az * D2R; while (a1 - a0 > Math.PI) a1 -= 2 * Math.PI; while (a0 - a1 > Math.PI) a1 += 2 * Math.PI;
+      anim = function (now) {
+        var k = ms ? Math.min(1, (now - t0) / ms) : 1; k = k * k * (3 - 2 * k);
+        az = a0 + (a1 - a0) * k; el = e0 + (v.el * D2R - e0) * k; dist = d0 + (v.dist - d0) * k; blend = b0 + (b1 - b0) * k; placeField(); if (k >= 1) anim = null;
+      };
+    }
+    function onField(d) {
+      if (!buildField()) return;
+      showField(true); setupReplay.v = null;
+      var first = !last, px = d.x * IN_PER_M, py = d.y * IN_PER_M, h = (+d.h || 0) * D2R;
+      last = { px: px, py: py, h: h };
+      fieldG.matrix.makeRotationZ(-h).multiply(m4().makeTranslation(-px, -py, 0)); fieldG.matrixWorldNeedsUpdate = true;
+      held.visible = !!d.coral; heldAlgae.visible = !!d.algae;
+      sync('scored', d.scored, function (e) { return F.scoredAt(e[0], e[1]); });
+      sync('dropped', d.dropped, function (e) { var o = F.makeCoral(); o.rotation.x = Math.PI / 2; o.rotation.z = 0.6; o.position.set(e[0], e[1], 2.25); fieldG.add(o); return o; });
+      sync('netted', d.netted, function (e) { var o = F.makeAlgae(); o.position.set(F.netX, e[1], F.netZ); fieldG.add(o); return o; });
+      F.reefAlgae.forEach(function (o, i) { o.visible = !(d.taken || []).some(function (p) { return F.nearestFace(p[0], p[1]) === i; }); });
+      ghost.visible = !!d.est;
+      if (d.est) { ghost.position.set(d.est[0] * IN_PER_M, d.est[1] * IN_PER_M, 5.5); ghost.rotation.z = h; }
+      var tag = d.tag !== undefined && d.tag !== null ? F.tags[d.tag] : null;
+      if (litTag) { litTag.mesh.material = F.M.tapeBlack; litTag = null; }
+      sight.visible = !!tag;
+      if (tag) {
+        var m = d.seen === 3 ? sightMat.used : d.seen >= 4 ? sightMat.refused : sightMat.idle, fr = tag.frame;
+        var a = new T.Vector3(px + CAM[0] * Math.cos(h), py + CAM[0] * Math.sin(h), CAM[2]);
+        var b = new T.Vector3(fr.position.x - 0.4 * Math.cos(fr.rotation.z), fr.position.y - 0.4 * Math.sin(fr.rotation.z), tag.z), dir = b.clone().sub(a);
+        sight.material = m; sight.scale.set(1, dir.length(), 1); sight.position.copy(a).add(b).multiplyScalar(0.5);
+        sight.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), dir.normalize());
+        if (d.seen >= 3) { tag.mesh.material = m; litTag = tag; }
+      }
+      if (first) setCam(camMode, 0); else if (!anim) placeField();
+      dirty = true;
+    }
     window.addEventListener('message', function (e) {
-      var d = e.data; if (!d || d.type !== 'pose') return;
+      var d = e.data; if (!d) return;
+      if (d.type === 'cam' && (d.mode === 'follow' || d.mode === 'field')) { if (last) setCam(d.mode, 600); else camMode = d.mode; return; }
+      if (d.type === 'path' && buildField()) {
+        if (path) fieldG.remove(path);
+        var pts = (d.pts || []).map(function (p) { return new T.Vector3(p[0] * IN_PER_M, p[1] * IN_PER_M, 0.35); });
+        path = new T.Line(new T.BufferGeometry().setFromPoints(pts), new T.LineBasicMaterial({ color: 0xffd34d })); fieldG.add(path);
+        VIEWS.follow.az = -bestSide(pts); if (last && camMode === 'follow') setCam('follow', 500);
+        dirty = true; return;
+      }
+      if (d.type !== 'pose') return;
       state.c = +d.c || 0; state.th = d.th === undefined ? -90 : +d.th; state.psi = d.psi === undefined ? 90 : +d.psi; state.tray = +d.tray || 0; apply();
+      if (d.x !== undefined) return onField(d);
+      showField(false);
       if (d.view === 'climb' && setupReplay.v !== 'climb') { setupReplay.v = 'climb'; setView(150, 14, 135, new T.Vector3(-4, 20, 0), 600); }
       if (d.view === 'auto' && setupReplay.v !== 'auto') { setupReplay.v = 'auto'; setView(52, 12, 215, new T.Vector3(0, 48, 0), 600); }
     });

@@ -23,14 +23,14 @@ The driver holds one trigger. The robot picks the branch, drives to it, raises t
 
 ## Watch it run
 
-This is the real command running in the simulator: one button for the station pickup, then one for branch D at L4. Press Play, or drag the slider to step through it.
+This is the real command running in the simulator: one button for the station pickup, then one for branch D at L4. Press Play, or drag the slider to step through it. Drag the 3D view to look round.
 
 <AutoReplay files={[{ file: 'teleop_cycle.json', label: 'Station to L4, one button each' }]} zoom pickLabel="Recording" />
 
 The chips above the map light up as the command moves through the steps on this page. Three things to look for:
 
 - **The ring.** It is 48 in from the scoring spot. The carriage goal stays at stow until the robot crosses it.
-- **The goal climbs in steps.** The command asks for L4 once, but the goal beside the 3D robot does not jump straight to 65.25 in. The steps come from [the planner that keeps the wrist clear](../superstructure/) on the way up.
+- **The goal climbs in steps.** The command asks for L4 once, but the carriage goal under the map does not jump straight to 65.25 in. The steps come from [the planner that keeps the wrist clear](../superstructure/) on the way up.
 - **The release waits.** The robot is on the spot before the carriage is up. The coral goes only when the carriage is there too.
 
 ## 1. The button

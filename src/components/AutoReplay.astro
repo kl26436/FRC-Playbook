@@ -1,6 +1,7 @@
 ---
-// Plays a simulated run: the robot's true path on the field map, and the 3D robot moving its elevator, wrist,
-// climber fork and funnel tray as recorded. The climb has no path, so it shows the 3D robot alone.
+// Plays a simulated run: the 3D robot driving the recorded path on a 3D field (public/robot-viewer/field.js),
+// moving its mechanisms and leaving its game pieces where they went, with the path on the field map under it.
+// The climb has no path, so it shows the 3D robot alone.
 // Recordings live in public/replays/ and are copied from the robot code repo by scripts/fetch-replays.mjs.
 import fieldMap from '../assets/field-map.svg';
 import fieldMapText from '../assets/field-map.svg?raw';
@@ -48,6 +49,10 @@ const mapSrc = files ? plainMap : fieldMap.src;
       <select data-pick aria-label={`Choose a ${pickLabel.toLowerCase()}`}></select>
     </label>
     <button type="button" data-play>Play</button>
+    <span class="replay-cams" data-cams hidden role="group" aria-label="Camera">
+      <button type="button" data-cam="follow" aria-pressed="true">Follow the robot</button>
+      <button type="button" data-cam="field" aria-pressed="false">Whole field</button>
+    </span>
     <label class="replay-scrub">
       <span class="sr-only">Time in the routine</span>
       <input type="range" data-scrub min="0" max="15" step="0.05" value="0" />
@@ -171,6 +176,10 @@ const mapSrc = files ? plainMap : fieldMap.src;
     const mapX = (m: number) => m * IN_PER_M;
     const mapY = (m: number) => FIELD_HEIGHT_IN - m * IN_PER_M;
 
+    // Game pieces that end up somewhere other than the claw, each with when and where (inches on the field).
+    type Loose = { t: number; at: [number, number] };
+    let loose: { dropped: Loose[]; taken: Loose[]; netted: Loose[] } = { dropped: [], taken: [], netted: [] };
+    const cams = q<HTMLElement>('[data-cams]');
     let run: Replay | null = null;
     let col: Record<string, number> = {};
     let t = 0;
@@ -197,6 +206,9 @@ const mapSrc = files ? plainMap : fieldMap.src;
       return {
         x: v('x_m') * IN_PER_M,
         y: FIELD_HEIGHT_IN - v('y_m') * IN_PER_M,
+        xM: v('x_m'),
+        yM: v('y_m'),
+        estM: 'est_x_m' in col ? [e('est_x_m'), e('est_y_m')] : null,
         heading: 'heading_deg' in col ? turn(num(a, 'heading_deg'), num(b, 'heading_deg'), f) : 0,
         carriage: v('carriage_in'),
         wrist: v('wrist_deg'),
@@ -349,8 +361,29 @@ const mapSrc = files ? plainMap : fieldMap.src;
         q('[data-err-text]').textContent = `${(off * 0.0254).toFixed(2)} m (${off.toFixed(0)} in)`;
       }
       // The 3D robot takes the same four numbers the recording holds.
+      const now = (list: { t: number }[]) => list.filter((e) => e.t <= t + 1e-6);
       model.contentWindow?.postMessage(
-        { type: 'pose', c: p.carriage, th: p.wrist, psi: p.fork, tray: p.tray, view: onField ? 'auto' : 'climb' },
+        onField
+          ? {
+              type: 'pose',
+              c: p.carriage,
+              th: p.wrist,
+              psi: p.fork,
+              tray: p.tray,
+              x: p.xM,
+              y: p.yM,
+              h: p.heading,
+              coral: p.coral,
+              algae: p.algae,
+              scored: now(run.events.filter((e) => e.what === 'coral')).map((e) => [(e as { branch: string }).branch, (e as { level: string }).level]),
+              dropped: now(loose.dropped).map((e) => e.at),
+              taken: now(loose.taken).map((e) => e.at),
+              netted: now(loose.netted).map((e) => e.at),
+              est: vision && p.estM ? p.estM : undefined,
+              tag: vision ? p.tag : undefined,
+              seen: vision ? p.sees : undefined,
+            }
+          : { type: 'pose', c: p.carriage, th: p.wrist, psi: p.fork, tray: p.tray, view: 'climb' },
         window.location.origin,
       );
 
@@ -382,6 +415,32 @@ const mapSrc = files ? plainMap : fieldMap.src;
       scrub.value = String(t);
     }
 
+    // A coral that leaves the claw with no score to go with it fell on the carpet. An algae that arrives in the
+    // claw came off the reef, and one that scores went into the net.
+    function findLoose() {
+      loose = { dropped: [], taken: [], netted: [] };
+      if (!run || !('x_m' in col)) return;
+      const s = run.samples as number[][];
+      const place = (row: number[], ahead: number): [number, number] => {
+        const h = (row[col.heading_deg] * Math.PI) / 180;
+        return [row[col.x_m] * IN_PER_M + ahead * Math.cos(h), row[col.y_m] * IN_PER_M + ahead * Math.sin(h)];
+      };
+      for (let i = 1; i < s.length; i++) {
+        const time = s[i][0];
+        if ('coral' in col && s[i - 1][col.coral] > 0.5 && s[i][col.coral] < 0.5 && !run.events.some((e) => e.what === 'coral' && Math.abs(e.t - time) < 0.4))
+          loose.dropped.push({ t: time, at: place(s[i], 24) });
+        if ('algae' in col && s[i - 1][col.algae] < 0.5 && s[i][col.algae] > 0.5) loose.taken.push({ t: time, at: place(s[i], 0) });
+      }
+      for (const e of run.events.filter((x) => x.what === 'net')) {
+        const row = s.find((r) => r[0] >= e.t) ?? s[s.length - 1];
+        loose.netted.push({ t: e.t, at: place(row, 0) });
+      }
+    }
+    function sendPath() {
+      if (!run || !('x_m' in col)) return;
+      model.contentWindow?.postMessage({ type: 'path', pts: run.samples.map((r) => [r[col.x_m], r[col.y_m]]) }, window.location.origin);
+    }
+
     function stop() {
       playing = false;
       playBtn.textContent = 'Play';
@@ -407,6 +466,10 @@ const mapSrc = files ? plainMap : fieldMap.src;
       field.style.display = onField ? '' : 'none';
       box.classList.toggle('no-field', !onField);
       const stamp = data.code ? ` Recorded from code commit ${data.code}${data.recorded ? ` on ${data.recorded}` : ''}.` : '';
+      findLoose();
+      sendPath();
+      cams.hidden = !onField;
+      box.classList.toggle('drive', onField);
       stepList.replaceChildren();
       stepList.hidden = !('phase' in col);
       key.hidden = !('phase' in col) && !vision;
@@ -436,10 +499,19 @@ const mapSrc = files ? plainMap : fieldMap.src;
       draw();
     });
     pick.addEventListener('change', () => load(pick.value));
+    for (const button of cams.querySelectorAll<HTMLButtonElement>('[data-cam]')) {
+      button.addEventListener('click', () => {
+        for (const other of cams.querySelectorAll('[data-cam]')) other.setAttribute('aria-pressed', String(other === button));
+        model.contentWindow?.postMessage({ type: 'cam', mode: button.dataset.cam }, window.location.origin);
+      });
+    }
     if (zoom) new ResizeObserver(() => frame()).observe(field);
     // The 3D robot loads after the first frame is drawn: pose it again once it says it is ready.
     window.addEventListener('message', (e) => {
-      if (e.source === model.contentWindow && e.data?.type === 'robot-viewer-ready') draw();
+      if (e.source === model.contentWindow && e.data?.type === 'robot-viewer-ready') {
+        sendPath();
+        draw();
+      }
     });
 
     (given ? Promise.resolve(given) : fetch(`${root}/index.json`).then((r) => r.json()))
@@ -548,6 +620,54 @@ const mapSrc = files ? plainMap : fieldMap.src;
   }
   .replay.no-field .replay-body {
     grid-template-columns: 1fr;
+  }
+  /* A run with a path: the 3D field across the top, the map and the numbers under it. */
+  .replay.drive .replay-body {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas: 'view view' 'map facts';
+  }
+  .replay.drive .replay-side {
+    display: contents;
+  }
+  .replay.drive .replay-side :global(iframe.robot-viewer) {
+    grid-area: view;
+  }
+  .replay.drive .replay-field {
+    grid-area: map;
+    border-right: 1px solid #d3dae0;
+  }
+  .replay.drive dl {
+    grid-area: facts;
+    font-size: var(--sl-text-xs);
+  }
+  @media (max-width: 40rem) {
+    .replay.drive .replay-body {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'view' 'map' 'facts';
+    }
+    .replay.drive .replay-field {
+      border-right: 0;
+      border-bottom: 1px solid #d3dae0;
+    }
+  }
+  .replay-cams {
+    display: inline-flex;
+  }
+  .replay-cams button {
+    min-width: 0;
+    font-size: var(--sl-text-sm);
+    border-radius: 0;
+  }
+  .replay-cams button:first-child {
+    border-radius: 0.25rem 0 0 0.25rem;
+  }
+  .replay-cams button:last-child {
+    border-radius: 0 0.25rem 0.25rem 0;
+    border-left: 0;
+  }
+  .replay-cams button[aria-pressed='true'] {
+    color: var(--sl-color-black);
+    background: var(--sl-color-white);
   }
   dl {
     padding: 0.5rem 0.75rem;
