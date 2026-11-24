@@ -63,6 +63,19 @@ const profileTime = (v: Values) => {
   return (2 * peak) / v.accel + Math.max(0, v.travel - ramps) / peak;
 };
 
+// One reef tag seen by the nose camera: the same formula as SingleTagFix.distanceM in the robot code.
+const TAG_IN = 6.5; // the black square of a field AprilTag
+const TAG_CENTRE_IN = 12.13; // a reef tag's centre above the carpet
+const LENS_IN = 9.58; // the camera lens above the carpet
+const V_FOV_DEG = 56.2;
+const V_PIXELS = 800;
+const tagDistanceIn = (px: number) => {
+  const tan = Math.tan((((px * V_FOV_DEG) / V_PIXELS) * Math.PI) / 180);
+  const h = TAG_CENTRE_IN - TAG_IN / 2 - LENS_IN; // tag bottom above the lens (negative: the lens is a little higher)
+  const disc = Math.max(0, TAG_IN * TAG_IN - 4 * tan * tan * h * (h + TAG_IN));
+  return (TAG_IN + Math.sqrt(disc)) / (2 * tan);
+};
+
 export const calcs: Record<string, CalcDef> = {
   'cycle-value': {
     title: 'What a scoring cycle is worth',
@@ -266,6 +279,26 @@ export const calcs: Record<string, CalcDef> = {
       'Multiply by 32.17 for feet per second squared.',
     ],
     note: 'Modelled, with battery and bumpers on. The default is the worst case: carriage at the top, wrist level.',
+  },
+
+  'tag-distance': {
+    title: 'How far away is the tag?',
+    group: 'Software',
+    page: 'code/vision',
+    inputs: [{ key: 'px', label: 'Height of the tag in the picture', unit: 'px', value: 134, step: 1 }],
+    outputs: [
+      { label: 'Angle the tag fills, top to bottom', unit: '°', digits: 2, compute: (v) => (v.px * V_FOV_DEG) / V_PIXELS },
+      { label: 'Distance from camera to tag', unit: 'in', compute: (v) => tagDistanceIn(v.px) },
+      { label: 'The same, in metres', unit: 'm', digits: 2, compute: (v) => tagDistanceIn(v.px) * 0.0254 },
+      { label: 'Change in distance if the height is one pixel off', unit: 'in', digits: 2, compute: (v) => Math.abs(tagDistanceIn(v.px) - tagDistanceIn(v.px + 1)) },
+    ],
+    steps: [
+      'Angle = height in pixels × 56.2° ÷ 800. The camera sees 56.2° from top to bottom, spread over 800 pixels.',
+      'The tag is 6.5 in tall. From far away, distance ≈ 6.5 in ÷ tan(angle).',
+      'The exact formula also allows for the lens sitting 9.58 in up and the tag centre 12.13 in up. For this robot that changes the answer by about 1% at half a metre, and less from further away.',
+      'Try 34 px, the tag from 4 m away, and 134 px, the tag from 1 m away.',
+    ],
+    note: 'Calculated. No real camera has been tested yet. Far away, one pixel is several inches, which is why the code only trusts the tag it is driving toward and gets more exact as it closes in.',
   },
 
   'keep-out': {

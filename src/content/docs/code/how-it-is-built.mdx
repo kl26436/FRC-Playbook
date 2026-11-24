@@ -3,11 +3,53 @@ title: "How the code is built"
 description: "What the robot code is made of, how it is laid out, and why it runs the same on the robot and in simulation."
 ---
 
+import CodeMap from '../../../components/CodeMap.astro';
+import Flow from '../../../components/Flow.astro';
+
 :::note[Draft]
 First draft, written from the code and its notes as of November 23. Nothing here has run on a real robot yet.
 :::
 
 The robot code is finished as designed and runs a full match in simulation. This chapter explains how it is put together and why. The code is public at [github.com/kl26436/ClaudeBot](https://github.com/kl26436/ClaudeBot).
+
+## The code on one page
+
+The code is in layers. A request starts at the top and is passed down until something moves.
+
+<CodeMap />
+
+Three things make this layout worth having:
+
+- **One job per layer.** A command knows what scoring means. It does not know what a motor is. A mechanism knows how to reach a height. It does not know why.
+- **One boss for the mechanisms.** Only the superstructure tells the elevator, wrist and rollers what to do. That is the one place the keep-out rules have to be right.
+- **One line where the code ends.** Everything above the dashed line runs unchanged in the simulator, so a test in the simulator is a test of the real code.
+
+### Follow one request down
+
+The driver holds the right trigger with L4 chosen:
+
+1. **Who asks.** The controller's trigger starts the scoring command.
+2. **Command.** It asks the drive to go to the branch, and tells the camera which reef face to watch.
+3. **Deciders.** 48 in from the spot, the command asks the superstructure for L4. The superstructure works out an order of moves that keeps the wrist out of the elevator.
+4. **Mechanisms.** The elevator is told a height, the wrist an angle.
+5. **The edge.** The motor classes send those targets to the motor controllers, which do the fast control themselves.
+
+[One button to score](../one-button-to-score/) goes through the same request in the real code.
+
+### What happens every loop
+
+The robot code runs 50 times a second. Each time, every mechanism does the same things in the same order:
+
+<Flow label="What every mechanism does, 50 times a second" steps={[
+  { title: 'Read', text: 'Get its sensor readings through the IO layer' },
+  { title: 'Log', text: 'Record every reading before using it' },
+  { title: 'Decide', text: 'Compare where it is with where it is wanted' },
+  { title: 'Act', text: 'Send a new target to its motor controller' },
+]} />
+
+Logging every reading before using it is what lets a match be replayed afterwards: feed the same readings back in, and the code makes the same decisions.
+
+Two things run faster than the main loop. The wheels and gyro are read 250 times a second, to track position. The motor controllers run their own control 1,000 times a second, which is why the code sends them targets and not voltages.
 
 ## What we decided
 
@@ -44,18 +86,47 @@ Every mechanism has the same four pieces. Learn one and you can read them all.
 3. **A simulation subclass** adds only physics. It reads the voltage the simulated motor applies and feeds position and speed back.
 4. **The subsystem** holds a wanted state and a current state.
 
+Here is piece 3 for the elevator. The class extends the real motor class, so every line of control code is shared. All it adds is the physics:
+
+```java title="ElevatorIOSim.java"
+public class ElevatorIOSim extends ElevatorIOTalonFX {
+    // ...
+    /** Advance the physics by {@code dtSeconds} using the voltage the left motor is commanding. */
+    public void simulate(double dtSeconds) {
+        double battery = RobotController.getBatteryVoltage();
+        leftSim.setSupplyVoltage(battery);
+        rightSim.setSupplyVoltage(battery);
+        physics.setInput(leftSim.getMotorVoltage());
+        physics.update(dtSeconds);
+        physicsTimeS += dtSeconds;
+        writeRotor();
+    }
+}
+```
+
+The simulated motor controller decides a voltage exactly as the real one would. `simulate` hands that voltage to a physics model of the elevator, then writes the new position back for the controller to read. The camera is the one place with two separate classes. A Limelight has no simulated twin the way a motor controller does, so the pretend one is written from geometry. [How the camera finds the robot](../vision/) shows that side by side.
+
 Only one part of the code, the superstructure, tells the mechanisms where to go. That is covered in [Moving without hitting anything](../superstructure/).
 
 ## Where things live
 
-| Folder | Holds |
-| --- | --- |
-| `config/` | `Ports` (every CAN ID and port), `RobotConstants` (dimensions and ratios), `Setpoints`, `KeepOut` |
-| `subsystems/` | One folder per mechanism: drive, elevator, wrist, coral rollers, claw, climber, vision |
-| `commands/` | Scoring and pickup moves shared by teleop and autos |
-| `autos/` | The auto list, the chooser and the building blocks |
-| `field/` | Reef, station, barge and start positions for both alliances |
-| `sim/` | The simulated robot and the judge that decides whether a piece scored |
+| Folder | Files | Holds | Read this first |
+| --- | --- | --- | --- |
+| top level | 4 | Start-up, the button bindings, which hardware to use | `RobotContainer` |
+| `config/` | 4 | `Ports` (every CAN ID and port), `RobotConstants` (dimensions and ratios), `Setpoints`, `KeepOut` | `Setpoints` |
+| `subsystems/` | 38 | One folder per mechanism: drive, elevator, wrist, coral rollers, claw, climber, vision | `Superstructure` |
+| `commands/` | 3 | Scoring, pickup and climbing moves shared by teleop and autos | `ScoreCommands` |
+| `autos/` | 5 | The auto list, the chooser and the building blocks | `AutoFactory` |
+| `field/` | 6 | Reef, station, barge and start positions for both alliances | `Reef` |
+| `sim/` | 2 | The simulated robot and the judge that decides whether a piece scored | `ScoreJudge` |
+
+That is 62 files and about 6,800 lines. The tests are another 28 files and about 4,300 lines: roughly two lines of test for every three lines of robot code.
+
+### A good order to read it in
+
+1. [One button to score](../one-button-to-score/): one request, top to bottom.
+2. [How the camera finds the robot](../vision/): one piece of maths, and the real camera beside the pretend one.
+3. [Write a new auto](../write-an-auto/): change the code yourself and let the tests judge it.
 
 ## Numbers nobody has confirmed yet
 

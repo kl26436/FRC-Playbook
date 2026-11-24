@@ -95,7 +95,19 @@ export default defineConfig({
                         { "label": "How the code is built", "slug": "code/how-it-is-built" },
                         { "label": "Moving without hitting anything", "slug": "code/superstructure" },
                         { "label": "Driving, aiming and autos", "slug": "code/driving-and-autos" },
-                        { "label": "Simulation and tests", "slug": "code/simulation-and-tests" }
+                        { "label": "Simulation and tests", "slug": "code/simulation-and-tests" },
+                        {
+                                "label": "Example: one button to score",
+                                "slug": "code/one-button-to-score"
+                        },
+                        {
+                                "label": "Example: how the camera finds the robot",
+                                "slug": "code/vision"
+                        },
+                        {
+                                "label": "Example: write a new auto",
+                                "slug": "code/write-an-auto"
+                        }
                 ]
         },
         {

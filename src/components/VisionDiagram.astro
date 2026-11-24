@@ -1,0 +1,116 @@
+---
+// Two schematic views of one tag sighting: from the side (distance from the tag's height in the picture)
+// and from above (direction from the angle to the tag plus the gyro heading). Not to scale.
+---
+
+<figure class="vd not-content">
+  <svg viewBox="0 0 720 250" role="img" aria-label="Side view and top view of the camera looking at one reef tag">
+    <!-- side view -->
+    <text x="10" y="18" class="h">From the side: how far</text>
+    <line x1="10" y1="200" x2="345" y2="200" class="ground"></line>
+    <rect x="22" y="150" width="78" height="44" rx="3" class="bot"></rect>
+    <circle cx="100" cy="158" r="5" class="lens"></circle>
+    <text x="26" y="142" class="s">camera lens, 9.58 in up</text>
+    <rect x="300" y="60" width="26" height="140" class="reef"></rect>
+    <rect x="293" y="118" width="7" height="60" class="tag"></rect>
+    <text x="334" y="112" class="s" text-anchor="end">tag, 6.5 in tall</text>
+    <line x1="100" y1="158" x2="293" y2="118" class="ray"></line>
+    <line x1="100" y1="158" x2="293" y2="178" class="ray"></line>
+    <path d="M160,146 A62,62 0 0 1 160,164" class="arc"></path>
+    <text x="168" y="160" class="a">angle</text>
+    <line x1="100" y1="222" x2="293" y2="222" class="dim"></line>
+    <line x1="100" y1="216" x2="100" y2="228" class="dim"></line>
+    <line x1="293" y1="216" x2="293" y2="228" class="dim"></line>
+    <text x="196" y="240" class="s" text-anchor="middle">distance = what we want</text>
+
+    <line x1="360" y1="10" x2="360" y2="245" class="split"></line>
+
+    <!-- top view -->
+    <text x="378" y="18" class="h">From above: which way</text>
+    <polygon points="610,70 690,70 700,90 690,110 610,110 600,90" class="reef"></polygon>
+    <rect x="596" y="78" width="6" height="24" class="tag"></rect>
+    <text x="650" y="62" class="s" text-anchor="middle">reef, tag at a known spot</text>
+    <g transform="translate(450 180) rotate(-20)">
+      <rect x="-32" y="-32" width="64" height="64" rx="4" class="bot"></rect>
+      <circle cx="32" cy="0" r="5" class="lens"></circle>
+      <line x1="32" y1="0" x2="150" y2="0" class="head"></line>
+    </g>
+    <text x="586" y="150" class="s">where the robot points (gyro)</text>
+    <line x1="480" y1="169" x2="598" y2="91" class="ray"></line>
+    <path d="M536,150 A60,60 0 0 0 529,137" class="arc"></path>
+    <text x="545" y="140" class="a">tx</text>
+    <text x="378" y="240" class="s">Known spot − distance along that line = the camera.</text>
+  </svg>
+  <figcaption>Not to scale. The picture gives two numbers, the tag's height and the angle to it. The gyro gives the third.</figcaption>
+</figure>
+
+<style>
+  .vd {
+    margin: 1.5rem 0;
+    padding: 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+  }
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  figcaption {
+    margin-top: 0.5rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+  .h {
+    font-size: 13px;
+    font-weight: 600;
+    fill: var(--sl-color-white);
+  }
+  .s {
+    font-size: 11.5px;
+    fill: var(--sl-color-gray-2);
+  }
+  .a {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--sl-color-accent-high);
+  }
+  .ground,
+  .dim,
+  .split {
+    stroke: var(--sl-color-gray-4);
+    stroke-width: 1.5;
+  }
+  .split {
+    stroke-dasharray: 3 4;
+  }
+  .bot {
+    fill: var(--sl-color-gray-5);
+    stroke: var(--sl-color-gray-3);
+  }
+  .lens {
+    fill: var(--sl-color-white);
+  }
+  .reef {
+    fill: none;
+    stroke: var(--sl-color-gray-3);
+    stroke-width: 1.5;
+  }
+  .tag {
+    fill: var(--sl-color-white);
+  }
+  .ray {
+    stroke: var(--sl-color-accent-high);
+    stroke-width: 1.5;
+  }
+  .head {
+    stroke: var(--sl-color-gray-2);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 4;
+  }
+  .arc {
+    fill: none;
+    stroke: var(--sl-color-accent-high);
+    stroke-width: 1.5;
+  }
+</style>

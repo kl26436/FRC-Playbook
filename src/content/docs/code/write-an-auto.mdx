@@ -1,0 +1,168 @@
+---
+title: "Write a new auto"
+description: "The four edits that add an autonomous routine, with the real code, and the test that says whether it works."
+---
+
+:::note[Draft]
+The code on this page is copied from the robot code as it was on November 23 (commit `67a30bb`). The example auto is not in the repo and has not been run.
+:::
+
+There are no drawn paths in this code. An auto is a list of **legs**: score on this branch, go to that station, score on the next branch. Each leg is the same command the driver's buttons use, so the robot works out its own route. Adding an auto means writing the list.
+
+The example here is a two-coral auto from the right: E, then C.
+
+## What a leg is
+
+```java title="AutoFactory.java"
+/**
+ * Score on a branch at L4, or skip straight on if the coral sensor answers and sees no coral. With
+ * the sensor offline the leg runs anyway: a blind attempt costs a few seconds, a skipped preload
+ * costs the piece.
+ */
+private Command scoreLeg(Branch b) {
+    return Commands.either(
+                    ScoreCommands.alignAndScore(r, () -> b, () -> Wanted.L4, SCORE_SPEED_MPS, false)
+                            .withTimeout(SCORE_LEG_TIMEOUT_S),
+                    Commands.none(),
+                    () -> r.superstructure().hasCoral() || !r.superstructure().coralSensorOnline())
+            .withName("Score " + b);
+}
+
+/** Drive to the station and take a coral, waiting there at most {@link #STATION_WAIT_S}. */
+private Command stationLeg(Station.Side side) {
+    Pose2d pickup = Station.pickupPose(alliance, side);
+    return ScoreCommands.stationPickup(r, () -> side, STATION_SPEED_MPS, false)
+            .raceWith(Commands.waitUntil(
+                            () -> r.drive().pose().getTranslation().getDistance(pickup.getTranslation()) <= AT_STATION_M)
+                    .andThen(Commands.waitSeconds(STATION_WAIT_S)))
+            .withTimeout(STATION_LEG_TIMEOUT_S)
+            .withName("Station " + side);
+}
+```
+
+**A scoring leg** is [`alignAndScore`](../one-button-to-score/) at L4, with two additions:
+
+- **A timeout.** If the leg is not done in 6 s it is cancelled, and the auto moves on.
+- **A skip.** If the sensor works and says there is no coral, the leg is skipped. If the sensor is dead, the leg runs anyway. The comment gives the reason: a blind try costs seconds, a skipped preload costs the piece.
+
+**A station leg** drives to the station with the intake running and ends when a coral arrives. `raceWith` gives it a second way to end: once the robot is at the station, it waits at most 2 s. A slow human player costs one coral and not the rest of the routine.
+
+## How the existing autos use them
+
+```java title="AutoFactory.java"
+private AutoRoutine threeCoral(StartPose start, Station.Side side, Branch first, Branch second, Branch third) {
+    return new AutoRoutine(
+            from(start, alliance),
+            Commands.sequence(
+                    scoreLeg(first), stationLeg(side), scoreLeg(second), stationLeg(side), scoreLeg(third)),
+            List.of(first, second, third));
+}
+```
+
+```java title="AutoFactory.java"
+AutoRoutine threeRightECD() {
+    return threeCoral(StartPose.RIGHT, Station.Side.RIGHT, Branch.E, Branch.C, Branch.D);
+}
+```
+
+An `AutoRoutine` is three things: where the robot starts, the command to run, and the branches it should score on, in order. The third is a promise the test will hold it to.
+
+## The four edits
+
+### 1. Name it
+
+Add one value to the list of autos.
+
+```java title="autos/Auto.java" ins={8}
+public enum Auto {
+    IDLE,
+    LEAVE,
+    ONE_RIGHT,
+    ONE_CENTRE,
+    ONE_LEFT,
+    THREE_RIGHT_ECD,
+    TWO_RIGHT_EC,
+    THREE_LEFT_JLK,
+    CENTRE_H_ALGAE
+}
+```
+
+### 2. Write the list of legs
+
+Add one method to `AutoFactory`. This is the whole auto.
+
+```java title="autos/AutoFactory.java (example, not in the repo)"
+AutoRoutine twoRightEC() {
+    return new AutoRoutine(
+            from(StartPose.RIGHT, alliance),
+            Commands.sequence(scoreLeg(Branch.E), stationLeg(Station.Side.RIGHT), scoreLeg(Branch.C)),
+            List.of(Branch.E, Branch.C));
+}
+```
+
+It is the first three legs of "3 Right: E, C, D", so it should pass. Nobody has run it. The test decides.
+
+### 3. Put it on the dashboard
+
+Add one row to `AutoChooser.PROGRAMS`. The text is what the drive team sees.
+
+```java title="autos/AutoChooser.java" ins={3}
+        new AutoProgram(Auto.ONE_LEFT, "1 Left", AutoFactory::oneLeft),
+        new AutoProgram(Auto.THREE_RIGHT_ECD, "3 Right: E, C, D", AutoFactory::threeRightECD),
+        new AutoProgram(Auto.TWO_RIGHT_EC, "2 Right: E, C", AutoFactory::twoRightEC),
+        new AutoProgram(Auto.THREE_LEFT_JLK, "3 Left: J, L, K", AutoFactory::threeLeftJLK),
+```
+
+### 4. Tell the tests what you meant
+
+Two tests in `AutoMatchTest` hold a written copy of the plan, so that a change to an auto has to be made on purpose. Add your auto to both:
+
+- `expectedCoralMatchesTheDesign` has a table of every auto and its branches. Add `Auto.TWO_RIGHT_EC, List.of(Reef.Branch.E, Reef.Branch.C)`.
+- `labelsAreTheDashboardNames` has the list of dashboard names, in order. Add `"2 Right: E, C"` in the same place as the row in step 3.
+
+If you forget, those two tests fail.
+
+## Run it
+
+```sh
+./gradlew simTest --tests '*AutoMatchTest'
+```
+
+This runs every auto, on both alliances, for the full 15 seconds in the physics simulator. Yours is picked up automatically because the test loops over every value in `Auto`. These are the checks each one has to pass:
+
+```java title="AutoMatchTest.java"
+assertEquals(h.routine().expectedCoral(), scored.stream().map(CoralScore::branch).toList(), "scored " + scored);
+assertTrue(scored.stream().allMatch(s -> s.alliance() == alliance), "scored on the wrong reef: " + scored);
+assertTrue(scored.stream().allMatch(s -> s.timeS() <= 15.0), "late: " + scored);
+assertTrue(h.keepOutNeverViolated(), "keep-out broken at " + h.firstViolation());
+assertTrue(h.chooser().poseSetForSelected());
+```
+
+| Check | In plain words |
+| --- | --- |
+| Line 1 | It scored exactly the branches it promised, in that order. No more, no fewer |
+| Line 2 | On its own alliance's reef |
+| Line 3 | All inside 15 s |
+| Line 4 | The wrist never entered a [keep-out zone](../superstructure/) on the way |
+| Line 5 | The start position had been set |
+
+The test also prints when each coral scored, so you can see how much time is spare.
+
+## Watch it
+
+Add `-PreplayDir=docs/playbook/replays` to the same command and the test saves a recording of each blue auto, ten rows a second. Those are the files behind [the replay player](../driving-and-autos/#watch-one-run). To see a new one on this site, add its file name to the list in `scripts/fetch-replays.mjs` in the site's repo.
+
+For the full 3D field view, run the simulator and open AdvantageScope, as described in [Simulation and tests](../simulation-and-tests/).
+
+## Before it goes on a real robot
+
+- **The start spots are placeholders.** `StartPose.RIGHT` is marked `PLACEHOLDER(field-check)`. Measure it on a real field.
+- **The speeds are placeholders.** 3.0 m/s works in the simulator.
+- **Passing here means the logic is right.** It does not mean the real robot drives or grips like the simulated one.
+- **At a match:** pick the auto, place the robot, and press "Set pose to auto start". A warning stays on the dashboard until that has been done.
+
+## Your turn
+
+1. Write "3 Left: K, L, J", the same three branches as an existing auto in a different order. Predict whether it is faster or slower, then run the test and read the times it prints.
+2. Write an auto that scores on a branch on the far side of the reef. Does it pass? If not, which check fails, and what is the robot doing when the 15 s run out?
+3. Read `stationLeg` again. If no coral ever arrived and it had no `raceWith` and no timeout, what would happen to the rest of the routine?

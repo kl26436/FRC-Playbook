@@ -1,0 +1,255 @@
+---
+title: "How the camera finds the robot"
+description: "From an AprilTag in the picture to a corrected position on the field, followed through the real code, and how the simulator stands in for the camera."
+---
+
+import Calc from '../../../components/Calc.astro';
+import Flow from '../../../components/Flow.astro';
+import VisionDiagram from '../../../components/VisionDiagram.astro';
+
+:::note[Draft]
+The code on this page is copied from the robot code as it was on November 23 (commit `67a30bb`). It has run in the simulator. No real camera has been tested.
+:::
+
+The wheels and the gyro track where the robot is, but the answer drifts. Near the reef, the camera corrects it from one AprilTag. This page follows one sighting from the camera to the correction.
+
+<Flow label="From a tag in the picture to a corrected position" steps={[
+  { title: 'The camera', text: 'Finds the tag and publishes what it sees' },
+  { title: 'Read them', text: 'Tag ID, angle to it, its corners' },
+  { title: 'How far', text: 'From the tag\'s height in the picture' },
+  { title: 'Where', text: 'Distance, angle and gyro heading' },
+  { title: 'Trust it?', text: 'Seven checks, then correct the position' },
+]} />
+
+## What the camera does and what our code does
+
+Finding the tag in the picture is the camera's job. The Limelight runs its own AprilTag program and publishes the answer on the robot's network. Our code never sees a picture. It starts from a few numbers.
+
+```java title="VisionIOLimelight.java"
+@Override
+public void updateInputs(VisionIOInputs in) {
+    double now = Timer.getFPGATimestamp();
+    double hb = heartbeat.get();
+    if (!Double.isNaN(hb) && hb != lastHeartbeat) {
+        lastHeartbeat = hb;
+        lastHeartbeatChangeS = now;
+    }
+    in.connected = now - lastHeartbeatChangeS <= HEARTBEAT_TIMEOUT_S;
+    in.hasTarget = in.connected && tv.get() >= 1;
+    in.tagId = (int) tid.get();
+    in.txDeg = tx.get();
+    in.heightPx = tagHeightPx(corners.get());
+}
+```
+
+| Name | What the Limelight publishes |
+| --- | --- |
+| `tv` | 1 when it can see a tag |
+| `tid` | The number printed on the tag |
+| `tx` | Degrees from the centre of the picture to the tag, right is positive |
+| `tcornxy` | The pixel position of the tag's four corners |
+| `hb` | A counter that goes up while the camera is running |
+
+The heartbeat matters. If the camera loses power, the old numbers stay on the network. The code watches the counter, and if it has not changed for half a second the camera counts as disconnected.
+
+## How far: the tag's height in the picture
+
+A tag looks smaller from further away. Every field tag is the same size, 6.5 in, so its height in pixels tells you the distance.
+
+<VisionDiagram />
+
+First the height, from the four corners:
+
+```java title="VisionIOLimelight.java"
+/**
+ * Height of the primary tag in pixels: the mean length of its two vertical edges, from its four
+ * corners (x0, y0, ..., x3, y3). NaN without four corners.
+ */
+public static double tagHeightPx(double[] xy) {
+    if (xy.length < 8) {
+        return Double.NaN;
+    }
+    // Sort the four corners by x: the two leftmost form the left edge, the others the right edge.
+    Integer[] order = {0, 1, 2, 3};
+    java.util.Arrays.sort(order, (a, b) -> Double.compare(xy[2 * a], xy[2 * b]));
+    double left = Math.abs(xy[2 * order[0] + 1] - xy[2 * order[1] + 1]);
+    double right = Math.abs(xy[2 * order[2] + 1] - xy[2 * order[3] + 1]);
+    return (left + right) / 2;
+}
+```
+
+Then the distance:
+
+```java title="SingleTagFix.java"
+/**
+ * Horizontal distance from the camera to the tag. With theta the angle the tag subtends
+ * vertically, T the tag size and h the tag bottom height above the camera,
+ * tan(theta) = T*d / (d^2 + h*(h+T)); this returns the larger root.
+ */
+public static double distanceM(double heightPx, CameraModel cam, double tagBottomHeightM) {
+    double theta = Math.toRadians(heightPx * cam.vFovDeg() / cam.vPixels());
+    double tan = Math.tan(theta);
+    double t = TAG_SIZE_M;
+    double h = tagBottomHeightM - cam.robotToCamera().getZ();
+    double disc = Math.max(0, t * t - 4 * tan * tan * h * (h + t));
+    return (t + Math.sqrt(disc)) / (2 * tan);
+}
+```
+
+<Calc id="tag-distance" />
+
+Look at the last line of the calculator at 34 px and at 134 px. From 4 m, one pixel of error moves the answer about 4.5 in. From 1 m it is about 0.3 in. The fix gets better as the robot closes in, which is when it matters.
+
+## Where: add the direction
+
+```java title="SingleTagFix.java"
+public static Translation2d robotPosition(TagObservation obs, CameraModel cam, Rotation2d gyro, Pose3d tag) {
+    double bottom = tag.getZ() - TAG_SIZE_M / 2;
+    double d = distanceM(obs.heightPx(), cam, bottom);
+    double camYaw = cam.robotToCamera().getRotation().getZ();
+    // tx is positive to the right (clockwise), so the bearing is gyro + camera yaw - tx.
+    var bearing = gyro.plus(Rotation2d.fromRadians(camYaw)).minus(Rotation2d.fromDegrees(obs.txDeg()));
+    var tagXY = tag.toPose2d().getTranslation();
+    var camera = tagXY.minus(new Translation2d(d, bearing));
+    var mount = cam.robotToCamera().getTranslation().toTranslation2d();
+    return camera.minus(mount.rotateBy(gyro));
+}
+```
+
+Read it from the bottom of the diagram up:
+
+1. **Which way is the tag?** The gyro says where the robot points. `tx` says how far off that the tag is. Together they give the direction from the camera to the tag on the field.
+2. **Where is the camera?** The tag's place on the field is known. Go back from it by the distance, along that direction.
+3. **Where is the robot?** The camera is in the nose, 13.6 in ahead of the centre. Take that off, turned to match the heading.
+
+The heading always comes from the gyro. Only the position is corrected.
+
+## Deciding whether to trust it
+
+A wrong fix is worse than no fix, because the robot would drive confidently to the wrong place. Every sighting has to pass these checks, in this order:
+
+```java title="Vision.java"
+/** Apply a fix if this loop's sighting earns one; returns why not, or "" when one was applied. */
+private String evaluate() {
+    if (targetFace.isEmpty()) {
+        return "no target face";
+    }
+    if (!inputs.connected || !inputs.hasTarget) {
+        return "no tag in view";
+    }
+    Optional<Alliance> alliance = RobotState.get().alliance();
+    if (alliance.isEmpty()) {
+        return "alliance unknown";
+    }
+    int face = targetFace.get();
+    if (inputs.tagId != Reef.tagId(alliance.get(), face)) {
+        return "tag " + inputs.tagId + " is not face " + face;
+    }
+    if (!Double.isFinite(inputs.heightPx) || !Double.isFinite(inputs.txDeg) || inputs.heightPx < MIN_HEIGHT_PX) {
+        return "degenerate sighting";
+    }
+    var estimate = drive.pose();
+    var fix = SingleTagFix.robotPosition(
+            new TagObservation(inputs.tagId, inputs.txDeg, inputs.heightPx),
+            cam,
+            estimate.getRotation(),
+            Reef.tagPose3d(alliance.get(), face));
+    if (!Double.isFinite(fix.getX()) || !Double.isFinite(fix.getY())) {
+        return "fix not finite";
+    }
+    if (fix.getDistance(estimate.getTranslation()) > MAX_JUMP_M) {
+        return "fix too far from the estimate";
+    }
+    drive.resetTranslation(fix);
+    lastFix = Optional.of(fix);
+    return "";
+}
+```
+
+| It says | Why the sighting was thrown away |
+| --- | --- |
+| no target face | The robot is not driving to the reef, so it does not need a fix |
+| no tag in view | Camera disconnected, or nothing seen |
+| alliance unknown | It cannot tell which reef is ours |
+| tag N is not face F | It can see a tag, but not the one on the face it is driving to |
+| degenerate sighting | The numbers are broken, or the tag is under 8 px tall |
+| fix not finite | The arithmetic gave no usable answer |
+| fix too far from the estimate | The fix is over 1 m from where the wheels say the robot is |
+
+The reason is logged every loop as `Vision/Rejected`. After a match you can see exactly why the camera was or was not used at any moment.
+
+## The same code with a pretend camera
+
+Everything above runs unchanged in the simulator. One line decides where the numbers come from:
+
+```java title="RobotContainer.java (the other mechanisms' lines left out)"
+switch (RobotConstants.currentMode()) {
+    case REAL -> {
+        // ...
+        visionIo = new VisionIOLimelight(LIMELIGHT_NAME);
+    }
+    case SIM -> {
+        // ...
+        visionIo = new VisionIOSim(driveSim::truePose, CameraModel.limelight4());
+    }
+```
+
+Both classes fill in the same five inputs. The real one reads them from the Limelight. The simulated one works them out:
+
+```java title="VisionIOSim.java"
+@Override
+public void updateInputs(VisionIOInputs in) {
+    Pose2d robot = truePose.get();
+    Optional<TagObservation> best = Optional.empty();
+    for (int id : Reef.allTagIds()) {
+        var seen = cam.project(robot, id, Reef.anyTagPose3d(id), NOISE_PX, rng);
+        if (seen.isPresent() && (best.isEmpty() || seen.get().heightPx() > best.get().heightPx())) {
+            best = seen;
+        }
+    }
+    in.connected = true;
+    in.hasTarget = best.isPresent();
+    in.tagId = best.map(TagObservation::tagId).orElse(-1);
+    in.txDeg = best.map(TagObservation::txDeg).orElse(0.0);
+    in.heightPx = best.map(TagObservation::heightPx).orElse(0.0);
+}
+```
+
+| | On the robot | In the simulator |
+| --- | --- | --- |
+| Where the numbers come from | The Limelight, over the network | Geometry, from where the simulated robot really is |
+| Which tag is reported | The Limelight's main target | The tallest tag in view, to match |
+| What it cannot see | Whatever the real lens cannot | Tags over 4 m away, outside the 82° view, or facing away |
+| Pixel noise | Real, and not yet measured | Set to zero, so tests repeat exactly |
+| Everything after the five inputs | The same code | The same code |
+
+The simulator knows where the robot really is. The code under test does not. That makes this test possible:
+
+```java title="VisionSimTest.java"
+@Test
+void fixCorrectsAnOdometryError() {
+    placeAt(oneMetreFromFace(0));
+    drive.resetPose(shifted(sim.truePose(), 0.25, -0.15));
+    vision.setTargetFace(Optional.of(0));
+    SimHarness.run(0.3);
+    assertEquals(0, errorM(), 0.05);
+    assertTrue(vision.lastFix().isPresent());
+}
+```
+
+It puts the robot 1 m from a reef face, then lies to the code about its position by 0.25 m one way and 0.15 m the other. After 0.3 s the code's answer must be within 0.05 m of the truth. Other tests in the same file check that it ignores the wrong face, ignores the other alliance's tags, and refuses a fix more than 1 m off.
+
+## What the simulator cannot tell you
+
+- **Noise.** The pretend camera is perfect. A real one blurs when the robot moves, and the calculator shows what a pixel costs at range.
+- **Delay.** A real picture is slightly old by the time its numbers arrive, and the robot has moved since. The simulated one is instant.
+- **Light.** Glare and dim venues change what the camera finds.
+- **Mounting.** The code assumes the camera is exactly where the CAD puts it, pitched up 12°. A camera a degree off gives a fix that is off.
+
+The first real test is simple: park the robot at a measured spot in front of a tag and compare.
+
+## Your turn
+
+1. In the calculator, find the pixel height where one pixel of error costs 1 in. How far away is that?
+2. The code throws away a fix more than 1 m from the estimate. Describe a match situation where that rule throws away a correct fix. What would the robot do next?
+3. `VisionIOSim` has `NOISE_PX = 0.0`. Set it to 2 and run `./gradlew simTest --tests '*VisionSimTest'`. Which tests fail first, and what does that tell you about how good the real camera needs to be?

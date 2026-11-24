@@ -1,0 +1,219 @@
+---
+title: "One button to score"
+description: "What happens between the driver pulling a trigger and the coral landing on a branch, followed through the real code."
+---
+
+import Flow from '../../../components/Flow.astro';
+
+:::note[Draft]
+The code on this page is copied from the robot code as it was on November 23 (commit `67a30bb`). It has run in the simulator. It has not run on a real robot.
+:::
+
+The driver holds one trigger. The robot picks the branch, drives to it, raises the elevator on the way, lets go of the coral when everything is lined up, and stows. The same command scores in the autos. This page follows it from the button to the stow.
+
+<Flow label="What happens when the driver holds a scoring trigger" steps={[
+  { title: 'Trigger held', text: 'Nearest reef face, left or right branch' },
+  { title: 'Plan a route', text: 'Straight there, or round the reef' },
+  { title: 'Drive and raise', text: 'Elevator starts up 48 in from the spot' },
+  { title: 'All three ready', text: 'Last leg, on the spot, mechanism in pose' },
+  { title: 'Release', text: 'Until the sensor sees the coral go' },
+  { title: 'Stow', text: 'Also if the driver lets go early' },
+]} />
+
+## 1. The button
+
+```java title="RobotContainer.java"
+// Once the funnel is open for the climb the mechanism stays put, so these do nothing.
+Trigger playing = new Trigger(() -> !climber.committed());
+controller.rightTrigger().and(playing).whileTrue(scoreOnNearestFace(false));
+controller.leftTrigger().and(playing).whileTrue(scoreOnNearestFace(true));
+```
+
+```java title="RobotContainer.java"
+private Command scoreOnNearestFace(boolean left) {
+    return ScoreCommands.alignAndScore(
+            this,
+            () -> {
+                int face = Reef.nearestFace(allianceOrBlue(), drive.pose().getTranslation());
+                return Reef.Branch.values()[2 * face + (left ? 0 : 1)];
+            },
+            () -> RobotState.get().selectedLevel(),
+            TELEOP_ALIGN_SPEED_MPS,
+            true);
+}
+```
+
+- **`whileTrue`** runs the command while the trigger is held and cancels it when the driver lets go. The driver can always take the robot back.
+- **`playing`** is false once the robot has committed to the climb, so the scoring buttons do nothing after that.
+- **The branch** is worked out when the trigger is pulled: find the nearest reef face, then take its left or right branch. The twelve branches are listed in pairs, A and B on face 0, C and D on face 1, which is what `2 * face + (left ? 0 : 1)` picks from.
+- **The level** was chosen earlier with Y, X, B or A, and is read here.
+
+## 2. Where to stand
+
+```java title="Reef.java"
+/** Robot facing the tag, `outIn` inches out along the tag normal, `leftIn` inches to the robot's left. */
+private static Pose2d facing(Pose2d tag, double outIn, double leftIn) {
+    // the robot looks back at the tag, so its left is the tag frame's -y
+    return tag.transformBy(new Transform2d(
+            Units.inchesToMeters(outIn), -Units.inchesToMeters(leftIn), Rotation2d.k180deg));
+}
+
+public static Pose2d scoringPose(Alliance a, Branch b) {
+    double left = b.isLeft() ? BRANCH_OFFSET_IN : -BRANCH_OFFSET_IN;
+    return facing(tagPose(a, b.face()), RobotConstants.DriveK.BUMPER_FACE_FROM_CENTRE_IN, left);
+}
+```
+
+Every scoring spot is measured from the AprilTag on that reef face:
+
+- **17.25 in out** from the tag. That is half of the robot's 34.5 in width over the bumpers, so the bumper touches the reef.
+- **6.47 in left or right**, which is where the branch is.
+- **Turned to face the tag.**
+
+Nothing here says red or blue. The tag's position is looked up for the alliance, so one piece of code gives all 24 spots.
+
+## 3. Getting there
+
+```java title="ScoreCommands.java, inside RouteCommand"
+@Override
+public final void initialize() {
+    Optional<Alliance> alliance = RobotState.get().alliance();
+    noAlliance = alliance.isEmpty();
+    if (noAlliance) {
+        return;
+    }
+    target = targetFor.apply(alliance.get());
+    route = Reef.route(alliance.get(), r.drive().pose().getTranslation(), target);
+    leg = 0;
+    start(alliance.get(), target);
+    driveLeg();
+}
+```
+
+The route is planned once, when the command starts. If the straight line to the spot would pass within 1.69 m of the centre of the reef, `Reef.route` adds points on a circle 2.0 m from the centre, so the robot goes round the reef and not through it. When the robot gets within 0.25 m of one of those points it heads for the next.
+
+If the robot does not know its alliance, the command ends at once and does nothing. It will not guess which reef is ours.
+
+## 4. Raise on the way, release when ready
+
+```java title="ScoreCommands.java"
+public static Command alignAndScore(
+        RobotContainer r,
+        Supplier<Reef.Branch> branch,
+        Supplier<Wanted> level,
+        double maxSpeedMps,
+        boolean teleopGains) {
+    return new RouteCommand(r, a -> Reef.scoringPose(a, branch.get()), maxSpeedMps, teleopGains) {
+        private Wanted chosen;
+        private double releasedAtS;
+
+        @Override
+        void start(Alliance a, Pose2d target) {
+            chosen = level.get();
+            releasedAtS = Double.NaN;
+            r.vision().setTargetFace(Optional.of(Reef.nearestFace(a, target.getTranslation())));
+        }
+
+        @Override
+        void step() {
+            var s = r.superstructure();
+            if (distanceToTargetM() <= RAISE_DISTANCE_M && s.wanted() != chosen) {
+                s.setWanted(chosen);
+            }
+            if (Double.isNaN(releasedAtS) && onFinalLeg() && r.drive().atTarget() && s.atPose()) {
+                s.requestRelease(true);
+                releasedAtS = Timer.getFPGATimestamp();
+            }
+        }
+
+        @Override
+        boolean done() {
+            var s = r.superstructure();
+            return !Double.isNaN(releasedAtS)
+                    && releaseOver(s, releasedAtS, s.hasCoral(), s.coralSensorOnline());
+        }
+
+        @Override
+        void finish() {
+            r.superstructure().requestRelease(false);
+            r.vision().setTargetFace(Optional.empty());
+            r.superstructure().setWanted(Wanted.STOW);
+        }
+    };
+}
+```
+
+`step()` runs 50 times a second while the robot drives. It makes two decisions.
+
+**When to raise.** The elevator starts up once the robot is within 48 in of the spot. Raise too early and the robot drives fast with its weight high. Raise too late and it waits at the reef.
+
+**When to let go.** All three of these have to be true:
+
+| Check | Means |
+| --- | --- |
+| `onFinalLeg()` | The robot is past the reef corners and heading for the spot itself |
+| `r.drive().atTarget()` | It is within 3 cm and 2° of the spot |
+| `s.atPose()` | The carriage is within 0.5 in and the wrist within 1.5° of the scoring pose |
+
+`start()` also tells the camera which reef face to watch. That is the only tag the robot will take a position fix from. [How the camera finds the robot](../vision/) follows that part.
+
+## 5. Knowing the coral is gone
+
+```java title="ScoreCommands.java"
+static boolean releaseOver(
+        Superstructure s, double requestedAtS, boolean pieceSeen, boolean sensorOnline) {
+    double t = Timer.getFPGATimestamp() - requestedAtS;
+    if (!s.isReleasing()) {
+        return t >= RELEASE_TIMEOUT_S;
+    }
+    boolean seenGone = sensorOnline && !pieceSeen;
+    return (seenGone && t >= MIN_RELEASE_S) || t >= RELEASE_TIMEOUT_S;
+}
+```
+
+| Situation | The release ends |
+| --- | --- |
+| The sensor works | When it stops seeing the coral, but not before 0.25 s |
+| The sensor is unplugged or dead | After 1.0 s |
+| The release never started | After 1.0 s, so the robot is not stuck |
+
+A broken sensor costs under a second a cycle. It does not stop the robot scoring. There is a test for exactly that case, with the simulated sensor unplugged.
+
+## 6. Cleaning up
+
+`finish()` runs when the command ends for any reason, including the driver letting go of the trigger half way. It stops the release, tells the camera to stop watching the face, and stows. The base class also stops the drive.
+
+That is why "letting go cancels the move" is safe: there is one way out of the command, and it always leaves the robot stowed.
+
+## The same code in the simulator
+
+None of the code above knows whether it is on the robot or in the simulator. This test runs the real command against simulated motors, sensors and field:
+
+```java title="TeleopCycleTest.java"
+@Test
+void stationToL4Cycle() {
+    startAt(Station.pickupPose(Alliance.Blue, Station.Side.RIGHT), false);
+    schedule(ScoreCommands.stationPickup(r, () -> Station.Side.RIGHT, 3.0, true));
+    SimHarness.run(2.0);
+    assertTrue(r.superstructure().hasCoral());
+    schedule(ScoreCommands.alignAndScore(r, () -> Reef.Branch.C, () -> Wanted.L4, 3.0, true));
+    SimHarness.run(6.0);
+    assertFalse(r.superstructure().hasCoral());
+    assertEquals(Wanted.STOW, r.superstructure().wanted());
+    // The score judge saw it land on the named branch.
+    assertEquals(List.of(Reef.Branch.C), r.sim().coralScored().stream().map(CoralScore::branch).toList());
+    assertEquals(Wanted.L4, r.sim().coralScored().get(0).level());
+}
+```
+
+The last two checks ask the simulator's score judge. It works only from where the simulated robot really was and where its mechanism really pointed when the coral left. The command cannot pass by claiming it scored.
+
+## What is not proven
+
+The speeds and the 0.25 s are marked `PLACEHOLDER(tuning)` in the code. They are first guesses that work in the simulator. A real robot will need its own. [How the code is built](../how-it-is-built/) lists every number like that.
+
+## Your turn
+
+1. Change `RAISE_DISTANCE_M` to 12 in, then to 120 in. Before running the test, predict what each does to the cycle time. Then say what the test cannot tell you about the second one.
+2. The driver lets go of the trigger while the elevator is at L4 and the coral is still in the rollers. Trace what runs next, line by line.
+3. `alignAndScore` and `stationPickup` are both built on `RouteCommand`. List what the base class does so that neither of them has to.
