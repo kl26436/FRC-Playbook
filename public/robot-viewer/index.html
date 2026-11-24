@@ -32,6 +32,16 @@ a { color: var(--accent); }
 .mode-part #view { height: 340px; }
 .mode-replay #view { height: 400px; }
 .mode-keepout #view { height: clamp(300px, 46vh, 460px); }
+.mode-assemble #view { height: 360px; }
+@media (max-width: 520px) { .mode-assemble #view { height: 250px; } }
+.mode-assemble .readout { display: none; }
+.asbar { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 10px; align-items: center; padding: 8px 10px; border-top: 1px solid var(--line); }
+.asbar strong { font-size: 1rem; line-height: 1.25; }
+.asbar .sub { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+.asbar button:disabled { opacity: 0.4; cursor: default; }
+.asbar .mid { display: grid; gap: 1px; text-align: center; }
+.asbar .n { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dotkey i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 4px 0 10px; }
 .hint, .readout { position: absolute; left: 10px; right: 10px; font-size: 12.5px; color: var(--ink); pointer-events: none; text-shadow: 0 0 4px var(--viewer-bg), 0 0 4px var(--viewer-bg); }
 .hint { bottom: 8px; }
 .readout { top: 8px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-variant-numeric: tabular-nums; }
@@ -65,8 +75,8 @@ a { color: var(--accent); }
 .keep.ok b { color: var(--good); }
 .num { font-variant-numeric: tabular-nums; min-width: 4.2em; text-align: right; }
 @media (max-width: 720px) { .keepwrap { grid-template-columns: 1fr; } .keepwrap .stage { border-right: 0; border-bottom: 1px solid var(--line); } .mode-keepout .keepwrap #view { height: 300px; min-height: 0; } #chart { height: 300px; } }
-.only-explore, .only-part, .only-keepout { display: none; }
-.mode-explore .only-explore, .mode-part .only-part, .mode-keepout .only-keepout { display: grid; }
+.only-explore, .only-part, .only-keepout, .only-assemble { display: none; }
+.mode-explore .only-explore, .mode-part .only-part, .mode-keepout .only-keepout, .mode-assemble .only-assemble { display: grid; }
 .mode-keepout .keepwrap { display: grid; }
 body:not(.mode-keepout) .chartbox { display: none; }
 body:not(.mode-keepout) .keepwrap { display: block; }
@@ -99,6 +109,13 @@ body:not(.mode-keepout) .keepwrap { display: block; }
     <label class="slide"><span>Pull the subsystems apart</span><input type="range" id="apart" min="0" max="1" step="0.01" value="0"></label>
     <label class="check"><input type="checkbox" id="bysub"> Colour by subsystem</label>
   </div>
+</div>
+
+<div class="asbar only-assemble">
+  <button type="button" id="as-prev" aria-label="Previous step">&#9664; Back</button>
+  <div class="mid"><strong id="as-title">Loading the steps&hellip;</strong><span class="n" id="as-count"></span></div>
+  <button type="button" id="as-next" aria-label="Next step">Next &#9654;</button>
+  <div class="sub"><span id="as-what"></span><span class="dotkey"><i style="background:#ff7a1a"></i>new part<i style="background:#e6007e"></i>new fastener<i style="background:#2b2f36"></i>fastener already in</span></div>
 </div>
 
 <div class="panel only-part">

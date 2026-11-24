@@ -1,0 +1,50 @@
+---
+title: "The whole build, in order"
+description: "Which mechanism goes on the robot when, and why the order matters."
+---
+
+import Assembly from '../../components/Assembly.astro';
+
+:::note[Draft]
+Proposed order, worked out from the CAD and the build notes. Nothing has been assembled yet.
+:::
+
+Each mechanism has its own page of steps. This page is the order they go onto the robot.
+
+The order is not free. Some parts are riveted to parts of a different mechanism. Some sit underneath what comes next. Get it wrong and something has to come off again.
+
+Scroll through the steps and the robot builds itself in the 3D view above them.
+
+<Assembly set="robot" />
+
+## Rules that apply everywhere
+
+| Joint | Fastener | Drill |
+| --- | --- | --- |
+| Rivet | 5/32 in aluminium blind rivet. Pick the grip length to suit the thickness being joined | 0.161 in (#20), drilled through the mating part |
+| #10 screw passing through | #10-32 socket head or button head | 0.196 in (#9) |
+| #10 screw into thin tube or sheet | #10-32 rivnut | 0.297 in. Check against the rivnuts you buy |
+| #8 screw into sheet | #8-32 rivnut | 0.266 in |
+| 1/4 in screw into a rail | 1/4-20 rivnut | 0.391 in |
+| Screw into a printed part | #10-32 heat-set insert, pressed in with a soldering iron | 0.262 in |
+
+Which rivet to use depends on the total thickness it has to grip:
+
+| Thickness being joined | Rivet |
+| --- | --- |
+| 0.126 to 0.187 in | 97517A032 |
+| 0.188 to 0.25 in | 97517A035 |
+| 0.251 to 0.375 in | 97517A040 |
+| 0.376 to 0.5 in | 97517A041 |
+
+- **Lock nuts.** Where a step says "and lock nut", the screw goes right through and takes a nylon-insert nut.
+- **Thread locker.** Use it on screws into tapped aluminium and into motor faces. Do not use it on screws into printed parts or heat-set inserts.
+- **Set CAN IDs first.** Give every motor controller and sensor its ID before it goes on the robot.
+
+## Tools to have out
+
+- Rivet gun and rivnut tool
+- Drills: #20 and #9, plus 0.266, 0.297 and 0.391 in for rivnuts
+- Hex keys: 1/16, 3/32, 1/8 and 5/32 in
+- Soldering iron with insert tips
+- A long-reach nosepiece for the rivet gun, for the mast brace

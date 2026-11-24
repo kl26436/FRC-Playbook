@@ -10,8 +10,30 @@ The paths at the top of each script point at where the package was unpacked when
 
 ## Rebuilding the 3D model data
 
-`make_viewer_data.py <robotA_mesh.json>` turns the CAD mesh export into `public/robot-viewer/robot.bin` and `robot.json`.
-Run it after `parts.json` changes, because it reads the part numbers from there so a clicked part can link to its page.
+Four steps, in this order. Each prints a short check when it finishes.
+
+    # 1. Each vendor STEP file, once: a coarse mesh in the vendor's own axes
+    python3 tools/vendor_tessellate.py <file.step> <cache>/<name>.npz [tolerance] [smallest face] [names to leave out or recolour]
+    # 2. Put every vendor model where it sits on the robot
+    python3 tools/make_vendor_parts.py <cache> <folder of vendor STEP files> <CAD source folder> <cache>/placed.npz [robotA_mesh.json]
+    # 3. The robot: public/robot-viewer/robot.bin and robot.json
+    python3 tools/make_viewer_data.py [robotA_mesh.json] --vendor=<cache>/placed.npz
+    # 4. The fasteners, then the assembly steps
+    python3 tools/make_fastener_data.py [robotA_detail_fasteners.step] --vendor=<cache>/placed.npz
+    python3 tools/assembly/steps.py
+
+- The CAD mesh export draws the swerve modules, their motors, the electronics and the camera as outline shapes. Steps 1 and 2
+  swap in the makers' own models: SDS MK4i, WCP Kraken X60, REV power hub and Mini Power Module, NI roboRIO, CTRE CANivore
+  and Pigeon, the AndyMark breaker, the Vivid-Hosting radio and the Limelight 4. Leave `--vendor` off to build without them.
+- `make_vendor_parts.py` uses the same placements as the CAD source (`assembly/vendor_place.py`). It prints how far each
+  electronics model's mounting holes land from the holes we drill. All were within 0.002 in. The roboRIO and the breaker
+  fit either way round, so the model cannot say which way their connectors face.
+- The swerve module was tessellated at tolerance 0.2 and smallest face 0.1, leaving out the Falcon motors (we use Krakens),
+  the screws and the two gear sets we do not use. Its plates were recoloured black, because the file's colours are placeholders.
+- Run step 3 after `parts.json` changes, because it reads the part numbers from there so a clicked part can link to its page.
+- Run step 4 after step 3 every time. Fasteners and steps refer to parts by their number in `robot.json`, and that number changes.
+- The assembly steps are written by hand in `tools/assembly/steps.py`. The script checks that every part and every fastener
+  in the model is placed by some step, and stops if a step names a part that is not there.
 
 ## Rebuilding the code example pages
 

@@ -1,7 +1,8 @@
 /* The robot in 3D, from the final CAD. Data: robot.json + robot.bin, written by tools/make_viewer_data.py.
    CAD units are inches: X forward, Y left, Z up, origin on the carpet at the robot's centre.
-   One page, four uses, chosen by ?mode= : explore (click a part), part (one part, alone or in place),
-   keepout (the wrist keep-out table as a picture), replay (posed by the page that embeds it). */
+   One page, five uses, chosen by ?mode= : explore (click a part), part (one part, alone or in place),
+   keepout (the wrist keep-out table as a picture), replay (posed by the page that embeds it),
+   assemble (build a mechanism step by step, with its fasteners: steps come from assembly.json). */
 (function () {
   'use strict';
   var T = window.THREE, D2R = Math.PI / 180;
@@ -58,7 +59,7 @@
   function toThree(c) { return new T.Vector3(c[0], c[2], -c[1]); }
   var S = [], GG = [];              // S[sub]: a group per subsystem; GG[sub][motion group]
   var state = { c: 0, th: -90, psi: 90, tray: 0 }, apart = 0;
-  var meshes = [], parts = [], made = {}, subs = [], byMark = {}, samples = {}, M = {};
+  var meshes = [], parts = [], made = {}, subs = [], byMark = {}, byG = {}, samples = {}, M = {};
   var dirty = true;
   GROUPS.forEach(function (g) { M[g] = new T.Matrix4(); });
 
@@ -126,7 +127,7 @@
   var hlSoft = new T.MeshBasicMaterial({ color: 0xff7a1a, transparent: true, opacity: 0.6, depthTest: false });
   var hlSolid = new T.MeshStandardMaterial({ color: new T.Color('#ff7a1a').convertSRGBToLinear(), roughness: 0.6, metalness: 0.1 });
   function subGeom(p) {
-    var src = meshes[p.m].geom, ix = src.index.array.subarray(p.t0 * 3, (p.t0 + p.nt) * 3), g = new T.BufferGeometry();
+    var src = meshes[p.m].geom, ix = meshes[p.m].idxAll.subarray(p.t0 * 3, (p.t0 + p.nt) * 3), g = new T.BufferGeometry();
     g.setAttribute('position', src.getAttribute('position')); g.setAttribute('normal', src.getAttribute('normal'));
     g.setIndex(new T.BufferAttribute(new Uint32Array(ix), 1)); return g;
   }
@@ -146,7 +147,7 @@
     });
     dirty = true;
   }
-  function same(p) { return p.k ? byMark[p.k] : [p]; }
+  function same(p) { return p.k ? byMark[p.k] : p.g !== undefined ? byG[p.g] : [p]; }   // a vendor model in several colours is several pieces with one g
 
   // ---- picking ----
   var ray = new T.Raycaster(), ndc = new T.Vector2();
@@ -219,10 +220,10 @@
         var col = new T.Color(m.color[0], m.color[1], m.color[2]).convertSRGBToLinear(), a = m.color[3];
         var mat = new T.MeshStandardMaterial({ color: col, metalness: 0.15, roughness: 0.62, transparent: a < 0.99, opacity: a < 0.99 ? Math.max(0.35, a) : 1, side: a < 0.99 ? T.DoubleSide : T.FrontSide, depthWrite: a >= 0.99 });
         var mesh = new T.Mesh(g, mat); mesh.userData.mi = mi; GG[m.sub][m.group].add(mesh);
-        meshes.push({ sub: m.sub, group: m.group, geom: g, mesh: mesh, mat: mat, base: col.clone(), alpha: a, parts: [] });
+        meshes.push({ sub: m.sub, group: m.group, geom: g, mesh: mesh, mat: mat, base: col.clone(), alpha: a, parts: [], idxAll: idx });
         var s = samples[m.group] || (samples[m.group] = []); for (var k2 = 0; k2 < m.nv; k2 += 7) s.push(pos[k2 * 3], pos[k2 * 3 + 1], pos[k2 * 3 + 2]);
       });
-      J.parts.forEach(function (p) { parts.push(p); meshes[p.m].parts.push(p); if (p.k) (byMark[p.k] || (byMark[p.k] = [])).push(p); });
+      J.parts.forEach(function (p, i) { p.i = i; parts.push(p); meshes[p.m].parts.push(p); if (p.k) (byMark[p.k] || (byMark[p.k] = [])).push(p); if (p.g !== undefined) (byG[p.g] || (byG[p.g] = [])).push(p); });
       apply();
       return J;
     });
@@ -389,6 +390,76 @@
     hint.textContent = 'Side view. Drag the dot on the chart, or use the sliders.';
   }
 
+  // ---- assemble: one mechanism built up step by step ----
+  var FAST_NEW = new T.MeshBasicMaterial({ color: 0xe6007e, depthTest: false, transparent: true, opacity: 0.95 });
+  var FAST_OLD = new T.MeshStandardMaterial({ color: new T.Color('#2b2f36').convertSRGBToLinear(), roughness: 0.5, metalness: 0.4 });
+  function setupAssemble(J) {
+    var name = qs.get('set') || 'robot';
+    Promise.all([fetch('assembly.json').then(function (r) { return r.json(); }), fetch('fasteners.json').then(function (r) { return r.json(); })]).then(function (res) {
+      var A = res[0][name], F = res[1]; if (!A) { hint.textContent = 'No steps found for this mechanism.'; return; }
+      var steps = A.steps, cur = -1, title = $('as-title'), count = $('as-count'), what = $('as-what');
+      // which step first shows each part and each fastener (-1: there from the start, undefined: never)
+      var partStep = {}, fastStep = {};
+      A.base.forEach(function (i) { partStep[i] = -1; }); A.basef.forEach(function (i) { fastStep[i] = -1; });
+      steps.forEach(function (st, n) { st.p.forEach(function (i) { partStep[i] = n; }); st.f.forEach(function (i) { fastStep[i] = n; }); });
+      // a small cylinder for every fastener, riding with the first part it joins
+      var unit = new T.CylinderGeometry(1, 1, 1, 10), up = new T.Vector3(0, 1, 0), fmesh = {};
+      Object.keys(fastStep).forEach(function (k) {
+        var it = F.items[k], host = meshes[parts[it[9][0]].m], len = it[7], r = Math.max(0.07, it[8] * 0.7);
+        var m = new T.Mesh(unit, FAST_OLD), d = new T.Vector3(it[4], it[5], it[6]);
+        m.position.set(it[1] + it[4] * len / 2, it[2] + it[5] * len / 2, it[3] + it[6] * len / 2);
+        m.quaternion.setFromUnitVectors(up, d); m.userData = { r: r, len: len }; m.scale.set(r, len, r); m.visible = false;
+        GG[host.sub][host.group].add(m); fmesh[k] = m;
+      });
+      function centreOf(list, flist) {
+        var lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9], v = new T.Vector3();
+        function grow(x, y, z, r, g) { v.set(x, y, z).applyMatrix4(M[g]); [v.x, v.y, v.z].forEach(function (c, k) { lo[k] = Math.min(lo[k], c - r); hi[k] = Math.max(hi[k], c + r); }); }
+        list.forEach(function (i) { var q = parts[i]; grow(q.c[0], q.c[1], q.c[2], q.r, meshes[q.m].group); });
+        flist.forEach(function (k) { var it = F.items[k]; grow(it[1], it[2], it[3], 0.4, meshes[parts[it[9][0]].m].group); });
+        if (lo[0] > hi[0]) return null;
+        return { c: [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2], r: Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2 };
+      }
+      function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+      function show(n, quiet) {
+        n = Math.max(0, Math.min(steps.length - 1, n)); if (n === cur) return; cur = n; var st = steps[n];
+        var p = st.pose || {}; state.c = p.c || 0; state.th = p.th === undefined ? -90 : p.th; state.psi = p.psi === undefined ? 90 : p.psi; state.tray = p.tray || 0; apply();
+        meshes.forEach(function (m) {
+          var cnt = 0; m.parts.forEach(function (q) { if (partStep[q.i] !== undefined && partStep[q.i] <= n) cnt += q.nt * 3; });
+          if (!cnt) { m.mesh.visible = false; return; }
+          var arr = new m.idxAll.constructor(cnt), o = 0;
+          m.parts.forEach(function (q) { if (partStep[q.i] !== undefined && partStep[q.i] <= n) { arr.set(m.idxAll.subarray(q.t0 * 3, (q.t0 + q.nt) * 3), o); o += q.nt * 3; } });
+          m.geom.setIndex(new T.BufferAttribute(arr, 1)); m.mesh.visible = true;
+        });
+        mark(st.p.map(function (i) { return parts[i]; }), true);
+        Object.keys(fmesh).forEach(function (k) {
+          var m = fmesh[k], s = fastStep[k], on = s <= n, now = s === n, r = m.userData.r * (now ? 1.7 : 1);
+          m.visible = on; m.material = now ? FAST_NEW : FAST_OLD; m.renderOrder = now ? 20 : 0; m.scale.set(r, m.userData.len + (now ? 0.12 : 0), r);
+        });
+        var box = centreOf(st.p, st.f) || centreOf(A.base.concat.apply(A.base, steps.slice(0, n + 1).map(function (x) { return x.p; })), []);
+        if (box) {
+          var side = box.c[1] > 2 ? -1 : 1, back = box.c[0] < -5;
+          setView(side * (back ? 142 : 38), 24, Math.max(22, Math.min(170, box.r * 3.4)), toThree(box.c), 500);
+        }
+        title.textContent = 'Step ' + (n + 1) + ' of ' + steps.length + ': ' + st.t;
+        var seen = {}, np = 0; st.p.forEach(function (i) { var g = parts[i].g; if (g === undefined) np++; else if (!seen[g]) { seen[g] = 1; np++; } });
+        var bits = []; if (np) bits.push(plural(np, 'part') + ' in orange');
+        var nf = 0; Object.keys(st.fam || {}).forEach(function (k) { nf += st.fam[k]; });
+        if (nf) bits.push(plural(nf, 'fastener') + ' in pink');
+        what.textContent = bits.length ? 'New at this step: ' + bits.join(', ') + '.' : 'Nothing new to fit at this step.';
+        count.textContent = (n + 1) + ' / ' + steps.length;
+        $('as-prev').disabled = n === 0; $('as-next').disabled = n === steps.length - 1;
+        if (!quiet && window.parent !== window) window.parent.postMessage({ type: 'assembly-step', set: name, i: n }, '*');
+      }
+      $('as-prev').addEventListener('click', function () { show(cur - 1); });
+      $('as-next').addEventListener('click', function () { show(cur + 1); });
+      window.addEventListener('message', function (e) { var d = e.data; if (d && d.type === 'assembly-show' && d.set === name) show(+d.i, true); });
+      lim.dmin = 6; lim.emin = -0.6; camera.near = 0.5; camera.updateProjectionMatrix();
+      hint.textContent = 'Drag to turn, pinch or scroll to zoom.';
+      show(+qs.get('step') || 0, true);
+      if (window.parent !== window) window.parent.postMessage({ type: 'assembly-ready', set: name }, '*');
+    }).catch(function () { hint.textContent = 'The assembly steps did not load.'; });
+  }
+
   // ---- replay: the page that embeds this one sends each pose ----
   function setupReplay() {
     window.addEventListener('message', function (e) {
@@ -405,6 +476,6 @@
   retheme(); placeCam(); requestAnimationFrame(frame);
   load().then(function (J) {
     document.body.classList.add('loaded');
-    if (MODE === 'part') setupPart(J); else if (MODE === 'keepout') setupKeep(); else if (MODE === 'replay') setupReplay(); else setupExplore(J);
+    if (MODE === 'part') setupPart(J); else if (MODE === 'keepout') setupKeep(); else if (MODE === 'replay') setupReplay(); else if (MODE === 'assemble') setupAssemble(J); else setupExplore(J);
   }).catch(function () { hint.textContent = 'The model files did not load.'; });
 })();

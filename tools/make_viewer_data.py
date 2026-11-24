@@ -6,7 +6,11 @@ Output: public/robot-viewer/robot.bin  int16 positions (step q inches), then ind
         public/robot-viewer/robot.json meshes, parts, made-part lookup
 
 Meshes are regrouped by subsystem as well as motion group and colour, so the viewer can hide or pull apart a subsystem.
-Run: python3 tools/make_viewer_data.py <path to robotA_mesh.json>
+Run: python3 tools/make_viewer_data.py <path to robotA_mesh.json> [--vendor=<placed.npz>] [--out=<folder>]
+
+--vendor swaps the real vendor models (placed by make_vendor_parts.py) in for the outline shapes the CAD export
+used for the swerve modules, their motors, the electronics and the camera. A vendor model in several colours
+becomes several parts that share a number "g", so the viewer treats them as one part.
 """
 import sys, os, re, json, base64, collections
 import numpy as np
@@ -14,7 +18,8 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
 SRC = ARGS[0] if ARGS else '/mnt/user-data/uploads/RobotA_final_2026-11-23/3_docs/kickoff_brief/robotA/robotA_mesh.json'
-OUT = os.path.join(HERE, '..', 'public', 'robot-viewer')
+OPT = dict(a[2:].split('=', 1) for a in sys.argv[1:] if a.startswith('--') and '=' in a)
+OUT = OPT.get('out') or os.path.join(HERE, '..', 'public', 'robot-viewer')
 SUBS = ['Drivebase', 'Elevator', 'Wrist and claw', 'Funnel', 'Climber', 'Electronics', 'Bumpers']
 
 made = json.load(open(os.path.join(HERE, '..', 'src', 'data', 'parts.json')))
@@ -75,9 +80,24 @@ for p in J['parts']:
     mk = mark_of(p['label'])
     parts.append(dict(label=p['label'], group=m['group'], color=tuple(m['color']), tris=tris + m['v0'], mark=mk))
 
+# ---- the real vendor models, in place of the stand-in shapes ----
+if OPT.get('vendor'):
+    D = np.load(OPT['vendor']); meta = json.loads(str(D['meta']))
+    gone = [re.compile(m['replaces']) for m in meta if m['replaces']]
+    before = len(parts); parts = [q for q in parts if not any(rx.search(q['label']) for rx in gone)]
+    extra, gid, seen = [POS], {}, collections.Counter(m['label'] for m in meta)
+    n0 = len(POS)
+    for i, m in enumerate(meta):
+        v = np.round(D[f'v{i}'] / Q).astype(np.int16); t = D[f't{i}'].astype(np.int64).reshape(-1) + n0
+        q = dict(label=m['label'], group='frame', color=tuple(m['colour']) + (1.0,) * (len(parts[0]['color']) - 3), tris=t, mark=None, fixed_sub=m['sub'])
+        if seen[m['label']] > 1: q['g'] = gid.setdefault(m['label'], len(gid))
+        parts.append(q); extra.append(v); n0 += len(v)
+    POS = np.concatenate(extra)
+    print(f"vendor models: {len(set(m['label'] for m in meta))} models in {len(meta)} pieces replace {before - (len(parts) - len(meta))} stand-in parts")
+
 # servo horns carry no subsystem word: give each the subsystem of the nearest servo
 def centre(q): return POS[np.unique(q['tris'])].mean(axis=0) * Q
-for q in parts: q['sub'] = sub_of(q['label'], q['group'], q['mark'])
+for q in parts: q['sub'] = q['fixed_sub'] if 'fixed_sub' in q else sub_of(q['label'], q['group'], q['mark'])
 servos = [q for q in parts if q['label'].startswith('REV-41-1097')]
 for q in parts:
     if q['label'].startswith('Servo horn') and servos:
@@ -99,6 +119,7 @@ for (sub, group, color), lst in buckets.items():
         lo, hi = f.min(axis=0), f.max(axis=0)
         plist.append(dict(l=q['label'], m=mi, t0=tri, nt=len(inv) // 3, k=q['mark'],
                           c=[round(float(x), 2) for x in (lo + hi) / 2], r=round(float(np.linalg.norm(hi - lo) / 2), 2)))
+        if 'g' in q: plist[-1]['g'] = q['g']
         tri += len(inv) // 3
     V = np.concatenate(vp); I = np.concatenate(ip)
     w = 2 if nv <= 65535 else 4

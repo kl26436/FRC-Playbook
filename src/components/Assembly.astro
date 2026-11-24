@@ -1,0 +1,331 @@
+---
+// Step-by-step assembly of one mechanism (or of the whole robot).
+// The steps are written once, in tools/assembly/steps.py, which resolves them against the 3D model and writes
+// public/robot-viewer/assembly.json. This component prints them, and keeps a 3D view pinned above them that shows
+// the step being read: parts already on, the new parts in orange, the new fasteners in pink.
+import all from '../../public/robot-viewer/assembly.json';
+
+interface Props {
+  set: keyof typeof all;
+}
+type Step = {
+  t: string; do: string[]; hw?: string[]; check?: string; warn?: string; link?: string | null;
+  pl: { k?: string; n: number; name: string; slug?: string }[]; fk: [string, number][]; fam: Record<string, number>;
+};
+const { set } = Astro.props;
+const data = all[set] as unknown as { title: string; intro: string; steps: Step[] };
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const src = `${base}/robot-viewer/index.html?mode=assemble&set=${set}`;
+const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const famText = (fam: Record<string, number>) =>
+  ['rivet', 'screw', 'lock nut', 'rivnut'].filter((k) => fam[k]).map((k) => plural(fam[k], k)).join(', ');
+---
+
+<div class="assembly not-content" data-set={set}>
+  <div class="as-view">
+    <iframe class="robot-viewer" src={src} title={`${data.title}: the assembly step being read, in 3D`} loading="lazy"></iframe>
+  </div>
+
+  <ol class="as-steps">
+    {
+      data.steps.map((st, i) => (
+        <li class="as-step" data-step={i} id={`step-${i + 1}`}>
+          <header>
+            <span class="as-n">{i + 1}</span>
+            <h3>{st.t}</h3>
+            <button type="button" class="as-show no-print">Show in 3D</button>
+          </header>
+          <ul class="as-do">{st.do.map((d) => <li>{d}</li>)}</ul>
+          {st.warn && <p class="as-warn"><strong>Watch out.</strong> {st.warn}</p>}
+          {
+            st.pl.length > 0 && (
+              <p class="as-parts">
+                <span class="as-label">Parts</span>
+                {st.pl.map((p) =>
+                  p.slug ? (
+                    <a href={`${base}/parts/${p.slug}/`}>{p.n > 1 ? `${p.n} × ` : ''}{p.k} {p.name.split(',')[0]}</a>
+                  ) : (
+                    <span>{p.n > 1 ? `${p.n} × ` : ''}{p.name}</span>
+                  ),
+                )}
+              </p>
+            )
+          }
+          {
+            st.hw && st.hw.length > 0 && (
+              <div class="as-hw">
+                <span class="as-label">Hardware</span>
+                <ul>{st.hw.map((h) => <li>{h}</li>)}</ul>
+              </div>
+            )
+          }
+          {
+            st.fk.length > 0 && (
+              <details class="as-model">
+                <summary>In the 3D model at this step: {famText(st.fam)}</summary>
+                <ul>{st.fk.map(([k, n]) => <li>{n} × {k}</li>)}</ul>
+              </details>
+            )
+          }
+          {st.check && <p class="as-check"><span class="box" aria-hidden="true"></span><span><strong>Check.</strong> {st.check}</span></p>}
+          {st.link && <p class="as-more"><a href={`${base}/assemble/${st.link}/`}>Every step for this part of the build</a></p>}
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<script>
+  for (const box of document.querySelectorAll<HTMLElement>('.assembly[data-set]')) {
+    const set = box.dataset.set;
+    const frame = box.querySelector<HTMLIFrameElement>('iframe.robot-viewer')!;
+    const view = box.querySelector<HTMLElement>('.as-view')!;
+    const cards = [...box.querySelectorAll<HTMLElement>('.as-step')];
+    let current = -1;
+    let ready = false;
+    let jumping = 0;
+
+    const setActive = (i: number, tell: boolean) => {
+      if (i === current) return;
+      current = i;
+      cards.forEach((c, k) => c.classList.toggle('on', k === i));
+      if (tell && ready) frame.contentWindow?.postMessage({ type: 'assembly-show', set, i }, window.location.origin);
+    };
+
+    // Size the frame to its content, and follow the site's theme (same as the other embedded views).
+    const sync = () => {
+      const doc = frame.contentDocument;
+      if (!doc?.documentElement) return;
+      doc.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+      const h = doc.body ? doc.body.scrollHeight : 0;
+      if (h > 0) frame.style.height = `${h}px`;
+    };
+    frame.addEventListener('load', () => {
+      sync();
+      const doc = frame.contentDocument;
+      if (doc?.body && 'ResizeObserver' in window) new ResizeObserver(sync).observe(doc.body);
+    });
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // The step being read is the last one whose top has passed just under the pinned 3D view.
+    const pick = () => {
+      if (Date.now() < jumping) return;
+      const line = view.getBoundingClientRect().bottom + 40;
+      let i = 0;
+      cards.forEach((c, k) => {
+        if (c.getBoundingClientRect().top <= line) i = k;
+      });
+      setActive(i, true);
+    };
+    let queued = false;
+    window.addEventListener('scroll', () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        pick();
+      });
+    }, { passive: true });
+
+    const goTo = (i: number) => {
+      const card = cards[i];
+      if (!card) return;
+      jumping = Date.now() + 900;
+      const y = card.getBoundingClientRect().top + window.scrollY - view.getBoundingClientRect().bottom - 12;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      setActive(i, true);
+    };
+    cards.forEach((c, i) => c.querySelector('.as-show')?.addEventListener('click', () => goTo(i)));
+
+    window.addEventListener('message', (e) => {
+      if (e.source !== frame.contentWindow || e.data?.set !== set) return;
+      if (e.data.type === 'assembly-ready') {
+        ready = true;
+        const i = Math.max(0, current);
+        current = -1;
+        setActive(i, true);
+      }
+      if (e.data.type === 'assembly-step') {
+        // Back or Next was pressed inside the 3D view: bring that step's text up under it.
+        jumping = Date.now() + 900;
+        const card = cards[e.data.i];
+        if (card) {
+          const y = card.getBoundingClientRect().top + window.scrollY - view.getBoundingClientRect().bottom - 12;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        }
+        current = e.data.i;
+        cards.forEach((c, k) => c.classList.toggle('on', k === e.data.i));
+      }
+    });
+    setActive(0, false);
+  }
+</script>
+
+<style>
+  .assembly {
+    margin-block: 1.5rem;
+  }
+  .as-view {
+    position: sticky;
+    top: calc(var(--sl-nav-height) + var(--sl-mobile-toc-height));
+    z-index: 2;
+    background: var(--sl-color-bg);
+    padding-bottom: 0.5rem;
+  }
+  .as-view iframe {
+    display: block;
+    width: 100%;
+    height: 440px;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+  }
+  .as-steps {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .as-step {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 4px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+    scroll-margin-top: 30rem;
+  }
+  .as-step.on {
+    border-left-color: #ff7a1a;
+  }
+  .as-step header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .as-n {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--sl-color-black);
+    background: var(--sl-color-white);
+  }
+  .as-step h3 {
+    margin: 0;
+    font-size: var(--sl-text-h4);
+    line-height: 1.25;
+    color: var(--sl-color-white);
+  }
+  .as-show {
+    font: inherit;
+    font-size: var(--sl-text-sm);
+    padding: 0.3rem 0.7rem;
+    color: var(--sl-color-white);
+    background: transparent;
+    border: 1px solid var(--sl-color-gray-4);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .as-do {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .as-label {
+    display: block;
+    font-size: var(--sl-text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sl-color-gray-3);
+  }
+  .as-parts {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.5rem;
+    font-size: var(--sl-text-sm);
+  }
+  .as-parts .as-label {
+    flex: 0 0 100%;
+  }
+  .as-parts a,
+  .as-parts span:not(.as-label) {
+    padding: 0.05rem 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 1rem;
+    text-decoration: none;
+    color: var(--sl-color-gray-2);
+  }
+  .as-parts a {
+    color: var(--sl-color-text-accent);
+    border-color: var(--sl-color-accent);
+  }
+  .as-hw ul,
+  .as-model ul {
+    margin: 0.2rem 0 0;
+    padding-left: 1.2rem;
+    font-size: var(--sl-text-sm);
+  }
+  .as-model {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+  .as-model summary {
+    cursor: pointer;
+  }
+  .as-warn {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    border-left: 4px solid var(--sl-color-orange);
+    background: var(--sl-color-orange-low);
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+  }
+  .as-check {
+    margin: 0;
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    font-size: var(--sl-text-sm);
+  }
+  .box {
+    flex: none;
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    transform: translateY(0.1rem);
+  }
+  .as-more {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+  }
+  @media (max-width: 40rem) {
+    .as-step header {
+      grid-template-columns: auto 1fr;
+    }
+    .as-show {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+  @media print {
+    .as-view,
+    .no-print {
+      display: none !important;
+    }
+    .as-step {
+      break-inside: avoid;
+    }
+    .as-model:not([open]) ul {
+      display: none;
+    }
+  }
+</style>

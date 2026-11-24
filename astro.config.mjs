@@ -83,7 +83,16 @@ export default defineConfig({
         },
         {
                 "label": "6. Assemble it",
-                "slug": "assemble-it"
+                "items": [
+                        { "label": "The whole build, in order", "slug": "assemble-it" },
+                        { "label": "Drivebase", "slug": "assemble/drivebase" },
+                        { "label": "Electronics boards", "slug": "assemble/electronics" },
+                        { "label": "Elevator", "slug": "assemble/elevator" },
+                        { "label": "Wrist and claw", "slug": "assemble/wrist-and-claw" },
+                        { "label": "Funnel", "slug": "assemble/funnel" },
+                        { "label": "Climber", "slug": "assemble/climber" },
+                        { "label": "Bumpers", "slug": "assemble/bumpers" }
+                ]
         },
         {
                 "label": "7. Wire it",
