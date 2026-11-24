@@ -7,6 +7,7 @@ Live at https://kl26436.github.io/FRC-Playbook/
 ## How it works
 
 - Pages are Markdown files in `src/content/docs/`. Edit one, push to `main`, and the site republishes in a few minutes.
+- `docs/decisions-and-math.md` is the design log the pages are written from: every decision with its options, reason and numbers. It is not built into the site. When the CAD changes, update the log first, then the pages that use it.
 - The sidebar order is set in `astro.config.mjs`.
 - Built with [Astro](https://astro.build) and its [Starlight](https://starlight.astro.build) docs theme.
 - `.github/workflows/deploy.yml` builds and publishes the site to GitHub Pages on every push to `main`.

@@ -122,7 +122,7 @@ export const calcs: Record<string, CalcDef> = {
       { key: 'funnel', label: 'Funnel', unit: 'lb', value: 6.9, step: 0.1 },
       { key: 'elec', label: 'Electronics', unit: 'lb', value: 4.0, step: 0.1 },
       { key: 'wiring', label: 'Wiring (estimate)', unit: 'lb', value: 4.0, step: 0.1 },
-      { key: 'fasteners', label: 'Fasteners', unit: 'lb', value: 6.0, step: 0.1 },
+      { key: 'fasteners', label: 'Fasteners', unit: 'lb', value: 6.1, step: 0.1 },
       { key: 'limit', label: 'Weight limit', unit: 'lb', value: 115, step: 1 },
     ],
     outputs: [
@@ -133,7 +133,7 @@ export const calcs: Record<string, CalcDef> = {
       'Robot weight = the sum of every subsystem, plus wiring and fasteners.',
       'Room left = weight limit − robot weight. A negative number means the robot is over.',
     ],
-    note: 'Modelled, except wiring, which is an estimate. The rows are rounded, so they add to 115.7 lb; the model total is 115.63 lb. Battery and bumpers do not count toward the limit.',
+    note: 'Modelled, except wiring, which is an estimate. The rows are rounded, so they add to 115.8 lb; the model total is 115.68 lb. Battery and bumpers do not count toward the limit.',
   },
 
   'drive-speed': {
