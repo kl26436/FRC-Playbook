@@ -7,7 +7,7 @@ import Calc from '../../../components/Calc.astro';
 import RobotViewer from '../../../components/RobotViewer.astro';
 
 :::note[Draft]
-First draft, written from the design log and the climber drawings (Rev C). Nothing here has been built, and the climber is the part that most needs a real cage to prove it.
+First draft, written from the design log and the climber drawings (Rev D). Nothing here has been built, and the climber is the part that most needs a real cage to prove it.
 :::
 
 The deep cage is worth 12 points for a few seconds of work. The climber is a fork across the back of the robot. It lets down, the robot backs onto the cage, and two winches pull the fork back up, which lifts the robot.
@@ -26,7 +26,7 @@ Press Climbed to see the fork wind back up. The cage is not drawn.
 | Hard stops | At −2° and 97°, a bolt in each tower plate |
 | Pull | Two ropes, one each side, over a 3.5 in radius track on the fork and onto a 1 in spool |
 | Power | Two Kraken X60 motors, each through a 25:1 planetary gearbox |
-| Holding | A 16-tooth steel ratchet wheel and pawl on each spool. Springs hold the pawls down. Servos lift them |
+| Holding | A bought WCP ratchet wheel and pawl (18 teeth) on each spool. Each pawl turns on a gearbox standoff. Springs hold the pawls down. Servos lift them through printed links |
 | Letting it down | Torsion springs push the fork out of stow, then its own weight takes it to level |
 | Gripping the cage | Rubber sleeves on the fork, and a spring gate each side that snaps shut behind the cage's pipes |
 
@@ -63,6 +63,7 @@ This subsystem was redesigned twice, and both times the problem was found in CAD
   | Widen the gap | Rejected. It moves the gearboxes and motors outward, which changes the drivebase and the funnel |
 
 - **The pawls were loose.** Each sat on a spacer that left 0.06 in of side play. Three thin shims under each took that to 0.02 in, so the pawl stays in line with its wheel.
+- **Then the ratchet was bought instead of made.** The wheel and pawl were drawn as steel parts to cut and file, which the team would rather not machine. WCP's Ratchet & Pawl (1/2 in hex), which the team already stocks, replaced them, and the shims went with the old pawl. See the worked example below.
 
 ## The math
 
@@ -72,9 +73,35 @@ This subsystem was redesigned twice, and both times the problem was found in CAD
 
 47 A a motor is more than the 40 A breaker's rating, for the few seconds the climb lasts. Breakers allow that for a short time, but it is one of the numbers to check on a real robot.
 
+### Worked example: can a bought ratchet hold the robot?
+
+A motor winds a rope onto a spool on each side, and the rope pulls the fork round until the robot hangs from the cage. Once it is up, a ratchet on each spool holds it, so the motors can stop. The first design had a ratchet wheel and pawl cut from steel plate. Those are fiddly to make, so the team switched to WCP's Ratchet & Pawl (1/2 in hex), which the team already buys. Before trusting it, check it against the load.
+
+**1. Torque on the fork.** The robot hangs from the fork pivot. Its centre of gravity is 14.6 in from the pivot, sideways, at the worst point of the climb. So the torque is 146.4 lb × 14.6 in = **2,140 lb·in**.
+
+**2. Pull in each rope.** Two ropes, one per side, each on a track of 3.5 in radius on the fork: 2,140 ÷ 2 ÷ 3.5 = **305 lb** in each rope.
+
+**3. Torque on each spool.** The spool's core plus the rope wound on it gives a radius of about 0.563 in: 305 × 0.563 = **172 lb·in**. Each ratchet has to hold this.
+
+**4. Push on one tooth.** The pawl touches the tooth 0.43 in from the centre of the shaft: 172 ÷ 0.43 = **400 lb** on one tooth.
+
+**5. Will the steel squash?** The pawl touches the tooth along one edge, not over a face. So the steel yields a little until the flat is wide enough to carry the load. The flat's width is the push ÷ (thickness × yield strength). For steel that yields at 60,000 psi: 400 ÷ (0.354 × 60,000) ≈ **0.02 in**. That is about a fifth of the 0.11 in tooth depth, so it is fine. But WCP does not publish the steel, so that 60,000 is a guess: ask, or load one on the bench.
+
+**6. Will the tooth break off?** The tooth is about 0.14 in wide at its root and 0.354 in thick, so it has 0.048 in² to shear through: 400 ÷ 0.048 ≈ 8,300 psi. Steel is many times stronger than that.
+
+**7. How far can the robot drop before it catches?** The wheel has 18 teeth, so one tooth is 20°. The fork turns 6.22 times slower than the spool (3.5 ÷ 0.563), so the fork can settle at most 20 ÷ 6.22 = **3.2°** before a pawl catches.
+
+**8. Why the servo cannot let go under load.** The tooth pushes the pawl about 22° off the line through the pawl's pivot, and that turns it further into the wheel. The harder it is loaded, the tighter it grips, which is what you want. But it means the code has to wind in a little to take the load off before the servo lifts the pawl.
+
+**A bonus.** The WCP pawl pivots exactly 1.000 in from the centre of the hex. The screws in the gearbox's output face sit on that same radius. So the pawl turns on one of the spacers that hold the gearbox off the plate, with no extra pivot to make.
+
+**The lessons.** Look for a part you can buy before you machine one. Check it against your load with the same few steps. And look for dimensions that line up with parts you already have.
+
+<Calc id="ratchet-load" />
+
 ### How far can the fork settle?
 
-The ratchet wheel has 16 teeth, so 360 ÷ 16 = 22.5° of spool for each tooth. The fork turns 6.22 times slower than the spool. So the fork can drop back at most 22.5 ÷ 6.22 = **3.6°** before a pawl catches.
+The ratchet wheel has 18 teeth, so 360 ÷ 18 = 20° of spool for each tooth. The fork turns 6.22 times slower than the spool. So the fork can drop back at most 20 ÷ 6.22 = **3.2°** before a pawl catches.
 
 ### Will the fork come out of stow on its own?
 
@@ -95,6 +122,7 @@ The drawing's own list, in its order:
 - **The cage is held by friction only.** Rubber sleeves and gates stop it sliding along the fork. Test on a real cage.
 - **Weights are estimates.** The cage is taken as 21 lb. Weigh the robot.
 - **The gearbox.** Check the planetary's load table for 19 N·m at its output.
+- **The ratchet steel.** WCP does not publish it. About 400 lb lands on one tooth: ask WCP, or load one on the bench.
 - **Springs and gates are untested.** Check that the fork leaves stow by itself as the winch pays out, and that each gate folds back past a 1.315 in pipe and springs shut. Make one gate first.
 - **The stops are not for stalling against.** They can take a current-limited winch. The code must stop at 88°.
 

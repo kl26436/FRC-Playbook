@@ -1,6 +1,6 @@
 # Design decisions and math log
 
-The source the playbook pages are written from (chapters 2 to 4, 9 and 10). It is not published as a page itself. It covers the mechanical design, Nov 19 to 23, 2026, at CAD package 3.2. Code decisions live in the code repo's own docs and appear here only where the CAD forced them.
+The source the playbook pages are written from (chapters 2 to 4, 9 and 10). It is not published as a page itself. It covers the mechanical design, Nov 19 to 23, 2026, at CAD package 3.3. Code decisions live in the code repo's own docs and appear here only where the CAD forced them.
 
 **How sure are we.** Nothing here has been built. Every number is one of three kinds:
 - *calculated*: worked by hand or in a script from catalogue data;
@@ -97,6 +97,7 @@ Each entry gives the decision, the options, the reason and the numbers.
 - **Numbers:** 115.68 lb modelled against the 115 lb limit (R103, battery and bumpers not counted). Kevin accepted 115.63; the six sprocket screws and the pawl shims added 0.05 lb. 12.4 lb of the total is estimated: wiring 4.0 lb and a fastener allowance.
 - **Options not taken:** 2x1 frame rails from 1/8 to 1/16 wall (about −3.6 lb), lightening pockets in the tube walls, or one climber motor instead of two.
 - **Note:** the robot cannot pass inspection at this weight. The playbook should show it as a known miss with the options above.
+- **Update (package 3.3):** the second mast brace adds 0.85 lb, and the WCP ratchet swap is about even. Now **116.53 lb, 1.5 lb over**. Kevin's call stands until he says otherwise.
 
 ### Nov 23: Wrist keep-out table (Design)
 - **Decided:** a six-zone table giving the lowest wrist angle the code may allow at each carriage height.
@@ -127,6 +128,21 @@ Each entry gives the decision, the options, the reason and the numbers.
 - **Problem:** the pawl (3/16 thick) sits on a 1/4 long spacer, which leaves 0.0625 in of axial play.
 - **Decided:** three 0.014 in shims (McMaster 99040A614, 5/16 ID × 1/2 OD) on the spacer under each pawl. The play drops to 0.25 − 0.1875 − 3 × 0.014 = 0.0205 in, and the pawl stays in line with the ratchet wheel.
 - **Check on real parts:** the pawl must still swing free.
+- **Superseded the same night** by the bought WCP ratchet (below): the shims went with the cut pawl.
+
+### Nov 23: A mast brace on each side (Design, from Kevin's question)
+- **Problem:** Kevin asked why there was only one diagonal brace, on the right, when the physics is the same on both sides. There had only ever been one, from the first layout.
+- **Math:** section 2.13. Without a brace the carriage sways about 1.1 in per g, with a wobble near 3 Hz; braced, about 0.3 in and 5.5 Hz. Strength was never the issue (about 6,000 psi at the base against 35,000). With one brace the two uprights move differently and the mast twists about 1.9° per g, which pinches the bearing blocks.
+- **Decided (elevator Rev J, drivebase Rev G):** a mirror pair, E-103-L and E-103-R, cut from the same blank (the rivet and access holes go in opposite walls). Gusset E-104 on both rails, 8 rivets into the uprights. The left rail D-101-L takes the four gusset rivet holes too.
+- **Cost:** 0.85 lb (elevator 31.30 → 32.15 lb). The robot is now 116.53 lb, 1.5 lb over (see the weight entry).
+
+### Nov 23: Bought WCP ratchet and pawl (Kevin)
+- **Problem:** the ratchet wheel CL-303 and pawl CL-304 were cut from 3/16 steel plate, with a pressed dowel and a filed tip. Kevin: "I'd prefer to just buy the WCP stuff because we already stock that stuff regularly."
+- **Decided (climber Rev D):** WCP-0405 Ratchet & Pawl (1/2 hex), two kits. Checked in section 2.14.
+- **How it fits:** the WCP pawl pivots 1.000 in from the centre of the hex, the radius of the MAXPlanetary output-face screws. So the pawl turns on the rear gearbox spacer CL-306, clamped between the tower plate and the gearbox face, with no pivot screw of its own. To give both sides the same layout, the gearboxes now bolt on through their 0° and 180° face holes (they used the 135°/315° pair, and the right one had to be turned a quarter turn).
+- **Knock-on changes:** the gearbox stands 0.50 in off the tower plate (was 0.30), so the wheel and pawl fit in the gap. New printed parts: link CL-311 (on a 1/4 in shoulder screw, 94035A532, threaded into the pawl's tapped tail hole), thrust washer CL-309 under the pawl and wheel spacer CL-310. A 9654K972 spring pulls the tail straight down to a post. The servo moved back and its blocks CL-305 are now 1.257 in thick (#8-32 × 1.75). The cut parts, the 5/16 pivot spacer, the shims and the dowel are gone.
+- **Checked in the model:** the pawl seats with zero gap; lifted 16° it clears the teeth by 0.10 in; its contact face points exactly in the pay-out direction, so it holds the hanging load and lets the rope wind in. The fork swings from 97° to −2° with no clash, and nothing hits stowed, swinging or climbing.
+- **Check on real parts:** WCP does not publish the steel. Ask, or load one on the bench (section 2.14).
 
 ---
 
@@ -179,8 +195,8 @@ Each section is a candidate for a playbook calculator: the inputs in the first l
 - **Check against the kickoff brief:** it estimated about 2,000 lb·in and about 150:1. The model gives 2,140 lb·in and 156:1.
 
 ### 2.6 Pawl: how far the fork can settle
-- **Inputs:** a 16-tooth ratchet wheel, so 360 / 16 = 22.5° of wheel per tooth.
-- The wheel is on the spool shaft. The fork turns 6.22 times slower than the spool, so one tooth lets the fork settle at most 22.5 / 6.22 = **3.6°** before a pawl bites.
+- **Inputs:** the WCP-0405 wheel has 18 teeth, so 360 / 18 = 20° of wheel per tooth. (The cut wheel it replaced had 16: 22.5°.)
+- The wheel is on the spool shaft. The fork turns 6.22 times slower than the spool, so one tooth lets the fork settle at most 20 / 6.22 = **3.2°** before a pawl bites.
 
 ### 2.7 Deploy springs against gravity
 - **Inputs:** fork 3.64 lb, centre of gravity 2.54 in in front of the pivot when stowed.
@@ -211,14 +227,14 @@ Each section is a candidate for a playbook calculator: the inputs in the first l
 | Package | lb |
 | --- | --- |
 | Drivebase | 37.7 |
-| Elevator | 31.3 |
+| Elevator | 32.2 |
 | Wrist and claw | 12.9 |
 | Climber | 12.9 |
 | Funnel | 6.9 |
 | Electronics | 4.0 |
 | Wiring (estimate) | 4.0 |
 | Fasteners (counted plus allowance) | 6.1 |
-| **Robot (R103)** | **115.7** |
+| **Robot (R103)** | **116.5** |
 | Battery | 12.9 |
 | Bumpers | 14.3 |
 
@@ -229,18 +245,39 @@ The kickoff estimate was 106 lb. The difference is fasteners that were counted r
 - **Algae on the reef:** a ball on the L2 branches has its centre 35.6 in up and blocks L2 and L3. A ball on the L3 branches sits at 51.5 in and blocks only L3.
 - **Scoring poses:** 17.25 in off the face along its normal, and 6.47 in left or right for the branch.
 
+### 2.13 Mast brace: none, one or two
+Worked on the elevator page of the playbook, with a calculator.
+- **Model:** each upright is a beam held at the mast base (a cantilever), 35 in tall, 2 × 1 × 1/16 tube bending the deep way: I = (1 × 2³ − 0.875 × 1.875³) ÷ 12 = 0.186 in⁴, E = 10,000,000 psi. Carriage at the top.
+- **Load per upright at 1 g sideways:** half of carriage and wrist 19.8 lb (CG 85.4 in up the mast), stage B 4.7 lb (62.6 in), stage A 5.7 lb (39.75 in). At the mast top: V = 15.1 lb and M = 577 lb·in.
+- **No brace:** top moves V L³/3EI + M L²/2EI = 0.31 in and tilts 0.016 rad; the carriage, 50.4 in higher, moves **1.1 in per g**. Base moment 1,106 lb·in, **about 5,950 psi**. Wobble √(386 ÷ 1.1) ÷ 2π ≈ **3.0 Hz**.
+- **Braced at 27.25 in (solid prop):** Mb = V × 7.75 + M = 694 lb·in; the upright turns Mb × 27.25 ÷ 4EI there; the carriage moves **about 0.29 in per g**, wobble 5.8 Hz, peak stress 3,730 psi. The brace pushes (V + 1.5 Mb ÷ 27.25) × 28.0 ÷ 10.5 = **142 lb per g**; it buckles at about 4,300 lb.
+- **One brace only:** (1.10 − 0.29) ÷ 25 in between the uprights = 0.032 rad, **about 1.9° of twist per g**.
+- **Checked against a beam model** with the brace allowed to stretch: 1.11 in, 0.33 in, 5,950 psi, 3.0 and 5.5 Hz, 138 lb, 1.8°. The hand sums are within about 10%.
+
+### 2.14 Ratchet tooth load (WCP-0405)
+Worked on the climber page of the playbook, with a calculator.
+- **Spool torque:** 172 lb·in per side (section 2.5).
+- **Push on one tooth:** the pawl touches 0.43 in from the shaft centre: 172 ÷ 0.43 = **400 lb**.
+- **Pawl tip:** it touches along one edge, so the steel beds in until the flat carries the load: 400 ÷ (0.354 × 60,000) ≈ **0.02 in** if the steel yields at 60,000 psi (assumed: WCP does not publish it). The teeth are 0.11 deep.
+- **Tooth root:** about 0.14 × 0.354 = 0.048 in² in shear: about 8,300 psi.
+- **Pivot:** 400 lb on the 3/8 aluminium spacer over the 0.354 pawl: about 3,000 psi bearing; the spacer is held at both ends.
+- **Holding direction:** the tooth pushes the pawl about 22° off the line through its pivot, into the wheel, so load makes it grip harder. The servo cannot lift it under load: wind in first.
+- **Servo:** the spring (9654K972, about 1.5 lb) is the only thing it lifts against: under 1 lb·in, against 11.7 lb·in (13.5 kg·cm) stall.
+
 ---
 
 ## 3. Misses and open items (chapter 10 material)
-- **Weight:** about 0.7 lb over (Kevin chose to leave it for now). See the options above.
+- **Weight:** 1.5 lb over at package 3.3 (it was 0.7 before the second brace; Kevin chose to leave it for now). See the options above.
 - **Elevator cruise speed** in code: 65 in/s against the 110 design (2.2).
 - **Wrist keep-out table:** read literally, it gave no way to leave stow. Found in the clash grid, fixed with the 1.25 in unstow band.
 - **Climber concept:** the left-rail fork could not do the deep climb. It was found in CAD before anything was cut.
 - **Deploy spring:** the first design needed a spring that does not exist.
+- **One mast brace:** the brace was drawn on the right side only from the first layout, and nobody asked why until the design was nearly finished. Kevin's question found it; section 2.13 showed one brace twists the mast.
+- **Making what you can buy:** the climber ratchet was drawn as cut steel parts before anyone checked for a bought one. WCP's fits, and even pivots on a gearbox spacer.
 - **Things only real parts can prove:** the climber on a real cage (it holds by friction on the sleeves and gates), the claw grip on a real ball, the coral turning end-on in the funnel, the net rim height (88.9 in read from the drawing), the processor pose (marked marginal) and the MAXPlanetary rating at the climber.
 
 ## Sources
-- The build123d model and its checks: `mass_summary.json`, `climber/study_summary.json`, `wrist_summary.json`, `assembly/fasteners.json` and the CAD package 3.2 README.
+- The build123d model and its checks: `mass_summary.json`, `climber/study_summary.json`, `wrist_summary.json`, `assembly/fasteners.json` and the CAD package 3.3 README.
 - The REEFSCAPE kickoff brief (Part 1 analysis, Part 2 design changes), the software handoff, and the climber deploy-spring design note (Nov 22).
 - The 2025 Game Manual and Field Drawings in this project.
 - WCP Kraken X60 motor performance: https://docs.wcproducts.com/kraken-x60/kraken-x60-motor/overview-and-features/motor-performance

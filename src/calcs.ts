@@ -79,6 +79,35 @@ const tagDistanceIn = (px: number) => {
   return (TAG_IN + Math.sqrt(disc)) / (2 * tan);
 };
 
+// Mast sway: each upright is a beam standing up from the mast base (a cantilever).
+// Everything is per upright, so the weights are halved. E is for aluminium.
+const E_ALU = 10.0e6; // psi
+const G_IN_S2 = 386.1;
+const mastI = (v: Values) => (v.width * v.depth ** 3 - (v.width - 2 * v.wall) * (v.depth - 2 * v.wall) ** 3) / 12; // in^4
+const mastS = (v: Values) => mastI(v) / (v.depth / 2); // in^3
+const mastV = (v: Values) => (v.g * (v.wC + v.wB + v.wA)) / 2; // lb, sideways at the mast top
+const mastM = (v: Values) => (v.g * (v.wC * (v.hC - v.L) + v.wB * (v.hB - v.L) + v.wA * (v.hA - v.L))) / 2; // lb·in at the mast top
+const swayFree = (v: Values) => {
+  const EI = E_ALU * mastI(v), V = mastV(v), M = mastM(v), L = v.L;
+  const top = (V * L ** 3) / (3 * EI) + (M * L ** 2) / (2 * EI);
+  const tilt = (V * L ** 2) / (2 * EI) + (M * L) / EI;
+  return top + tilt * (v.hC - L); // the stages above the top lean with it
+};
+const braceMoment = (v: Values) => mastV(v) * (v.L - v.b) + mastM(v); // lb·in in the upright at the brace
+const swayBraced = (v: Values) => {
+  const EI = E_ALU * mastI(v), V = mastV(v), M = mastM(v), c = v.L - v.b;
+  const tiltB = (braceMoment(v) * v.b) / (4 * EI); // upright held at the base, pinned at the brace
+  const top = tiltB * c + (V * c ** 3) / (3 * EI) + (M * c ** 2) / (2 * EI);
+  const tilt = tiltB + (V * c ** 2) / (2 * EI) + (M * c) / EI;
+  return top + tilt * (v.hC - v.L);
+};
+const wobbleHz = (sway: number, g: number) => Math.sqrt(G_IN_S2 / (sway / g)) / (2 * Math.PI);
+const braceForce = (v: Values) => {
+  const push = mastV(v) + (3 * braceMoment(v)) / (2 * v.b); // sideways push the brace has to take
+  const len = Math.hypot(v.x, v.b - v.yf);
+  return push * (len / v.x);
+};
+
 export const calcs: Record<string, CalcDef> = {
   'cycle-value': {
     title: 'What a scoring cycle is worth',
@@ -151,7 +180,7 @@ export const calcs: Record<string, CalcDef> = {
     page: 'subsystems/from-concept-to-design',
     inputs: [
       { key: 'drive', label: 'Drivebase', unit: 'lb', value: 37.7, step: 0.1 },
-      { key: 'elev', label: 'Elevator', unit: 'lb', value: 31.3, step: 0.1 },
+      { key: 'elev', label: 'Elevator', unit: 'lb', value: 32.2, step: 0.1 },
       { key: 'wrist', label: 'Wrist and claw', unit: 'lb', value: 12.9, step: 0.1 },
       { key: 'climb', label: 'Climber', unit: 'lb', value: 12.9, step: 0.1 },
       { key: 'funnel', label: 'Funnel', unit: 'lb', value: 6.9, step: 0.1 },
@@ -168,7 +197,7 @@ export const calcs: Record<string, CalcDef> = {
       'Robot weight = the sum of every subsystem, plus wiring and fasteners.',
       'Room left = weight limit − robot weight. A negative number means the robot is over.',
     ],
-    note: 'Modelled, except wiring, which is an estimate. The rows are rounded, so they add to 115.8 lb; the model total is 115.68 lb. Battery and bumpers do not count toward the limit.',
+    note: 'Modelled, except wiring, which is an estimate. The rows are rounded, so they add to 116.7 lb; the model total is 116.53 lb. Battery and bumpers do not count toward the limit.',
   },
 
   'drive-speed': {
@@ -398,5 +427,84 @@ export const calcs: Record<string, CalcDef> = {
       'Whole move = time speeding up + time at cruise + time slowing down.',
     ],
     note: 'Calculated. The acceleration is 0.55 g (g is 386.09 in/s²), just under the 0.6 g cap the code sets for the elevator.',
+  },
+
+  'ratchet-load': {
+    title: 'How hard does the ratchet tooth get pushed?',
+    group: 'Mechanical',
+    page: 'subsystems/climber',
+    inputs: [
+      { key: 'weight', label: 'Robot as it hangs (battery and bumpers on)', unit: 'lb', value: 146.4, step: 0.5 },
+      { key: 'lever', label: 'Fork pivot to centre of gravity, sideways', unit: 'in', value: 14.6, step: 0.1 },
+      { key: 'ropes', label: 'Number of ropes (one per side)', unit: '', value: 2, step: 1 },
+      { key: 'track', label: 'Rope track radius on the fork', unit: 'in', value: 3.5, step: 0.25 },
+      { key: 'spool', label: 'Spool radius, core plus rope', unit: 'in', value: 0.563, step: 0.01 },
+      { key: 'tooth', label: 'Radius where the pawl touches the tooth', unit: 'in', value: 0.43, step: 0.01 },
+      { key: 'thick', label: 'Ratchet thickness', unit: 'in', value: 0.354, step: 0.01 },
+      { key: 'teeth', label: 'Teeth on the ratchet wheel', unit: '', value: 18, step: 1 },
+      { key: 'yield', label: 'Yield strength of the steel (assumed)', unit: 'psi', value: 60000, step: 5000 },
+    ],
+    outputs: [
+      { label: 'Torque on the fork', unit: 'lb·in', digits: 0, compute: (v) => v.weight * v.lever },
+      { label: 'Pull in each rope', unit: 'lb', digits: 0, compute: (v) => (v.weight * v.lever) / v.ropes / v.track },
+      { label: 'Torque on each spool', unit: 'lb·in', digits: 0, compute: (v) => ((v.weight * v.lever) / v.ropes / v.track) * v.spool },
+      { label: 'Push on one tooth', unit: 'lb', digits: 0, compute: (v) => (((v.weight * v.lever) / v.ropes / v.track) * v.spool) / v.tooth },
+      { label: 'Flat the pawl tip wears to', unit: 'in', digits: 3, compute: (v) => (((v.weight * v.lever) / v.ropes / v.track) * v.spool) / v.tooth / (v.thick * v.yield) },
+      { label: 'Fork can settle before a pawl catches', unit: '°', digits: 1, compute: (v) => 360 / v.teeth / (v.track / v.spool) },
+    ],
+    steps: [
+      'Torque on the fork = robot weight × the distance from the fork pivot to the robot\'s centre of gravity (worst when that line is level).',
+      'Pull in each rope = fork torque ÷ number of ropes ÷ track radius.',
+      'Torque on each spool = rope pull × spool radius. This is what each ratchet has to hold.',
+      'Push on one tooth = spool torque ÷ the radius where the pawl touches.',
+      'The pawl touches along one edge, so the steel squashes a little until the flat is wide enough: width = push ÷ (thickness × yield strength).',
+      'Fork settling = degrees per tooth ÷ (track radius ÷ spool radius), the ratio between the fork and the spool.',
+    ],
+    note: 'The weight and lever are modelled. WCP does not publish the ratchet steel, so the yield strength is a guess: ask, or test one. A flat a few thousandths wide is fine; one near the tooth depth (0.11 in) is not.',
+  },
+
+  'mast-brace': {
+    title: 'Does the mast need a brace?',
+    group: 'Mechanical',
+    page: 'subsystems/elevator',
+    inputs: [
+      { key: 'g', label: 'Sideways acceleration (a hard stop or a hit)', unit: 'g', value: 1, step: 0.5 },
+      { key: 'wC', label: 'Carriage and wrist weight', unit: 'lb', value: 19.8, step: 0.1 },
+      { key: 'hC', label: 'Its height above the mast base', unit: 'in', value: 85.4, step: 0.5 },
+      { key: 'wB', label: 'Stage B weight', unit: 'lb', value: 4.7, step: 0.1 },
+      { key: 'hB', label: 'Its height above the mast base', unit: 'in', value: 62.6, step: 0.5 },
+      { key: 'wA', label: 'Stage A weight', unit: 'lb', value: 5.7, step: 0.1 },
+      { key: 'hA', label: 'Its height above the mast base', unit: 'in', value: 39.75, step: 0.5 },
+      { key: 'L', label: 'Mast height (base to top)', unit: 'in', value: 35, step: 0.5 },
+      { key: 'depth', label: 'Upright tube depth, in the sway direction', unit: 'in', value: 2, step: 0.5 },
+      { key: 'width', label: 'Upright tube width', unit: 'in', value: 1, step: 0.5 },
+      { key: 'wall', label: 'Upright tube wall', unit: 'in', value: 0.0625, step: 0.0625 },
+      { key: 'b', label: 'Brace joins the upright at', unit: 'in', value: 27.25, step: 0.25 },
+      { key: 'x', label: 'Brace foot, distance from the upright', unit: 'in', value: 10.5, step: 0.5 },
+      { key: 'yf', label: 'Brace foot, height above the mast base', unit: 'in', value: 1.3, step: 0.1 },
+      { key: 'gap', label: 'Distance between the two uprights', unit: 'in', value: 25, step: 0.5 },
+    ],
+    outputs: [
+      { label: 'Carriage sway, no brace', unit: 'in', digits: 2, compute: swayFree },
+      { label: 'Carriage sway, braced', unit: 'in', digits: 2, compute: swayBraced },
+      { label: 'Peak stress in the upright, no brace', unit: 'psi', digits: 0, compute: (v) => (mastV(v) * v.L + mastM(v)) / mastS(v) },
+      { label: 'Peak stress in the upright, braced', unit: 'psi', digits: 0, compute: (v) => braceMoment(v) / mastS(v) },
+      { label: 'Wobble, no brace', unit: 'Hz', digits: 1, compute: (v) => wobbleHz(swayFree(v), v.g) },
+      { label: 'Wobble, braced', unit: 'Hz', digits: 1, compute: (v) => wobbleHz(swayBraced(v), v.g) },
+      { label: 'Push in each brace', unit: 'lb', digits: 0, compute: braceForce },
+      { label: 'Twist if only one side is braced', unit: '°', digits: 1, compute: (v) => (((swayFree(v) - swayBraced(v)) / v.gap) * 180) / Math.PI },
+    ],
+    steps: [
+      'Work on one upright, so halve the weights. Multiply each by the acceleration in g to get the sideways force.',
+      'At the mast top: force V = the sum of the forces. Moment M = the sum of each force × (its height − mast height): the stages stick up above the top.',
+      'Tube stiffness I = (width × depth³ − (width − 2 × wall) × (depth − 2 × wall)³) ÷ 12. E = 10,000,000 psi for aluminium.',
+      'No brace (a cantilever): top moves V × L³ ÷ (3EI) + M × L² ÷ (2EI), and tilts V × L² ÷ (2EI) + M × L ÷ EI. The carriage moves the top movement + tilt × (carriage height − mast height).',
+      'Braced (held at the base, pinned at the brace, height b): moment at the brace Mb = V × (L − b) + M. The upright turns Mb × b ÷ (4EI) there. Add the bit above the brace as a short cantilever, then lean the carriage as before.',
+      'Stress = the biggest moment ÷ (I ÷ half the depth). Aluminium 6061 starts to bend for good at about 35,000 psi.',
+      'Wobble = √(386 ÷ sway at 1 g) ÷ 2π. Below about 4 Hz, the driver can feel it and the camera sees it.',
+      'Push in the brace = (V + 1.5 × Mb ÷ b) × brace length ÷ foot distance.',
+      'Twist with one brace = (sway unbraced − sway braced) ÷ distance between the uprights, in radians. Times 57.3 for degrees.',
+    ],
+    note: 'The braced number treats the brace as solid. A computer model that lets the brace stretch a little gives 0.33 in instead of 0.29 and 5.5 Hz instead of 5.8, so the hand sums are close enough to decide with. The robot\'s numbers are with the carriage at the top.',
   },
 };
