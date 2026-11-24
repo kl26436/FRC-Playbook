@@ -1,7 +1,77 @@
 [
   {
+    "file": "leave.json",
+    "label": "Leave",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  },
+  {
+    "file": "one_right.json",
+    "label": "1 Right",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  },
+  {
+    "file": "one_centre.json",
+    "label": "1 Centre",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  },
+  {
+    "file": "one_left.json",
+    "label": "1 Left",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  },
+  {
     "file": "three_right_ecd.json",
     "label": "3 Right: E, C, D",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  },
+  {
+    "file": "three_left_jlk.json",
+    "label": "3 Left: J, L, K",
     "columns": [
       "t_s",
       "x_m",
@@ -25,6 +95,17 @@
       "wrist_deg",
       "coral",
       "algae"
+    ]
+  },
+  {
+    "file": "climb.json",
+    "label": "Deep climb",
+    "columns": [
+      "t_s",
+      "carriage_in",
+      "wrist_deg",
+      "fork_deg",
+      "tray_deg"
     ]
   }
 ]

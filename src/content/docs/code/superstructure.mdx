@@ -4,6 +4,7 @@ description: "How the code moves the elevator and wrist together, and the rules 
 ---
 
 import Calc from '../../../components/Calc.astro';
+import RobotViewer from '../../../components/RobotViewer.astro';
 
 :::note[Draft]
 First draft, written from the code and its notes as of November 23. Nothing here has run on a real robot yet.
@@ -50,9 +51,20 @@ L4 and the net stop at 65.25 in, not the full 66 in of travel, to stay 0.75 in s
 | 15 to 23 in | −40° or higher |
 | 23 in and up | Any |
 
-<Calc id="keep-out" />
-
 The table came from the CAD: 3,256 clash tests of the wrist against every other part, at 15 carriage heights and 12 wrist angles.
+
+### The table as a picture
+
+Each dot is a pose that was tested on the CAD. The shaded area is what the table refuses. Drag the dot, or press a button, and the robot moves to that pose so you can see what the wrist would hit.
+
+<RobotViewer title="The keep-out table as a chart, beside the robot" mode="keepout" height={760} />
+
+Two things to notice:
+
+- **No red dot sits outside the shading.** Of the 180 poses on this chart's grid, 20 hit something, and the table refuses all 20.
+- **Some green dots sit inside it.** The table also refuses 17 poses that are clear. That is deliberate: seven simple rows are easier to check and to test than a shape that follows every dot.
+
+<Calc id="keep-out" />
 
 ### How a move stays legal
 

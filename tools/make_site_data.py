@@ -171,6 +171,24 @@ def outline_svg(p):
         return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" fill="none" stroke="currentColor" stroke-width="{sw:.4f}" stroke-linecap="round">' + ''.join(el) + '</svg>'
     return ''
 
+def callouts(svg, holes):
+    """Letter each hole size on a flat pattern: every circle gets class hN (N = its row in the hole table), and the
+    first circle of each size gets the letter beside it. Sizes are matched to the nearest table row within 0.004 in."""
+    if not svg or not holes: return svg
+    vb = [float(x) for x in re.search(r'viewBox="([^"]+)"', svg).group(1).split()]
+    fs = max(vb[2], vb[3]) / 26
+    seen, labels = set(), []
+    def one(m):
+        cx, cy, r = float(m.group(1)), float(m.group(2)), float(m.group(3))
+        i = min(range(len(holes)), key=lambda k: abs(holes[k]['dia'] - 2 * r))
+        if abs(holes[i]['dia'] - 2 * r) > 0.004: return m.group(0)
+        if i not in seen:
+            seen.add(i)
+            labels.append(f'<text x="{cx + r + fs * 0.2:.3f}" y="{cy - r - fs * 0.1:.3f}" class="h{i}" font-size="{fs:.3f}">{chr(65 + i)}</text>')
+        return f'<circle cx="{m.group(1)}" cy="{m.group(2)}" r="{m.group(3)}" class="h{i}"/>'
+    svg = re.sub(r'<circle cx="([-0-9.]+)" cy="([-0-9.]+)" r="([-0-9.]+)"(?: class="small")?/>', one, svg)
+    return svg.replace('</svg>', ''.join(labels) + '</svg>')
+
 # which drawing sheet shows each part best: the sheet of its own subsystem's drawing that names it most often
 # (ties go to the later sheet, since detail sheets follow the assembly sheet)
 counts = {}
@@ -193,14 +211,15 @@ for p in merged:
     pdf, page = max(own.items(), key=lambda kv: (kv[1], kv[0][1]))[0] if own else (home, p['page'] or 1)
     name = p['name']; name = re.sub(r'\s*\(DXF\)', '', name).strip(); name = name[0].upper() + name[1:] if name else p['mark']
     d = p['dxf'][0] if p['dxf'] else None
+    holes = [dict(dia=dia, n=n, drill=hole_use(dia)[0], use=hole_use(dia)[1]) for dia, n in d['holes']] if d else []
     site.append(dict(
         mark=p['mark'], slug=p['mark'].lower(), name=name, sub=p['sub'] or 'Robot', qty=qty_text(qty), kind=kind, machine=MACHINE[kind],
         stock=(p['stock'] or (f"{fnum(d['thick'])} in {'polycarbonate' if 'polycarbonate' in kind else 'steel' if kind == 'steel plate' else '6061 aluminium'} sheet" if d else '') or (p['printed']['material'] if p['printed'] else '')),
         size=p['size'] or (f"{fnum(d['w'])} × {fnum(d['h'])} in" if d else '') or (p['printed']['size'] + ' in' if p['printed'] else ''),
         detail=(p['printed']['what'] if p['printed'] else (p['labels'][0] if p['labels'] else '')),
         thick=d['thick'] if d else None, w=d['w'] if d else None, h=d['h'] if d else None,
-        holes=[dict(dia=dia, n=n, drill=hole_use(dia)[0], use=hole_use(dia)[1]) for dia, n in d['holes']] if d else [],
-        dxf=[f"{x['folder']}/{x['file']}" for x in p['dxf']], pdf=pdf, page=page, steps=steps, checks=checks, outline=outline_svg(p)))
+        holes=holes,
+        dxf=[f"{x['folder']}/{x['file']}" for x in p['dxf']], pdf=pdf, page=page, steps=steps, checks=checks, outline=callouts(outline_svg(p), holes)))
 order = ['Drivebase', 'Elevator', 'Wrist and claw', 'Funnel', 'Climber', 'Electronics', 'Bumpers', 'Robot']
 site.sort(key=lambda s: (order.index(s['sub']), s['mark']))
 os.makedirs(SITE + '/src/data', exist_ok=True)

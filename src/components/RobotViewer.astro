@@ -1,0 +1,55 @@
+---
+// Embeds the 3D robot from public/robot-viewer/ (built from the final CAD by tools/make_viewer_data.py).
+// mode: "explore" click a part to name it and open its page
+//       "part"    one made part, alone or in place on the robot (needs `part`, the mark)
+//       "keepout" the wrist keep-out table as a chart beside the model
+//       "replay"  no controls: the page posts each pose to it (see AutoReplay.astro)
+interface Props {
+  title: string;
+  mode?: 'explore' | 'part' | 'keepout' | 'replay';
+  part?: string;
+  height?: number;
+}
+
+const { title, mode = 'explore', part, height = mode === 'part' ? 410 : mode === 'replay' ? 400 : 820 } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const src = `${base}/robot-viewer/index.html?mode=${mode}${part ? `&part=${encodeURIComponent(part)}` : ''}`;
+---
+
+<iframe class="robot-viewer not-content" src={src} title={title} loading="lazy" style={`height:${height}px`}></iframe>
+
+<script>
+  // Keep the embedded model in step with the site's light or dark theme, and size the frame to its content.
+  for (const frame of document.querySelectorAll<HTMLIFrameElement>('iframe.robot-viewer')) {
+    const sync = () => {
+      const doc = frame.contentDocument;
+      if (!doc?.documentElement) return;
+      doc.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+      const height = doc.body ? doc.body.scrollHeight : 0;
+      if (height > 0) frame.style.height = `${height}px`;
+    };
+    const attach = () => {
+      sync();
+      const doc = frame.contentDocument;
+      if (doc?.body && 'ResizeObserver' in window) new ResizeObserver(sync).observe(doc.body);
+    };
+    frame.addEventListener('load', attach);
+    if (frame.contentDocument?.readyState === 'complete') attach();
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+</script>
+
+<style>
+  .robot-viewer {
+    display: block;
+    width: 100%;
+    margin-block: 1.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.375rem;
+  }
+  @media print {
+    .robot-viewer {
+      display: none;
+    }
+  }
+</style>

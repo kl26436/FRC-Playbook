@@ -40,6 +40,10 @@ export default defineConfig({
                                 "slug": "subsystems/from-concept-to-design"
                         },
                         {
+                                "label": "The whole robot in 3D",
+                                "slug": "subsystems/robot-in-3d"
+                        },
+                        {
                                 "label": "Drivebase",
                                 "slug": "subsystems/drivebase"
                         },

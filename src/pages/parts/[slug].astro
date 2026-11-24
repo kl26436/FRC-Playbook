@@ -4,6 +4,8 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import QRCode from 'qrcode';
 import parts from '../../data/parts.json';
+import RobotViewer from '../../components/RobotViewer.astro';
+import model from '../../../public/robot-viewer/robot.json';
 
 export function getStaticPaths() {
   return parts.map((part) => ({ params: { slug: part.slug }, props: { part } }));
@@ -16,7 +18,10 @@ const qr = await QRCode.toString(here, { type: 'svg', margin: 0, errorCorrection
 const sheet = `${base}/files/sheets/${part.pdf.replace('.pdf', '')}-${part.page}.jpg`;
 const pdf = `${base}/files/drawings/${part.pdf}#page=${part.page}`;
 const fmt = (n: number) => String(Number(n.toFixed(3)));
+const inModel = part.mark in (model.made as Record<string, unknown>);
+const letter = (i: number) => String.fromCharCode(65 + i);
 const headings = [
+  ...(inModel ? [{ depth: 2, slug: 'see-it', text: 'See it' }] : []),
   { depth: 2, slug: 'how-to-make-it', text: 'How to make it' },
   { depth: 2, slug: 'check-it', text: 'Check it' },
   { depth: 2, slug: 'drawing', text: 'Drawing' },
@@ -42,11 +47,20 @@ const headings = [
     {part.detail && <p class="detail">{part.detail.charAt(0).toUpperCase() + part.detail.slice(1)}.</p>}
 
     {
+      inModel && (
+        <div class="no-print">
+          <h2 id="see-it">See it</h2>
+          <RobotViewer title={`${part.mark} in 3D`} mode="part" part={part.mark} />
+        </div>
+      )
+    }
+
+    {
       part.outline && (
         <figure class="outline">
           <div set:html={part.outline} />
           <figcaption>
-            The flat pattern, {fmt(part.w!)} × {fmt(part.h!)} in. Holes drawn in orange are drilled. Everything else is cut with an end mill.
+            The flat pattern, {fmt(part.w!)} × {fmt(part.h!)} in. Each letter marks one hole size, listed in the table below.
           </figcaption>
         </figure>
       )
@@ -56,11 +70,11 @@ const headings = [
       part.holes.length > 0 && (
         <table class="holes">
           <thead>
-            <tr><th>Hole</th><th>How many</th><th>Cut with</th><th>Usually for</th></tr>
+            <tr><th>Mark</th><th>Hole</th><th>How many</th><th>Cut with</th><th>Usually for</th></tr>
           </thead>
           <tbody>
-            {part.holes.map((h) => (
-              <tr><td>{fmt(h.dia)} in</td><td>{h.n}</td><td>{h.drill}</td><td>{h.use}</td></tr>
+            {part.holes.map((h, i) => (
+              <tr><td><span class={`key h${i}`}>{letter(i)}</span></td><td>{fmt(h.dia)} in</td><td>{h.n}</td><td>{h.drill}</td><td>{h.use}</td></tr>
             ))}
           </tbody>
         </table>
@@ -133,8 +147,49 @@ const headings = [
     width: 100%;
     max-height: 22rem;
   }
-  .outline :global(.small) {
-    stroke: #cf6a0a;
+  .outline :global(circle[class^='h']) {
+    stroke: currentColor;
+    fill: currentColor;
+    fill-opacity: 0.18;
+  }
+  .outline :global(text) {
+    fill: currentColor;
+    stroke: #ffffff;
+    stroke-width: 0.25em;
+    paint-order: stroke;
+    font-weight: 700;
+    font-family: var(--sl-font-system);
+  }
+  .outline :global(.h0),
+  .key.h0 {
+    color: #b85c00;
+  }
+  .outline :global(.h1),
+  .key.h1 {
+    color: #1846b8;
+  }
+  .outline :global(.h2),
+  .key.h2 {
+    color: #17764f;
+  }
+  .outline :global(.h3),
+  .key.h3 {
+    color: #7a3ea3;
+  }
+  .outline :global(.h4),
+  .key.h4 {
+    color: #c23b33;
+  }
+
+  .key {
+    display: inline-block;
+    min-width: 1.5em;
+    padding: 0 0.3em;
+    text-align: center;
+    font-weight: 700;
+    background: #ffffff;
+    border: 1.5px solid currentColor;
+    border-radius: 0.25rem;
   }
   .outline figcaption {
     margin-top: 0.75rem;
@@ -235,6 +290,12 @@ const headings = [
     .holes :global(td),
     .holes :global(th) {
       padding: 0.15rem 0.6rem 0.15rem 0;
+    }
+    .key {
+      border: 0;
+      padding: 0;
+      min-width: 0;
+      line-height: inherit;
     }
   }
 </style>

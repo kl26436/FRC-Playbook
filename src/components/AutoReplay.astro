@@ -1,7 +1,9 @@
 ---
-// Plays a simulated run on the field map: the robot's true path, its elevator and wrist, and each score.
+// Plays a simulated run: the robot's true path on the field map, and the 3D robot moving its elevator, wrist,
+// climber fork and funnel tray as recorded. The climb has no path, so it shows the 3D robot alone.
 // Recordings live in public/replays/ and are copied from the robot code repo by scripts/fetch-replays.mjs.
 import fieldMap from '../assets/field-map.svg';
+import RobotViewer from './RobotViewer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
@@ -32,21 +34,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </svg>
 
     <div class="replay-side">
-      <svg class="replay-mech" viewBox="0 0 120 190" role="img" aria-label="Side view of the elevator and wrist">
-        <line x1="10" y1="180" x2="110" y2="180" class="floor"></line>
-        <rect x="27" y="166" width="62" height="12" class="frame"></rect>
-        <line x1="58" y1="166" x2="58" y2="17" class="mast"></line>
-        <g data-carriage>
-          <circle cx="58" cy="0" r="4" class="pivot"></circle>
-          <line data-wrist x1="58" y1="0" x2="86" y2="0" class="wrist"></line>
-        </g>
-        <text x="4" y="12" class="mech-label">Side view</text>
-      </svg>
+      <RobotViewer title="The robot's mechanisms at this moment in the run" mode="replay" />
       <dl>
         <div><dt>Carriage</dt><dd data-carriage-text>0.0 in</dd></div>
         <div><dt>Wrist</dt><dd data-wrist-text>-90°</dd></div>
-        <div><dt>Holding</dt><dd data-holding>nothing</dd></div>
-        <div><dt>Scored</dt><dd data-scored>nothing yet</dd></div>
+        <div data-holding-row><dt>Holding</dt><dd data-holding>nothing</dd></div>
+        <div><dt data-scored-label>Scored</dt><dd data-scored>nothing yet</dd></div>
       </dl>
     </div>
   </div>
@@ -57,12 +50,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const IN_PER_M = 1 / 0.0254;
   const FIELD_HEIGHT_IN = 317; // the map's y runs down the page, the field's y runs up
 
-  type Replay = { label: string; columns: string[]; events: { t: number; what: string; branch?: string; level?: string }[]; samples: number[][] };
+  type Replay = { label: string; code?: string; recorded?: string; columns: string[]; events: { t: number; what: string; branch?: string; level?: string }[]; samples: number[][] };
 
   // Where each branch sits on the map, so a score can be marked on it.
   const BRANCH: Record<string, [number, number]> = {
     A: [145.6, 152.0], B: [145.6, 165.0], C: [155.6, 182.2], D: [166.8, 188.7], E: [186.7, 188.7], F: [197.9, 182.2],
     G: [207.9, 165.0], H: [207.9, 152.0], I: [197.9, 134.8], J: [186.7, 128.3], K: [166.8, 128.3], L: [155.6, 134.8],
+  };
+
+  // The climb's steps, in plain words.
+  const STEP: Record<string, string> = {
+    STOWED: 'stowed', PREPARING: 'moving to the climb pose', OPENING: 'funnel opening', TENSIONING: 'winding in to unload the pawls',
+    LIFTING: 'lifting the pawls', PAYING_OUT: 'letting the fork down', DEPLOYED: 'fork down, waiting for the cage', WINDING: 'winding in', CLIMBED: 'climbed',
   };
 
   for (const box of document.querySelectorAll<HTMLElement>('.replay[data-replays]')) {
@@ -75,8 +74,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     const robot = q<SVGGElement>('[data-robot]');
     const trail = q<SVGPolylineElement>('[data-trail]');
     const scores = q<SVGGElement>('[data-scores]');
-    const carriage = q<SVGGElement>('[data-carriage]');
-    const wrist = q<SVGLineElement>('[data-wrist]');
+    const field = q<SVGSVGElement>('.replay-field');
+    const model = q<HTMLIFrameElement>('iframe.robot-viewer');
     const note = q<HTMLElement>('[data-note]');
 
     let run: Replay | null = null;
@@ -104,23 +103,28 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         wrist: v('wrist_deg'),
         coral: 'coral' in col ? a[col.coral] > 0.5 : false,
         algae: 'algae' in col ? a[col.algae] > 0.5 : false,
+        fork: 'fork_deg' in col ? v('fork_deg') : 90,
+        tray: 'tray_deg' in col ? v('tray_deg') : 0,
       };
     }
 
     function draw() {
       if (!run) return;
       const p = at(t);
-      robot.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${(-p.heading).toFixed(1)})`);
-      const pts = run.samples
-        .filter((s) => s[0] <= t + 1e-6)
-        .map((s) => `${(s[col.x_m] * IN_PER_M).toFixed(1)},${(FIELD_HEIGHT_IN - s[col.y_m] * IN_PER_M).toFixed(1)}`);
-      pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
-      trail.setAttribute('points', pts.join(' '));
-
-      // Side view at 1.8 px to the inch: the wrist pivot rests 24.5 in above the carpet (y = 180).
-      const cy = 180 - (24.5 + p.carriage) * 1.8;
-      carriage.setAttribute('transform', `translate(0 ${cy.toFixed(1)})`);
-      wrist.setAttribute('transform', `rotate(${(-p.wrist).toFixed(1)} 58 0)`);
+      const onField = 'x_m' in col;
+      if (onField) {
+        robot.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${(-p.heading).toFixed(1)})`);
+        const pts = run.samples
+          .filter((s) => s[0] <= t + 1e-6)
+          .map((s) => `${(s[col.x_m] * IN_PER_M).toFixed(1)},${(FIELD_HEIGHT_IN - s[col.y_m] * IN_PER_M).toFixed(1)}`);
+        pts.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
+        trail.setAttribute('points', pts.join(' '));
+      }
+      // The 3D robot takes the same four numbers the recording holds.
+      model.contentWindow?.postMessage(
+        { type: 'pose', c: p.carriage, th: p.wrist, psi: p.fork, tray: p.tray, view: onField ? 'auto' : 'climb' },
+        window.location.origin,
+      );
 
       const done = run.events.filter((e) => e.t <= t + 1e-6);
       scores.replaceChildren(
@@ -135,10 +139,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             return c;
           }),
       );
-      const said = done.map((e) =>
-        e.what === 'coral' ? `${e.branch} at ${e.level} (${e.t.toFixed(1)} s)` : e.what === 'net' ? `algae in the net (${e.t.toFixed(1)} s)` : `${e.what} (${e.t.toFixed(1)} s)`,
-      );
-      q('[data-scored]').textContent = said.length ? said.join(', ') : 'nothing yet';
+      const steps = done.filter((e) => e.what in STEP);
+      const said = done
+        .filter((e) => !(e.what in STEP))
+        .map((e) => (e.what === 'coral' ? `${e.branch} at ${e.level} (${e.t.toFixed(1)} s)` : e.what === 'net' ? `algae in the net (${e.t.toFixed(1)} s)` : `${e.what} (${e.t.toFixed(1)} s)`));
+      q('[data-scored-label]').textContent = onField ? 'Scored' : 'Step';
+      q('[data-scored]').textContent = onField ? (said.length ? said.join(', ') : 'nothing yet') : steps.length ? STEP[steps[steps.length - 1].what] : 'stowed';
+      q<HTMLElement>('[data-holding-row]').style.display = onField ? '' : 'none';
       q('[data-holding]').textContent = [p.coral ? 'a coral' : '', p.algae ? 'an algae' : ''].filter(Boolean).join(' and ') || 'nothing';
       q('[data-carriage-text]').textContent = `${p.carriage.toFixed(1)} in`;
       q('[data-wrist-text]').textContent = `${p.wrist.toFixed(0)}°`;
@@ -167,6 +174,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       run = data;
       col = Object.fromEntries(data.columns.map((name, i) => [name, i]));
       scrub.max = String(data.samples[data.samples.length - 1][0]);
+      const onField = 'x_m' in col;
+      field.style.display = onField ? '' : 'none';
+      box.classList.toggle('no-field', !onField);
+      const stamp = data.code ? ` Recorded from code commit ${data.code}${data.recorded ? ` on ${data.recorded}` : ''}.` : '';
+      note.textContent = onField
+        ? `Simulated. The solid line is where the robot really went in the simulator. The lighter arrows underneath are the routes planned on kickoff day.${stamp}`
+        : `Simulated. Between "fork down, waiting for the cage" and "winding in" the driver backs onto the cage. The recording does not show that: the robot stays where it is.${stamp}`;
       t = 0;
       draw();
     }
@@ -186,12 +200,15 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       draw();
     });
     pick.addEventListener('change', () => load(pick.value));
+    // The 3D robot loads after the first frame is drawn: pose it again once it says it is ready.
+    window.addEventListener('message', (e) => {
+      if (e.source === model.contentWindow && e.data?.type === 'robot-viewer-ready') draw();
+    });
 
     fetch(`${root}/index.json`)
       .then((r) => r.json())
       .then((list: { file: string; label: string; columns: string[] }[]) => {
-        // Only runs that record a position on the field can be drawn on the map.
-        const usable = list.filter((r) => r.columns.includes('x_m'));
+        const usable = list;
         if (!usable.length) throw new Error('none');
         pick.replaceChildren(...usable.map((r) => new Option(r.label, r.file)));
         const first = usable.find((r) => r.file.startsWith('three_')) ?? usable[0];
@@ -253,7 +270,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   }
   .replay-body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 11rem;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
     background: #ffffff;
     color: #0f2029;
   }
@@ -262,8 +279,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       grid-template-columns: 1fr;
     }
     .replay-side {
-      display: grid;
-      grid-template-columns: 7rem 1fr;
       border-left: 0;
       border-top: 1px solid #d3dae0;
     }
@@ -275,15 +290,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   }
   .replay-side {
     border-left: 1px solid #d3dae0;
-    padding: 0.5rem;
     font-size: var(--sl-text-xs);
   }
-  .replay-mech {
-    display: block;
-    width: 100%;
-    max-width: 9rem;
-    height: auto;
-    margin-inline: auto;
+  .replay-side :global(iframe.robot-viewer) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid #d3dae0;
+  }
+  .replay.no-field .replay-body {
+    grid-template-columns: 1fr;
+  }
+  dl {
+    padding: 0.5rem 0.75rem;
   }
   dl {
     margin: 0.25rem 0 0;
@@ -323,30 +342,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     fill: #ffffff;
     stroke: #1c7c54;
     stroke-width: 2.5;
-  }
-  .floor {
-    stroke: #55646e;
-    stroke-width: 2;
-  }
-  .frame {
-    fill: #1846b8;
-  }
-  .mast {
-    stroke: #d3dae0;
-    stroke-width: 6;
-    stroke-linecap: round;
-  }
-  .pivot {
-    fill: #0f2029;
-  }
-  .wrist {
-    stroke: #7a3ea3;
-    stroke-width: 5;
-    stroke-linecap: round;
-  }
-  .mech-label {
-    font-size: 9px;
-    fill: #55646e;
   }
   .replay-note {
     margin: 0;
