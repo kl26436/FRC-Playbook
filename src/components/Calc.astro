@@ -132,6 +132,8 @@ const show = (n: number, digits: number) => (Number.isFinite(n) ? n.toFixed(digi
     width: 6.5rem;
     padding: 0.25rem 0.5rem;
     font: inherit;
+    /* 16px stops iPhones zooming the page when a field is tapped */
+    font-size: 16px;
     font-variant-numeric: tabular-nums;
     text-align: right;
     color: var(--sl-color-white);
