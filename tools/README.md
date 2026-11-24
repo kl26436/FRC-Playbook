@@ -90,8 +90,9 @@ method before rebuilding, and update the commit named in each page's note.
   lines of the robot code and writes the page to `src/content/docs/code/`. Edit the page here, not there.
 - `code-pages/make_control_data.py <ClaudeBot clone>` reads the setpoints, gains and limits out of the code and writes
   `src/data/control.json`. The Setpoints and control page draws its chart, its gain tables and its model from that file.
-- `replay-recorder/` holds the test that records the runs played back on One button to score and How the camera finds
-  the robot. Its README says how to record, and why the copies in this repo carry a caveat.
+- The runs played back on One button to score, How the camera finds the robot and Setpoints and control are recorded by
+  the robot code's own test, `src/test/java/frc/robot/subsystems/vision/PlaybookReplayTest.java` in ClaudeBot. Its
+  `docs/playbook/replays/README.md` says how to record. The site's build fetches the files (`scripts/fetch-replays.mjs`).
 
 ## The field in the replays
 

@@ -7,7 +7,7 @@ import AutoReplay from '../../../components/AutoReplay.astro';
 import Flow from '../../../components/Flow.astro';
 
 :::note[Draft]
-The code on this page is copied from the robot code as it was on November 23 (commit `67a30bb`). It has run in the simulator. It has not run on a real robot.
+The code on this page is copied from the robot code as it was on November 24 (commit `407e9ff`). It has run in the simulator. It has not run on a real robot.
 :::
 
 The driver holds one trigger. The robot picks the branch, drives to it, raises the elevator on the way, lets go of the coral when everything is lined up, and stows. The same command scores in the autos. This page follows it from the button to the stow.
@@ -58,15 +58,21 @@ Nothing here says red or blue. The tag's position is looked up for the alliance,
 
 ## 3. Getting there
 
-@@CODE main/java/frc/robot/commands/ScoreCommands.java 245 257 ScoreCommands.java, inside RouteCommand@@
+@@CODE main/java/frc/robot/commands/ScoreCommands.java 265 283 ScoreCommands.java, inside RouteCommand@@
 
-The route is planned once, when the command starts. If the straight line to the spot would pass within 1.69 m of the centre of the reef, `Reef.route` adds points on a circle 2.0 m from the centre, so the robot goes round the reef and not through it. When the robot gets within 0.25 m of one of those points it heads for the next.
+The route is planned when the command starts. If the straight line to the spot would pass within 1.69 m of the centre of the reef, `Reef.route` adds points on a circle 2.0 m from the centre, so the robot goes round the reef and not through it. When the robot gets within 0.25 m of one of those points it heads for the next.
 
 If the robot does not know its alliance, the command ends at once and does nothing. It will not guess which reef is ours.
 
+The route is planned again if the robot's idea of where it is jumps:
+
+@@CODE main/java/frc/robot/commands/ScoreCommands.java 295 299 ScoreCommands.java, inside RouteCommand@@
+
+A jump of more than 0.4 m in one loop means the camera has corrected the position. The old route started from the wrong place, so it is thrown away. [How the camera finds the robot](../vision/) has a recording of that happening.
+
 ## 4. Raise on the way, release when ready
 
-@@CODE main/java/frc/robot/commands/ScoreCommands.java 63 106 ScoreCommands.java@@
+@@CODE main/java/frc/robot/commands/ScoreCommands.java 71 124 ScoreCommands.java@@
 
 `step()` runs 50 times a second while the robot drives. It makes two decisions.
 
@@ -80,11 +86,13 @@ If the robot does not know its alliance, the command ends at once and does nothi
 | `r.drive().atTarget()` | It is within 3 cm and 2° of the spot |
 | `s.atPose()` | The carriage is within 0.5 in and the wrist within 1.5° of the scoring pose |
 
+There is one more hold. If the camera has just seen the tag somewhere the robot's position cannot explain, `doubtsThePosition()` is true and the release waits, for 0.6 s at most. Letting go of a coral is the one thing the command cannot take back, so it does not do it while the robot is unsure where it is.
+
 `start()` also tells the camera which reef face to watch. That is the only tag the robot will take a position fix from. [How the camera finds the robot](../vision/) follows that part.
 
 ## 5. Knowing the coral is gone
 
-@@CODE main/java/frc/robot/commands/ScoreCommands.java 41 49 ScoreCommands.java@@
+@@CODE main/java/frc/robot/commands/ScoreCommands.java 42 50 ScoreCommands.java@@
 
 | Situation | The release ends |
 | --- | --- |

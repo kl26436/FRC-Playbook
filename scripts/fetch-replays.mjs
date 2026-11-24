@@ -15,9 +15,9 @@ const FILES = [
   'centre_h_algae',
   'climb',
 ];
-// Recordings a page names itself (see tools/replay-recorder). They are fetched like the others when the robot
-// code repo has them, but are not offered in the list of autos.
-const NAMED = ['teleop_cycle', 'vision_fix', 'vision_rejected'];
+// Recordings a page names itself. The robot code's PlaybookReplayTest makes them. They are fetched like the
+// others, but are not offered in the list of autos.
+const NAMED = ['teleop_cycle', 'vision_fix', 'vision_rejected', 'elevator_move'];
 const dir = fileURLToPath(new URL('../public/replays/', import.meta.url));
 await mkdir(dir, { recursive: true });
 

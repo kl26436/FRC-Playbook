@@ -7,7 +7,7 @@ import AutoReplay from '../../../components/AutoReplay.astro';
 import Flow from '../../../components/Flow.astro';
 
 :::note[Draft]
-The code on this page is copied from the robot code as it was on November 23 (commit `67a30bb`). It has run in the simulator. It has not run on a real robot.
+The code on this page is copied from the robot code as it was on November 24 (commit `407e9ff`). It has run in the simulator. It has not run on a real robot.
 :::
 
 The driver holds one trigger. The robot picks the branch, drives to it, raises the elevator on the way, lets go of the coral when everything is lined up, and stows. The same command scores in the autos. This page follows it from the button to the stow.
@@ -90,22 +90,40 @@ Nothing here says red or blue. The tag's position is looked up for the alliance,
 ```java title="ScoreCommands.java, inside RouteCommand"
 @Override
 public final void initialize() {
-    Optional<Alliance> alliance = RobotState.get().alliance();
-    noAlliance = alliance.isEmpty();
+    Optional<Alliance> known = RobotState.get().alliance();
+    noAlliance = known.isEmpty();
     if (noAlliance) {
         return;
     }
-    target = targetFor.apply(alliance.get());
-    route = Reef.route(alliance.get(), r.drive().pose().getTranslation(), target);
+    alliance = known.get();
+    target = targetFor.apply(alliance);
+    start(alliance, target);
+    plan();
+}
+
+private void plan() {
+    lastAt = r.drive().pose().getTranslation();
+    route = Reef.route(alliance, lastAt, target);
     leg = 0;
-    start(alliance.get(), target);
     driveLeg();
 }
 ```
 
-The route is planned once, when the command starts. If the straight line to the spot would pass within 1.69 m of the centre of the reef, `Reef.route` adds points on a circle 2.0 m from the centre, so the robot goes round the reef and not through it. When the robot gets within 0.25 m of one of those points it heads for the next.
+The route is planned when the command starts. If the straight line to the spot would pass within 1.69 m of the centre of the reef, `Reef.route` adds points on a circle 2.0 m from the centre, so the robot goes round the reef and not through it. When the robot gets within 0.25 m of one of those points it heads for the next.
 
 If the robot does not know its alliance, the command ends at once and does nothing. It will not guess which reef is ours.
+
+The route is planned again if the robot's idea of where it is jumps:
+
+```java title="ScoreCommands.java, inside RouteCommand"
+Translation2d at = drive.pose().getTranslation();
+if (at.getDistance(lastAt) > REPLAN_JUMP_M) {
+    plan(); // the camera has moved the estimate: the old route started somewhere else
+}
+lastAt = at;
+```
+
+A jump of more than 0.4 m in one loop means the camera has corrected the position. The old route started from the wrong place, so it is thrown away. [How the camera finds the robot](../vision/) has a recording of that happening.
 
 ## 4. Raise on the way, release when ready
 
@@ -119,11 +137,13 @@ public static Command alignAndScore(
     return new RouteCommand(r, a -> Reef.scoringPose(a, branch.get()), maxSpeedMps, teleopGains) {
         private Wanted chosen;
         private double releasedAtS;
+        private double readySinceS;
 
         @Override
         void start(Alliance a, Pose2d target) {
             chosen = level.get();
             releasedAtS = Double.NaN;
+            readySinceS = Double.NaN;
             r.vision().setTargetFace(Optional.of(Reef.nearestFace(a, target.getTranslation())));
         }
 
@@ -133,9 +153,17 @@ public static Command alignAndScore(
             if (distanceToTargetM() <= RAISE_DISTANCE_M && s.wanted() != chosen) {
                 s.setWanted(chosen);
             }
-            if (Double.isNaN(releasedAtS) && onFinalLeg() && r.drive().atTarget() && s.atPose()) {
-                s.requestRelease(true);
-                releasedAtS = Timer.getFPGATimestamp();
+            double now = Timer.getFPGATimestamp();
+            if (!(onFinalLeg() && r.drive().atTarget() && s.atPose())) {
+                readySinceS = Double.NaN;
+            } else if (Double.isNaN(releasedAtS)) {
+                if (Double.isNaN(readySinceS)) {
+                    readySinceS = now;
+                }
+                if (!r.vision().doubtsThePosition() || now - readySinceS >= DOUBT_LIMIT_S) {
+                    s.requestRelease(true);
+                    releasedAtS = now;
+                }
             }
         }
 
@@ -167,6 +195,8 @@ public static Command alignAndScore(
 | `onFinalLeg()` | The robot is past the reef corners and heading for the spot itself |
 | `r.drive().atTarget()` | It is within 3 cm and 2° of the spot |
 | `s.atPose()` | The carriage is within 0.5 in and the wrist within 1.5° of the scoring pose |
+
+There is one more hold. If the camera has just seen the tag somewhere the robot's position cannot explain, `doubtsThePosition()` is true and the release waits, for 0.6 s at most. Letting go of a coral is the one thing the command cannot take back, so it does not do it while the robot is unsure where it is.
 
 `start()` also tells the camera which reef face to watch. That is the only tag the robot will take a position fix from. [How the camera finds the robot](../vision/) follows that part.
 

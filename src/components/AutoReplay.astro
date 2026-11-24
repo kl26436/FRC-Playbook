@@ -123,7 +123,6 @@ const mapSrc = files ? plainMap : fieldMap.src;
   type Replay = {
     label: string;
     note?: string;
-    caveat?: string;
     code?: string;
     recorded?: string;
     tags?: Record<string, [number, number]>;
@@ -355,7 +354,7 @@ const mapSrc = files ? plainMap : fieldMap.src;
           'none',
           `not used: tag ${p.tag} is not on the target face`,
           'used',
-          `refused: ${(off * 0.0254).toFixed(2)} m from the estimate`,
+          `refused for now: ${(off * 0.0254).toFixed(2)} m from the estimate`,
           'refused: the numbers are broken',
         ][state];
         q('[data-err-text]').textContent = `${(off * 0.0254).toFixed(2)} m (${off.toFixed(0)} in)`;
@@ -476,7 +475,7 @@ const mapSrc = files ? plainMap : fieldMap.src;
       frame();
       tags();
       note.textContent = given
-        ? `Simulated. ${data.note ?? ''}${stamp}${data.caveat ? ` ${data.caveat}` : ''}`
+        ? `Simulated. ${data.note ?? ''}${stamp}`
         : onField
         ? `Simulated. The solid line is where the robot really went in the simulator. The lighter arrows underneath are the routes planned on kickoff day.${stamp}`
         : `Simulated. Between "fork down, waiting for the cage" and "winding in" the driver backs onto the cage. The recording does not show that: the robot stays where it is.${stamp}`;

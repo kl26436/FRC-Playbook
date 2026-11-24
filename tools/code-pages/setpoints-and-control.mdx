@@ -7,11 +7,12 @@ import Calc from '../../../components/Calc.astro';
 import Flow from '../../../components/Flow.astro';
 import GainLab from '../../../components/GainLab.astro';
 import GainTable from '../../../components/GainTable.astro';
+import MoveTrace from '../../../components/MoveTrace.astro';
 import ProfileCheck from '../../../components/ProfileCheck.astro';
 import SetpointChart from '../../../components/SetpointChart.astro';
 
 :::note[Draft]
-The code and numbers on this page are from the robot code as it was on November 23 (commit `67a30bb`). Every elevator and wrist gain is marked `PLACEHOLDER(tuning)` in the code. They work in the simulator. None has been tried on a real robot.
+The code and numbers on this page are from the robot code as it was on November 24 (commit `407e9ff`). Every elevator and wrist gain is marked `PLACEHOLDER(tuning)` in the code. They work in the simulator. None has been tried on a real robot.
 :::
 
 A setpoint is a position with a name, like `L4`. A control loop is what gets the mechanism there and holds it. This page follows one request from the name to the volts.
@@ -76,7 +77,22 @@ Cruising takes 10.3 V of the battery's 12. That is why cruise is set at 110 in/s
 
 The [elevator page](../../subsystems/elevator/) works the holding voltage by hand and gets about 0.6 V. Two things differ. It used the motor's figures without FOC, and it allowed 15% for losses in the gearbox. With FOC figures and the same allowance the answer is 0.46 V. The code uses 0.39 V, with no allowance. The real robot settles it: find the voltage that just holds the carriage still.
 
+## Watch the controller do it
+
+This is one move in the robot code's simulator, stow to L4 and back, with every 20 ms loop recorded.
+
+<MoveTrace />
+
+- **The goal moves in steps at first.** The carriage waits at 1.25 in while the wrist swings clear, and the planner lets it go a little at a time. That is [the planner](../superstructure/), not the controller.
+- **The volts follow the speed.** They ramp up as the carriage speeds up, sit flat at cruise, and ramp down. That shape is kV at work.
+- **At the top the volts do not go to zero.** They stay at about 0.39 V. That is kG holding the weight.
+- **Coming down, the volts go negative but the motors are still holding the weight back.** Gravity does the pulling.
+
+The simulator's motor current is left off. It jumps about from loop to loop in a way a real motor's does not.
+
 ## Try it
+
+The recording above is one move with one set of numbers. This model lets you change the numbers. With the robot's own, its volts make the same shape.
 
 <GainLab />
 

@@ -99,7 +99,7 @@ Holding the elevator still also takes voltage: 0.39 V in the code. [Setpoints an
 
 The climb is the one move that cannot be undone in a match, so the code is strict about it.
 
-1. **Hold the climb button.** The mechanism moves out of the way, the funnel swings open, and the fork comes down to level. Let go to pause at any point.
+1. **Hold the climb button.** The mechanism moves out of the way, the funnel swings open, and the fork comes down to level. Let go to pause at any point. Before the servos lift the pawls, the winch winds in half a tooth, 1.6° of fork, to take the load off them. A whole tooth is 3.2°, and winding in that far would drop the pawl over the next one.
 2. **Back onto the cage and hold the button again.** The winch winds the fork in and lifts the robot. Pawls stop it letting itself back down.
 
 - On a field, the climb is locked until the last 30 seconds.
