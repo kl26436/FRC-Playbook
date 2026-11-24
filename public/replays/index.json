@@ -1,0 +1,30 @@
+[
+  {
+    "file": "three_right_ecd.json",
+    "label": "3 Right: E, C, D",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  },
+  {
+    "file": "centre_h_algae.json",
+    "label": "Centre: H and algae",
+    "columns": [
+      "t_s",
+      "x_m",
+      "y_m",
+      "heading_deg",
+      "carriage_in",
+      "wrist_deg",
+      "coral",
+      "algae"
+    ]
+  }
+]

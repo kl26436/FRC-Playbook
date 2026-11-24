@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "replays": "node scripts/fetch-replays.mjs",
+    "predev": "node scripts/fetch-replays.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/fetch-replays.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },

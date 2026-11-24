@@ -3,6 +3,8 @@ title: "Driving, aiming and autos"
 description: "How the robot knows where it is, lines itself up to score, and runs its autonomous routines."
 ---
 
+import AutoReplay from '../../../components/AutoReplay.astro';
+
 :::note[Draft]
 First draft, written from the code and its notes as of November 23. Nothing here has run on a real robot yet.
 :::
@@ -70,6 +72,14 @@ Letting go of a trigger or bumper cancels the move.
 | Centre: H and algae | Centre | Preload on H at L4, take that face's algae and score it in the net |
 
 In simulation, every auto scores exactly the branches it lists, on both alliances, inside 15 seconds.
+
+### Watch one run
+
+These are recordings of the code driving the simulated robot, ten samples a second. Press Play, or drag the slider to step through.
+
+<AutoReplay />
+
+In the three-coral routines a station cycle takes about 5.6 s, of which 0.7 s is the wait for the human player. That leaves about 1.3 s spare out of the 15.
 
 ### How an auto is built
 

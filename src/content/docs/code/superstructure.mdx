@@ -71,7 +71,7 @@ The motor controllers do not jump to full speed. They follow a motion profile: s
 
 One motor turn moves the carriage 1.375 in: 22 teeth × 0.25 in of chain, × 3 for the three stages, ÷ the 12:1 gearbox.
 
-Holding the elevator still also takes voltage. The code starts with 0.46 V. The [hand calculation](../../subsystems/elevator/) gives about 0.6 V. Both are starting points, and the real value comes from tuning on the robot.
+Holding the elevator still also takes voltage. The code starts with 0.46 V. The [hand calculation](../../subsystems/elevator/) on the elevator page gives about 0.6 V. The difference is the motor data: the code's figure is for the motor running in its FOC mode, which the robot will use, and the hand calculation used the figures without it. Both are starting points, and the real value comes from tuning on the robot.
 
 ## The climb
 
