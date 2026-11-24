@@ -17,7 +17,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
-SRC = ARGS[0] if ARGS else '/mnt/user-data/uploads/RobotA_final_2026-11-23/3_docs/kickoff_brief/robotA/robotA_mesh.json'
+SRC = ARGS[0] if ARGS else '/home/claude/gen/r33/robotA_mesh_rev3.3.json'
 OPT = dict(a[2:].split('=', 1) for a in sys.argv[1:] if a.startswith('--') and '=' in a)
 OUT = OPT.get('out') or os.path.join(HERE, '..', 'public', 'robot-viewer')
 SUBS = ['Drivebase', 'Elevator', 'Wrist and claw', 'Funnel', 'Climber', 'Electronics', 'Bumpers']

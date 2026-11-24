@@ -7,7 +7,7 @@ import Calc from '../../../components/Calc.astro';
 import RobotViewer from '../../../components/RobotViewer.astro';
 
 :::note[Draft]
-First draft, written from the design log and the elevator drawings (Rev H). Nothing here has been built.
+First draft, written from the design log and the elevator drawings (Rev J). Nothing here has been built.
 :::
 
 The elevator carries the wrist from just above the frame to the top of the reef. It is the tallest and heaviest mechanism on the robot, so its speed, its motor current and the robot's balance all had to be worked out before anything was built.
@@ -127,7 +127,7 @@ That is a quarter of the unbraced sway. Wobble goes up to about 5.8 Hz, and the 
 
 The brace has to push back with V + 1.5 × Mb ÷ 27.25 = 53 lb sideways. It leans at an angle, so the push along it is 53 × 28.0 ÷ 10.5 = **142 lb**. A 1 × 1 × 1/16 tube 28 in long buckles at about 4,300 lb, so it has plenty of margin even at several g.
 
-**8. One brace or two?** With a brace on one side only, the braced upright moves 0.29 in and the other moves 1.1 in. The stages ride on both uprights, so the mast has to twist: (1.1 − 0.29) ÷ 25 in between the uprights = 0.032 rad, about **1.9° per g**. That twist pinches the bearing blocks and the stages bind. So it is **both sides or neither**. A second brace costs 0.75 lb.
+**8. One brace or two?** With a brace on one side only, the braced upright moves 0.29 in and the other moves 1.1 in. The stages ride on both uprights, so the mast has to twist: (1.1 − 0.29) ÷ 25 in between the uprights = 0.032 rad, about **1.9° per g**. That twist pinches the bearing blocks and the stages bind. So it is **both sides or neither**. The second brace and its gusset cost 0.85 lb.
 
 **What we checked it against.** A computer beam model of the same mast, with the brace allowed to stretch a little, gave 1.11 in unbraced, 0.33 in braced, 5,950 psi, 3.0 and 5.5 Hz, 138 lb in the brace and 1.8° of twist. The hand sums are within about 10%: close enough to make the decision.
 

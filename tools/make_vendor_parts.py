@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.join(CAD, 'common'))
 import layout as LAY
 from build123d import import_step, GeomType, Location, Plane, Pos
 
-SRC = sys.argv[5] if len(sys.argv) > 5 else '/mnt/user-data/uploads/RobotA_final_2026-11-23/3_docs/kickoff_brief/robotA/robotA_mesh.json'
+SRC = sys.argv[5] if len(sys.argv) > 5 else '/home/claude/gen/r33/robotA_mesh_rev3.3.json'
 J = json.load(open(SRC)); raw = base64.b64decode(J['bin_b64'])
 POS = np.frombuffer(raw, dtype=np.int16, count=J['pos_bytes'] // 2).reshape(-1, 3).astype(np.float64) * J['q']
 IDX = np.frombuffer(raw, dtype=np.uint32, offset=J['idx_offset'])

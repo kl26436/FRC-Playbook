@@ -1,6 +1,6 @@
 """Turn the merged parts list into the data the site renders: kind, machine, proposed route, outline, sheet."""
 import json, re, math, os, glob, subprocess, collections, sys
-PKG = '/mnt/user-data/uploads/RobotA_final_2026-11-23/1_cad_package_rev3.2'
+PKG = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/gen/r33/pkg/1_cad_package_rev3.3'        # the unpacked CAD package
 SITE = '/home/claude/frc-playbook'
 MERGED = '/home/claude/gen/parts/merged.json'
 merged = [p for p in json.load(open(MERGED)) if p['mark'] and not p['mark'].startswith('REV-') and p['src'] and p['mark'] != 'B-103']
@@ -198,8 +198,8 @@ for path in sorted(glob.glob('/tmp/robotA_*_drawings.txt')):
         for m in re.finditer(r'(?<![A-Z0-9-])((?:[A-Z]{1,3}|EL)-(?:[A-Z]+-)?\d{3})(?![0-9])', page):
             counts.setdefault(m.group(1), collections.Counter())[(pdf, n)] += 1
 pages = {}
-SUBPDF = {'Bumpers': 'robotA_bumpers_revC_drawings.pdf', 'Climber': 'robotA_climber_revC_drawings.pdf', 'Drivebase': 'robotA_drivebase_revF_drawings.pdf',
-          'Electronics': 'robotA_electronics_revD_drawings.pdf', 'Elevator': 'robotA_elevator_revH_drawings.pdf', 'Funnel': 'robotA_funnel_revF_drawings.pdf', 'Wrist and claw': 'robotA_wrist_claw_revE_drawings.pdf'}
+SUBKEY = {'Bumpers': 'bumpers', 'Climber': 'climber', 'Drivebase': 'drivebase', 'Electronics': 'electronics', 'Elevator': 'elevator', 'Funnel': 'funnel', 'Wrist and claw': 'wrist_claw'}
+SUBPDF = {sub: os.path.basename(glob.glob(f'{PKG}/drawings/robotA_{key}_rev?_drawings.pdf')[0]) for sub, key in SUBKEY.items()}   # the revision letter changes
 
 site = []
 for p in merged:
@@ -210,6 +210,7 @@ for p in merged:
     own = {k: v for k, v in counts.get(base, {}).items() if k[0] == home} or counts.get(base, {})
     pdf, page = max(own.items(), key=lambda kv: (kv[1], kv[0][1]))[0] if own else (home, p['page'] or 1)
     name = p['name']; name = re.sub(r'\s*\(DXF\)', '', name).strip(); name = name[0].upper() + name[1:] if name else p['mark']
+    if name.count('(') > name.count(')'): name = name[:name.rindex('(')].strip()      # a note the drawing's table column cut off
     d = p['dxf'][0] if p['dxf'] else None
     holes = [dict(dia=dia, n=n, drill=hole_use(dia)[0], use=hole_use(dia)[1]) for dia, n in d['holes']] if d else []
     site.append(dict(

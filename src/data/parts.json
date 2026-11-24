@@ -15,7 +15,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/8, 6061-T6. Make 2, each 20.00 in long.",
@@ -48,7 +48,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: 2x1 x 1/8, 6061-T6. Make 2, each 20.00 in long.",
@@ -81,7 +81,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: 2x1 x 1/8, 6061-T6. Make 1, each 26.00 in long.",
@@ -114,7 +114,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/8, 6061-T6. Make 1, each 7.25 in long.",
@@ -180,7 +180,7 @@
   "dxf": [
    "drivebase/D-201_belly_pan_0.063.dxf"
   ],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 1,
   "steps": [
    "Stock: 0.063 in 5052 aluminium sheet, at least 28.8 \u00d7 28.8 in for each part. Make 1.",
@@ -213,7 +213,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 1,
   "steps": [
    "Stock: 1x1x1/8 angle. Make 2. 3.00.",
@@ -242,7 +242,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 1,
   "steps": [
    "Stock: 1x1x1/8 angle. Make 2. 1.00.",
@@ -271,7 +271,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 1, each 26.00 in long.",
@@ -304,7 +304,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 2, each 35.00 in long.",
@@ -324,23 +324,23 @@
  {
   "mark": "E-103",
   "slug": "e-103",
-  "name": "Mast brace (right side only)",
+  "name": "Mast brace, L and R (mirror)",
   "sub": "Elevator",
-  "qty": "1",
+  "qty": "2",
   "kind": "tube",
   "machine": "Saw and mill",
   "stock": "1x1 x 1/16",
   "size": "29.91",
-  "detail": "mast brace 1x1 x 1/16 right side , lapped on the mast outer wall",
+  "detail": "mast brace 1x1 x 1/16, riveted to the right upright outer wall, foot on the rail",
   "thick": null,
   "w": null,
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 2,
   "steps": [
-   "Stock: 1x1 x 1/16, 6061-T6. Make 1, each 29.91 in long.",
+   "Stock: 1x1 x 1/16, 6061-T6. Make 2, each 29.91 in long.",
    "Saw each piece about 1/16 in over length.",
    "Square both ends on the mill and bring the piece to length. The elevator drawing asks for \u00b10.010 in, and the two uprights of one stage must match each other.",
    "Drill the holes on the mill from the hole table on the drawing. Measure from the end the drawing names. Use a #9 drill (0.196 in) for #10 screws and a #20 drill (0.161 in) for 5/32 rivets.",
@@ -357,14 +357,14 @@
  {
   "mark": "E-104",
   "slug": "e-104",
-  "name": "Brace foot gusset",
+  "name": "Brace foot gusset, one each side",
   "sub": "Elevator",
-  "qty": "1",
+  "qty": "2",
   "kind": "router, aluminium",
   "machine": "CNC router",
   "stock": "3/16 plate",
   "size": "2.57 \u00d7 5.45 in",
-  "detail": "brace foot gusset 3/16 in, riveted to the right rail inner wall and the brace",
+  "detail": "brace foot gusset 3/16 in one part, make 2 , riveted to the right rail inner wall and the brace",
   "thick": 0.188,
   "w": 2.57,
   "h": 5.45,
@@ -379,10 +379,10 @@
   "dxf": [
    "elevator/E-104_brace_foot_gusset_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 4,
   "steps": [
-   "Stock: 0.188 in 6061 aluminium sheet, at least 3.57 \u00d7 6.45 in for each part. Make 1.",
+   "Stock: 0.188 in 6061 aluminium sheet, at least 3.57 \u00d7 6.45 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `E-104_brace_foot_gusset_0.188.dxf` in the router software. It is drawn in inches at full size.",
    "Drill the small holes first, on the router, using its tool changer: 8 \u00d7 0.161 in with the #20 drill.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
@@ -410,7 +410,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Print 2 in Onyx (or mill from 6061).",
@@ -439,7 +439,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Print 1 in Onyx.",
@@ -469,7 +469,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Print 6 in TPU 95A.",
@@ -498,7 +498,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Print 1 in Onyx.",
@@ -527,7 +527,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 1, each 21.00 in long.",
@@ -560,7 +560,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 2, each 35.00 in long.",
@@ -608,7 +608,7 @@
   "dxf": [
    "elevator/E-203_chain_bracket_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.4 \u00d7 4 in for each part. Make 2.",
@@ -639,7 +639,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Print 2 in see the printed parts list.",
@@ -683,7 +683,7 @@
   "dxf": [
    "elevator/E-206_cap_plate_stage_A_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.95 \u00d7 3.7 in for each part. Make 2.",
@@ -715,7 +715,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Print 2 in see the printed parts list.",
@@ -744,7 +744,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 1, each 18.00 in long.",
@@ -777,7 +777,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 2, each 34.25 in long.",
@@ -825,7 +825,7 @@
   "dxf": [
    "elevator/E-306_cap_plate_stage_B_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 4.95 \u00d7 3.7 in for each part. Make 2.",
@@ -857,7 +857,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Stock: 1x1x1/8 angle. Make 2.",
@@ -886,7 +886,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Print 2 in see the printed parts list.",
@@ -915,7 +915,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 1, each 15.00 in long.",
@@ -948,7 +948,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/16, 6061-T6. Make 2, each 20.00 in long.",
@@ -1008,7 +1008,7 @@
   "dxf": [
    "elevator/E-403_pivot_plate_0.250.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: 0.25 in 6061 aluminium sheet, at least 3 \u00d7 7 in for each part. Make 2.",
@@ -1040,7 +1040,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Stock: 1x1x1/8 angle. Make 2.",
@@ -1078,7 +1078,7 @@
   "dxf": [
    "elevator/E-406_cable_chain_arm_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 6,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6.1 \u00d7 2 in for each part. Make 1.",
@@ -1109,7 +1109,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 1/2 in ThunderHex. Make 1.",
@@ -1156,7 +1156,7 @@
   "dxf": [
    "elevator/E-502_shaft_bearing_plate_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 4,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6 \u00d7 3.4 in for each part. Make 2.",
@@ -1204,7 +1204,7 @@
   "dxf": [
    "elevator/E-503_idler_plate_outer_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6 \u00d7 4 in for each part. Make 2.",
@@ -1265,7 +1265,7 @@
    "elevator/E-504-L_gearbox_plate_0.250.dxf",
    "elevator/E-504-R_gearbox_plate_0.250.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 0.25 in 6061 aluminium sheet, at least 6.4 \u00d7 7.68 in for each part. Make one left and one right.",
@@ -1299,7 +1299,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 1/2 in ThunderHex. Make 1.",
@@ -1345,7 +1345,7 @@
   "dxf": [
    "elevator/E-506_idler_plate_inner_0.188.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 6 \u00d7 3.25 in for each part. Make 2.",
@@ -1378,7 +1378,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 1/2 in ThunderHex. Make 2.",
@@ -1410,7 +1410,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 1,
   "steps": [
    "Print 2 in Onyx, or PA-CF / PETG-CF on the Bambu.",
@@ -1439,7 +1439,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 1,
   "steps": [
    "Print 1 in Onyx, or PA-CF / PETG-CF on the Bambu.",
@@ -1468,7 +1468,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 1,
   "steps": [
    "Print 1 in Onyx, or PA-CF / PETG-CF on the Bambu.",
@@ -1497,7 +1497,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 1,
   "steps": [
    "Print 2 in Onyx, or PA-CF / PETG-CF on the Bambu.",
@@ -1526,7 +1526,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: round bar, see the drawing. Make 2.",
@@ -1556,7 +1556,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: 1/2 in ThunderHex. Make 2.",
@@ -1603,7 +1603,7 @@
   "dxf": [
    "elevator/W-104_60T_25_sprocket_0.090.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: 0.09 in 6061 aluminium sheet, at least 5.75 \u00d7 5.75 in for each part. Make 1.",
@@ -1650,7 +1650,7 @@
   "dxf": [
    "elevator/W-105_wrist_drive_plate_0.250.dxf"
   ],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 3,
   "steps": [
    "Stock: 0.25 in 6061 aluminium sheet, at least 5.7 \u00d7 3.4 in for each part. Make 1.",
@@ -1683,7 +1683,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_elevator_revH_drawings.pdf",
+  "pdf": "robotA_elevator_revJ_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: aluminium angle, see the drawing. Make 1.",
@@ -2246,7 +2246,7 @@
  {
   "mark": "W-211",
   "slug": "w-211",
-  "name": "Spacer 1/2 hex bore x 0.85 (rear wheel shaft",
+  "name": "Spacer 1/2 hex bore x 0.85",
   "sub": "Wrist and claw",
   "qty": "1",
   "kind": "printed",
@@ -2439,6 +2439,35 @@
   "checks": [
    "It fits the purchased part or shaft it was drawn around.",
    "Holes are clear of stringing."
+  ],
+  "outline": ""
+ },
+ {
+  "mark": "CL-307",
+  "slug": "cl-307",
+  "name": "Latch link",
+  "sub": "Funnel",
+  "qty": "1",
+  "kind": "flat bar",
+  "machine": "Saw and drill press",
+  "stock": "1/16 x 3/8 6061 flat",
+  "size": "2.67 long, two 0.128 holes 2.30 apart",
+  "detail": "latch link (same part as the climber pawl link): 1/16 x 3/8 flat, two 0.128 holes 2.30 apart, #4-40 screws left free to turn",
+  "thick": null,
+  "w": null,
+  "h": null,
+  "holes": [],
+  "dxf": [],
+  "pdf": "robotA_funnel_revF_drawings.pdf",
+  "page": 3,
+  "steps": [
+   "Stock: 1/16 x 3/8 6061 flat. Make 1. 2.67 long, two 0.128 holes 2.30 apart.",
+   "Saw to length and round the ends with a file.",
+   "Mark, centre punch and drill the holes on the drill press.",
+   "Deburr."
+  ],
+  "checks": [
+   "Hole spacing: it sets how far a latch or pawl moves."
   ],
   "outline": ""
  },
@@ -2965,7 +2994,7 @@
   "machine": "3D printer",
   "stock": "printed",
   "size": "0.84 x 0.36 x 0.875",
-  "detail": "F-116 servo block, lower, printed Onyx 0.84 x 0.36 x 0.875, two 0.177 holes (same as climber block CL-305)",
+  "detail": "F-116 servo block, lower, printed Onyx 0.84 x 0.36 x 0.875, two 0.177 holes",
   "thick": null,
   "w": null,
   "h": null,
@@ -3132,7 +3161,7 @@
    },
    {
     "dia": 0.196,
-    "n": 7,
+    "n": 6,
     "drill": "#9 drill",
     "use": "clearance for a #10 screw"
    },
@@ -3152,12 +3181,12 @@
   "dxf": [
    "climber/CL-101_tower_plate_0.188.dxf"
   ],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 4,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 8.7 \u00d7 17.1 in for each part. Make 2.",
    "Fix the sheet flat to the spoilboard. Load the flat pattern `CL-101_tower_plate_0.188.dxf` in the router software. It is drawn in inches at full size.",
-   "Drill the small holes first, on the router, using its tool changer: 7 \u00d7 0.161 in with the #20 drill, 4 \u00d7 0.177 in with the #16 drill, 7 \u00d7 0.196 in with the #9 drill, 2 \u00d7 0.257 in with the F drill.",
+   "Drill the small holes first, on the router, using its tool changer: 7 \u00d7 0.161 in with the #20 drill, 4 \u00d7 0.177 in with the #16 drill, 6 \u00d7 0.196 in with the #9 drill, 2 \u00d7 0.257 in with the F drill.",
    "Cut the larger holes with the 1/4 in end mill: 1 \u00d7 1.125 in. For the 1.125 in bearing bores, cut one in scrap first and try a real bearing in it.",
    "Cut the inside cut-outs and corners with the 1/4 in end mill. They are drawn with rounded corners to suit it.",
    "Cut the outline last, with the 1/4 in end mill, leaving tabs so the part cannot move.",
@@ -3165,10 +3194,10 @@
   ],
   "checks": [
    "Overall size 7.7 \u00d7 16.1 in.",
-   "Hole count: 21.",
+   "Hole count: 20.",
    "A bearing presses into each 1.125 in bore without rocking."
   ],
-  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.694 -16.794 9.088 17.488\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0619\" stroke-linecap=\"round\"><path d=\"M1.000,-1.670 A0.130,0.130 0 1 0 0.870,-1.800\"/><line x1=\"1.000\" y1=\"-1.670\" x2=\"1.000\" y2=\"-0.000\"/><line x1=\"1.000\" y1=\"-0.000\" x2=\"7.700\" y2=\"-0.000\"/><line x1=\"7.700\" y1=\"-0.000\" x2=\"7.700\" y2=\"-2.650\"/><line x1=\"7.700\" y1=\"-2.650\" x2=\"6.250\" y2=\"-7.650\"/><line x1=\"6.250\" y1=\"-7.650\" x2=\"5.650\" y2=\"-9.250\"/><line x1=\"5.650\" y1=\"-9.250\" x2=\"2.616\" y2=\"-13.918\"/><path d=\"M2.595,-13.989 A0.130,0.130 0 0 0 2.616,-13.918\"/><line x1=\"2.595\" y1=\"-13.989\" x2=\"2.600\" y2=\"-15.800\"/><line x1=\"2.600\" y1=\"-15.800\" x2=\"2.350\" y2=\"-16.100\"/><line x1=\"2.350\" y1=\"-16.100\" x2=\"1.850\" y2=\"-16.100\"/><line x1=\"1.850\" y1=\"-16.100\" x2=\"0.500\" y2=\"-15.300\"/><line x1=\"0.500\" y1=\"-15.300\" x2=\"0.000\" y2=\"-14.800\"/><line x1=\"0.000\" y1=\"-14.800\" x2=\"0.000\" y2=\"-1.800\"/><line x1=\"0.000\" y1=\"-1.800\" x2=\"0.870\" y2=\"-1.800\"/><circle cx=\"1.500\" cy=\"-0.300\" r=\"0.098\" class=\"h2\"/><circle cx=\"1.500\" cy=\"-0.800\" r=\"0.098\" class=\"h2\"/><circle cx=\"1.500\" cy=\"-1.300\" r=\"0.098\" class=\"h2\"/><circle cx=\"0.300\" cy=\"-2.350\" r=\"0.081\" class=\"h0\"/><circle cx=\"0.700\" cy=\"-2.350\" r=\"0.081\" class=\"h0\"/><circle cx=\"2.800\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><line x1=\"0.900\" y1=\"-3.380\" x2=\"0.900\" y2=\"-10.920\"/><path d=\"M1.030,-11.050 A0.130,0.130 0 0 0 0.900,-10.920\"/><line x1=\"1.030\" y1=\"-11.050\" x2=\"1.916\" y2=\"-11.050\"/><path d=\"M2.045,-10.937 A0.130,0.130 0 0 0 1.916,-11.050\"/><line x1=\"2.045\" y1=\"-10.937\" x2=\"2.400\" y2=\"-8.250\"/><line x1=\"2.400\" y1=\"-8.250\" x2=\"2.400\" y2=\"-3.380\"/><path d=\"M2.270,-3.250 A0.130,0.130 0 0 0 2.400,-3.380\"/><line x1=\"2.270\" y1=\"-3.250\" x2=\"1.030\" y2=\"-3.250\"/><path d=\"M0.900,-3.380 A0.130,0.130 0 0 0 1.030,-3.250\"/><circle cx=\"2.700\" cy=\"-5.450\" r=\"0.098\" class=\"h2\"/><circle cx=\"3.110\" cy=\"-6.339\" r=\"0.098\" class=\"h2\"/><circle cx=\"4.000\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"5.200\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"6.400\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"7.200\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"4.560\" cy=\"-5.950\" r=\"0.562\" class=\"h4\"/><circle cx=\"5.267\" cy=\"-5.243\" r=\"0.098\" class=\"h2\"/><circle cx=\"3.853\" cy=\"-6.657\" r=\"0.098\" class=\"h2\"/><circle cx=\"4.451\" cy=\"-7.603\" r=\"0.088\" class=\"h1\"/><circle cx=\"4.851\" cy=\"-7.603\" r=\"0.088\" class=\"h1\"/><circle cx=\"1.213\" cy=\"-11.861\" r=\"0.129\" class=\"h3\"/><path d=\"M0.771,-14.014 A0.273,0.273 0 0 0 0.771,-14.086\"/><line x1=\"0.771\" y1=\"-14.014\" x2=\"0.667\" y2=\"-13.834\"/><path d=\"M0.604,-13.798 A0.273,0.273 0 0 0 0.667,-13.834\"/><line x1=\"0.604\" y1=\"-13.798\" x2=\"0.396\" y2=\"-13.798\"/><path d=\"M0.333,-13.834 A0.273,0.273 0 0 0 0.396,-13.798\"/><line x1=\"0.333\" y1=\"-13.834\" x2=\"0.229\" y2=\"-14.014\"/><path d=\"M0.229,-14.086 A0.273,0.273 0 0 0 0.229,-14.014\"/><line x1=\"0.229\" y1=\"-14.086\" x2=\"0.333\" y2=\"-14.266\"/><path d=\"M0.396,-14.303 A0.273,0.273 0 0 0 0.333,-14.266\"/><line x1=\"0.396\" y1=\"-14.303\" x2=\"0.604\" y2=\"-14.303\"/><path d=\"M0.667,-14.266 A0.273,0.273 0 0 0 0.604,-14.303\"/><line x1=\"0.667\" y1=\"-14.266\" x2=\"0.771\" y2=\"-14.086\"/><circle cx=\"2.107\" cy=\"-15.698\" r=\"0.129\" class=\"h3\"/><circle cx=\"4.451\" cy=\"-9.543\" r=\"0.088\" class=\"h1\"/><circle cx=\"4.851\" cy=\"-9.543\" r=\"0.088\" class=\"h1\"/><text x=\"1.733\" y=\"-0.465\" class=\"h2\" font-size=\"0.673\">C</text><text x=\"0.516\" y=\"-2.498\" class=\"h0\" font-size=\"0.673\">A</text><text x=\"5.257\" y=\"-6.579\" class=\"h4\" font-size=\"0.673\">E</text><text x=\"4.674\" y=\"-7.758\" class=\"h1\" font-size=\"0.673\">B</text><text x=\"1.477\" y=\"-12.057\" class=\"h3\" font-size=\"0.673\">D</text></svg>"
+  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.694 -16.794 9.088 17.488\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0619\" stroke-linecap=\"round\"><path d=\"M1.000,-1.670 A0.130,0.130 0 1 0 0.870,-1.800\"/><line x1=\"1.000\" y1=\"-1.670\" x2=\"1.000\" y2=\"-0.000\"/><line x1=\"1.000\" y1=\"-0.000\" x2=\"7.700\" y2=\"-0.000\"/><line x1=\"7.700\" y1=\"-0.000\" x2=\"7.700\" y2=\"-2.650\"/><line x1=\"7.700\" y1=\"-2.650\" x2=\"6.250\" y2=\"-7.650\"/><line x1=\"6.250\" y1=\"-7.650\" x2=\"5.650\" y2=\"-9.250\"/><line x1=\"5.650\" y1=\"-9.250\" x2=\"2.616\" y2=\"-13.918\"/><path d=\"M2.595,-13.989 A0.130,0.130 0 0 0 2.616,-13.918\"/><line x1=\"2.595\" y1=\"-13.989\" x2=\"2.600\" y2=\"-15.800\"/><line x1=\"2.600\" y1=\"-15.800\" x2=\"2.350\" y2=\"-16.100\"/><line x1=\"2.350\" y1=\"-16.100\" x2=\"1.850\" y2=\"-16.100\"/><line x1=\"1.850\" y1=\"-16.100\" x2=\"0.500\" y2=\"-15.300\"/><line x1=\"0.500\" y1=\"-15.300\" x2=\"0.000\" y2=\"-14.800\"/><line x1=\"0.000\" y1=\"-14.800\" x2=\"0.000\" y2=\"-1.800\"/><line x1=\"0.000\" y1=\"-1.800\" x2=\"0.870\" y2=\"-1.800\"/><circle cx=\"1.500\" cy=\"-0.300\" r=\"0.098\" class=\"h2\"/><circle cx=\"1.500\" cy=\"-0.800\" r=\"0.098\" class=\"h2\"/><circle cx=\"1.500\" cy=\"-1.300\" r=\"0.098\" class=\"h2\"/><circle cx=\"0.300\" cy=\"-2.350\" r=\"0.081\" class=\"h0\"/><circle cx=\"0.700\" cy=\"-2.350\" r=\"0.081\" class=\"h0\"/><circle cx=\"2.800\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><line x1=\"0.900\" y1=\"-3.380\" x2=\"0.900\" y2=\"-10.920\"/><path d=\"M1.030,-11.050 A0.130,0.130 0 0 0 0.900,-10.920\"/><line x1=\"1.030\" y1=\"-11.050\" x2=\"1.916\" y2=\"-11.050\"/><path d=\"M2.045,-10.937 A0.130,0.130 0 0 0 1.916,-11.050\"/><line x1=\"2.045\" y1=\"-10.937\" x2=\"2.400\" y2=\"-8.250\"/><line x1=\"2.400\" y1=\"-8.250\" x2=\"2.400\" y2=\"-3.380\"/><path d=\"M2.270,-3.250 A0.130,0.130 0 0 0 2.400,-3.380\"/><line x1=\"2.270\" y1=\"-3.250\" x2=\"1.030\" y2=\"-3.250\"/><path d=\"M0.900,-3.380 A0.130,0.130 0 0 0 1.030,-3.250\"/><circle cx=\"2.810\" cy=\"-4.950\" r=\"0.098\" class=\"h2\"/><circle cx=\"3.560\" cy=\"-5.950\" r=\"0.098\" class=\"h2\"/><circle cx=\"3.636\" cy=\"-7.279\" r=\"0.088\" class=\"h1\"/><circle cx=\"4.000\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"5.200\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"6.400\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"7.200\" cy=\"-0.900\" r=\"0.081\" class=\"h0\"/><circle cx=\"4.560\" cy=\"-5.950\" r=\"0.562\" class=\"h4\"/><circle cx=\"4.036\" cy=\"-7.279\" r=\"0.088\" class=\"h1\"/><circle cx=\"5.560\" cy=\"-5.950\" r=\"0.098\" class=\"h2\"/><circle cx=\"1.213\" cy=\"-11.861\" r=\"0.129\" class=\"h3\"/><circle cx=\"3.636\" cy=\"-9.219\" r=\"0.088\" class=\"h1\"/><path d=\"M0.771,-14.014 A0.273,0.273 0 0 0 0.771,-14.086\"/><line x1=\"0.771\" y1=\"-14.014\" x2=\"0.667\" y2=\"-13.834\"/><path d=\"M0.604,-13.798 A0.273,0.273 0 0 0 0.667,-13.834\"/><line x1=\"0.604\" y1=\"-13.798\" x2=\"0.396\" y2=\"-13.798\"/><path d=\"M0.333,-13.834 A0.273,0.273 0 0 0 0.396,-13.798\"/><line x1=\"0.333\" y1=\"-13.834\" x2=\"0.229\" y2=\"-14.014\"/><path d=\"M0.229,-14.086 A0.273,0.273 0 0 0 0.229,-14.014\"/><line x1=\"0.229\" y1=\"-14.086\" x2=\"0.333\" y2=\"-14.266\"/><path d=\"M0.396,-14.303 A0.273,0.273 0 0 0 0.333,-14.266\"/><line x1=\"0.396\" y1=\"-14.303\" x2=\"0.604\" y2=\"-14.303\"/><path d=\"M0.667,-14.266 A0.273,0.273 0 0 0 0.604,-14.303\"/><line x1=\"0.667\" y1=\"-14.266\" x2=\"0.771\" y2=\"-14.086\"/><circle cx=\"2.107\" cy=\"-15.698\" r=\"0.129\" class=\"h3\"/><circle cx=\"4.036\" cy=\"-9.219\" r=\"0.088\" class=\"h1\"/><text x=\"1.733\" y=\"-0.465\" class=\"h2\" font-size=\"0.673\">C</text><text x=\"0.516\" y=\"-2.498\" class=\"h0\" font-size=\"0.673\">A</text><text x=\"3.859\" y=\"-7.434\" class=\"h1\" font-size=\"0.673\">B</text><text x=\"5.257\" y=\"-6.579\" class=\"h4\" font-size=\"0.673\">E</text><text x=\"1.477\" y=\"-12.057\" class=\"h3\" font-size=\"0.673\">D</text></svg>"
  },
  {
   "mark": "CL-102",
@@ -3186,7 +3215,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 2x1 x 1/16 tube, 6061-T6. Make 2, each 8.50 in long.",
@@ -3219,7 +3248,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 1x1x1/8 angle. Make 2. 1.00 long.",
@@ -3248,7 +3277,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 1/2 ThunderHex. Make 1. 9.53 long, two 0.500 journals for the bearings, hex elsewhere.",
@@ -3306,7 +3335,7 @@
   "dxf": [
    "climber/CL-201_arm_plate_0.188.dxf"
   ],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 17.9 \u00d7 9.87 in for each part. Make 2.",
@@ -3339,7 +3368,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 1/2 round 6061. Make 3. 7.80 long.",
@@ -3379,7 +3408,7 @@
   "dxf": [
    "climber/CL-203_gate_finger_0.188.dxf"
   ],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 0.188 in 6061 aluminium sheet, at least 1.6 \u00d7 2.99 in for each part. Make 2.",
@@ -3411,7 +3440,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Print 2 in Onyx.",
@@ -3440,7 +3469,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 5,
   "steps": [
    "Print 2 in Onyx.",
@@ -3470,7 +3499,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 1/8 polycarbonate. Make 2. 3.60 x 2.90.",
@@ -3499,7 +3528,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "rubber hose. Make 2. 7.50 long.",
@@ -3526,7 +3555,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 4,
   "steps": [
    "Print 2 in Onyx.",
@@ -3555,7 +3584,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Print 2 in Onyx, or PA-CF / PETG-CF on the Bambu.",
@@ -3584,7 +3613,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 3/4 OD x 0.065 6061 tube. Make 1. between the hubs.",
@@ -3614,7 +3643,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
    "Stock: 6061, turned, hex milled. Make 2. 1.60 OD x 0.35.",
@@ -3638,17 +3667,17 @@
   "kind": "shaft",
   "machine": "Lathe",
   "stock": "1/2 ThunderHex",
-  "size": "1.70 long",
-  "detail": "spool shaft 1/2 ThunderHex x 1.70, into the MAXPlanetary output",
+  "size": "1.88 long",
+  "detail": "spool shaft 1/2 ThunderHex x 1.87, into the MAXPlanetary output",
   "thick": null,
   "w": null,
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 2,
   "steps": [
-   "Stock: 1/2 ThunderHex. Make 2. 1.70 long.",
+   "Stock: 1/2 ThunderHex. Make 2. 1.88 long.",
    "Saw about 1/16 in over length.",
    "In the lathe, face both ends and bring the shaft to length.",
    "Break the sharp edges with a file."
@@ -3660,93 +3689,6 @@
   "outline": ""
  },
  {
-  "mark": "CL-303",
-  "slug": "cl-303",
-  "name": "Ratchet wheel",
-  "sub": "Climber",
-  "qty": "2",
-  "kind": "steel plate",
-  "machine": "Manual mill",
-  "stock": "3/16 steel",
-  "size": "1.50 OD, 16 teeth",
-  "detail": "ratchet wheel 3/16 in steel, 16 teeth, 1.50 OD, 1/2 hex bore, on the spool shaft between the tower and the gearbox",
-  "thick": 0.188,
-  "w": 1.5,
-  "h": 1.5,
-  "holes": [],
-  "dxf": [
-   "climber/CL-303_ratchet_wheel_0.188_steel.dxf"
-  ],
-  "pdf": "robotA_climber_revC_drawings.pdf",
-  "page": 2,
-  "steps": [
-   "Stock: 3/16 in mild steel plate. The drawing says mild steel is strong enough. Make 2.",
-   "Saw a round blank a little over 1.50 in across, then bring it to 1.50 in on the lathe or the mill.",
-   "On the mill, cut the 1/2 in hex in the centre with a 1/8 in end mill, one flat at a time on a rotary table. The rounded corners it leaves fit ThunderHex shaft.",
-   "Hold the blank by its hex on a rotary table or dividing head and cut the 16 teeth, turning 22.5\u00b0 between teeth. Each tooth is 0.15 in deep.",
-   "A cutter lying flat on the wheel leaves a rounded corner at the root of each tooth. Stand the wheel on edge so the corner of the end mill cuts the root, or file each root square.",
-   "Deburr."
-  ],
-  "checks": [
-   "It slides onto the ThunderHex spool shaft without play.",
-   "It turns freely inside the two gearbox spacers: they sit 1.00 in from the shaft.",
-   "The pawl tip seats flat on a tooth face."
-  ],
-  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.110 -1.610 1.720 1.720\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0058\" stroke-linecap=\"round\"><line x1=\"0.057\" y1=\"-0.463\" x2=\"0.326\" y2=\"-0.326\"/><line x1=\"0.196\" y1=\"-0.520\" x2=\"0.057\" y2=\"-0.463\"/><line x1=\"0.326\" y1=\"-0.326\" x2=\"0.220\" y2=\"-0.220\"/><line x1=\"0.000\" y1=\"-0.750\" x2=\"0.196\" y2=\"-0.520\"/><line x1=\"0.220\" y1=\"-0.220\" x2=\"0.520\" y2=\"-0.196\"/><line x1=\"0.150\" y1=\"-0.750\" x2=\"0.000\" y2=\"-0.750\"/><line x1=\"0.520\" y1=\"-0.196\" x2=\"0.463\" y2=\"-0.057\"/><line x1=\"0.057\" y1=\"-1.037\" x2=\"0.150\" y2=\"-0.750\"/><line x1=\"0.463\" y1=\"-0.057\" x2=\"0.750\" y2=\"-0.150\"/><line x1=\"0.196\" y1=\"-0.980\" x2=\"0.057\" y2=\"-1.037\"/><line x1=\"0.750\" y1=\"-0.150\" x2=\"0.750\" y2=\"-0.000\"/><line x1=\"0.220\" y1=\"-1.280\" x2=\"0.196\" y2=\"-0.980\"/><line x1=\"0.750\" y1=\"-0.000\" x2=\"0.980\" y2=\"-0.196\"/><line x1=\"0.326\" y1=\"-1.174\" x2=\"0.220\" y2=\"-1.280\"/><line x1=\"0.980\" y1=\"-0.196\" x2=\"1.037\" y2=\"-0.057\"/><line x1=\"0.463\" y1=\"-1.443\" x2=\"0.326\" y2=\"-1.174\"/><line x1=\"1.037\" y1=\"-0.057\" x2=\"1.174\" y2=\"-0.326\"/><line x1=\"0.520\" y1=\"-1.304\" x2=\"0.463\" y2=\"-1.443\"/><line x1=\"1.174\" y1=\"-0.326\" x2=\"1.280\" y2=\"-0.220\"/><line x1=\"0.750\" y1=\"-1.500\" x2=\"0.520\" y2=\"-1.304\"/><line x1=\"1.280\" y1=\"-0.220\" x2=\"1.304\" y2=\"-0.520\"/><line x1=\"0.750\" y1=\"-1.350\" x2=\"0.750\" y2=\"-1.500\"/><line x1=\"1.304\" y1=\"-0.520\" x2=\"1.443\" y2=\"-0.463\"/><line x1=\"1.037\" y1=\"-1.443\" x2=\"0.750\" y2=\"-1.350\"/><line x1=\"1.443\" y1=\"-0.463\" x2=\"1.350\" y2=\"-0.750\"/><line x1=\"0.980\" y1=\"-1.304\" x2=\"1.037\" y2=\"-1.443\"/><line x1=\"1.350\" y1=\"-0.750\" x2=\"1.500\" y2=\"-0.750\"/><line x1=\"1.280\" y1=\"-1.280\" x2=\"0.980\" y2=\"-1.304\"/><line x1=\"1.500\" y1=\"-0.750\" x2=\"1.304\" y2=\"-0.980\"/><line x1=\"1.174\" y1=\"-1.174\" x2=\"1.280\" y2=\"-1.280\"/><line x1=\"1.304\" y1=\"-0.980\" x2=\"1.443\" y2=\"-1.037\"/><line x1=\"1.443\" y1=\"-1.037\" x2=\"1.174\" y2=\"-1.174\"/><line x1=\"0.896\" y1=\"-1.003\" x2=\"1.043\" y2=\"-0.750\"/><line x1=\"0.604\" y1=\"-1.003\" x2=\"0.896\" y2=\"-1.003\"/><line x1=\"0.457\" y1=\"-0.750\" x2=\"0.604\" y2=\"-1.003\"/><line x1=\"0.604\" y1=\"-0.497\" x2=\"0.457\" y2=\"-0.750\"/><line x1=\"0.896\" y1=\"-0.497\" x2=\"0.604\" y2=\"-0.497\"/><line x1=\"1.043\" y1=\"-0.750\" x2=\"0.896\" y2=\"-0.497\"/></svg>"
- },
- {
-  "mark": "CL-304",
-  "slug": "cl-304",
-  "name": "Pawl",
-  "sub": "Climber",
-  "qty": "2",
-  "kind": "steel plate",
-  "machine": "Manual mill",
-  "stock": "3/16 steel",
-  "size": "0.60 x 2.25",
-  "detail": "pawl 3/16 in steel, 0.60 x 2.25, spring loaded onto the ratchet wheel, lifted by the servo through link CL-307",
-  "thick": 0.188,
-  "w": 1.8,
-  "h": 1.8,
-  "holes": [
-   {
-    "dia": 0.094,
-    "n": 1,
-    "drill": "3/32 drill",
-    "use": "pin or small screw"
-   },
-   {
-    "dia": 0.124,
-    "n": 1,
-    "drill": "1/8 drill",
-    "use": "pin"
-   },
-   {
-    "dia": 0.32,
-    "n": 1,
-    "drill": "P drill",
-    "use": "pivot: it must turn freely on its 5/16 spacer"
-   }
-  ],
-  "dxf": [
-   "climber/CL-304_pawl_0.188_steel.dxf"
-  ],
-  "pdf": "robotA_climber_revC_drawings.pdf",
-  "page": 4,
-  "steps": [
-   "Stock: 3/16 in mild steel. Make 2, each 0.60 \u00d7 2.25 in.",
-   "Saw a blank and mill its edges to the outline on the drawing.",
-   "Drill the holes on the mill: 1 \u00d7 0.094 in (3/32 drill), 1 \u00d7 0.124 in (1/8 drill), 1 \u00d7 0.32 in (P drill). The 0.320 in hole is the pivot.",
-   "File the tip square, so it seats on a tooth face.",
-   "Deburr, and put a drop of oil on the pivot at assembly."
-  ],
-  "checks": [
-   "It swings freely on its 5/16 in spacer.",
-   "The tip seats flat on a tooth of the ratchet wheel CL-303."
-  ],
-  "outline": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-0.122 -1.925 2.047 2.047\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"0.0069\" stroke-linecap=\"round\"><line x1=\"1.803\" y1=\"-0.170\" x2=\"1.605\" y2=\"-0.226\"/><line x1=\"1.605\" y1=\"-0.226\" x2=\"0.813\" y2=\"-1.414\"/><line x1=\"1.683\" y1=\"-0.049\" x2=\"1.803\" y2=\"-0.170\"/><line x1=\"0.813\" y1=\"-1.414\" x2=\"0.283\" y2=\"-1.803\"/><line x1=\"1.379\" y1=\"-0.000\" x2=\"1.683\" y2=\"-0.049\"/><line x1=\"0.283\" y1=\"-1.803\" x2=\"0.000\" y2=\"-1.520\"/><line x1=\"0.389\" y1=\"-0.990\" x2=\"1.379\" y2=\"-0.000\"/><line x1=\"0.000\" y1=\"-1.520\" x2=\"0.389\" y2=\"-0.990\"/><circle cx=\"0.813\" cy=\"-0.990\" r=\"0.160\" class=\"h2\"/><circle cx=\"0.431\" cy=\"-1.174\" r=\"0.047\" class=\"h0\"/><circle cx=\"0.318\" cy=\"-1.485\" r=\"0.062\" class=\"h1\"/><text x=\"0.989\" y=\"-1.158\" class=\"h2\" font-size=\"0.079\">C</text><text x=\"0.494\" y=\"-1.229\" class=\"h0\" font-size=\"0.079\">A</text><text x=\"0.396\" y=\"-1.555\" class=\"h1\" font-size=\"0.079\">B</text></svg>"
- },
- {
   "mark": "CL-305",
   "slug": "cl-305",
   "name": "Servo block",
@@ -3754,15 +3696,15 @@
   "qty": "4",
   "kind": "printed",
   "machine": "3D printer",
-  "stock": "printed",
-  "size": "0.84 x 0.36 x 0.875",
-  "detail": "CL-305 servo block, printed Onyx 0.84 x 0.36 x 0.875, two 0.177 holes: between the servo ears and the tower plate",
+  "stock": "printed Onyx",
+  "size": "0.84 x 0.36 x 1.257",
+  "detail": "CL-305 servo block, printed Onyx 0.84 x 0.36 x 1.257, two 0.177 holes: between the servo ears and the tower plate",
   "thick": null,
   "w": null,
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 5,
   "steps": [
    "Print 4 in Onyx.",
@@ -3781,55 +3723,27 @@
   "name": "Gearbox spacer",
   "sub": "Climber",
   "qty": "4",
-  "kind": "printed",
-  "machine": "3D printer",
-  "stock": "3/8 round, #10 bore",
-  "size": "0.30 long",
-  "detail": "CL-306 gearbox spacer 3/8 OD x 0.30 long, #10 clearance (the two MAXPlanetary screws pass through; the ratchet wheel turns between them)",
+  "kind": "turned",
+  "machine": "Lathe",
+  "stock": "3/8 round 6061, #10 bore",
+  "size": "0.50 long, ends square",
+  "detail": "gearbox spacer 3/8 OD x 0.50 long, #10 clearance: the MAXPlanetary screws pass through",
   "thick": null,
   "w": null,
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 5,
   "steps": [
-   "Print 4 in Onyx, or PA-CF / PETG-CF on the Bambu.",
-   "Use the STL file from the package. STL files are in millimetres, with the part sitting flat on the bed.",
-   "Print one and try it against the real part it fits before printing the full set."
+   "Stock: 3/8 round 6061, #10 bore. Make 4. 0.50 long, ends square.",
+   "In the lathe, face the end, turn the outside to size and drill or bore the hole.",
+   "Part it off a little long, turn it round and face it to length.",
+   "Break the sharp edges."
   ],
   "checks": [
-   "It fits the purchased part or shaft it was drawn around.",
-   "Holes are clear of stringing."
-  ],
-  "outline": ""
- },
- {
-  "mark": "CL-307",
-  "slug": "cl-307",
-  "name": "Pawl link",
-  "sub": "Climber",
-  "qty": "2",
-  "kind": "flat bar",
-  "machine": "Saw and drill press",
-  "stock": "1/16 x 3/8 6061 flat",
-  "size": "2.67 long, two 0.128 holes 2.30 apart",
-  "detail": "pawl link, 1/16 x 3/8 6061 flat, two 0.128 holes 2.30 apart: on the pawl pin at one end, a #4-40 screw through the horn at the other",
-  "thick": null,
-  "w": null,
-  "h": null,
-  "holes": [],
-  "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
-  "page": 4,
-  "steps": [
-   "Stock: 1/16 x 3/8 6061 flat. Make 2. 2.67 long, two 0.128 holes 2.30 apart.",
-   "Saw to length and round the ends with a file.",
-   "Mark, centre punch and drill the holes on the drill press.",
-   "Deburr."
-  ],
-  "checks": [
-   "Hole spacing: it sets how far a latch or pawl moves."
+   "Length and diameters with calipers.",
+   "It fits the shaft or screw it goes on."
   ],
   "outline": ""
  },
@@ -3849,7 +3763,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_climber_revC_drawings.pdf",
+  "pdf": "robotA_climber_revD_drawings.pdf",
   "page": 5,
   "steps": [
    "Stock: 3/8 steel rod, lathe. Make 4. 3/8 OD x 3/16, 0.257 bore.",
@@ -3860,6 +3774,93 @@
   "checks": [
    "Length and diameters with calipers.",
    "It fits the shaft or screw it goes on."
+  ],
+  "outline": ""
+ },
+ {
+  "mark": "CL-309",
+  "slug": "cl-309",
+  "name": "Pawl thrust washer",
+  "sub": "Climber",
+  "qty": "2",
+  "kind": "printed",
+  "machine": "3D printer",
+  "stock": "printed Onyx",
+  "size": "0.70 OD x 0.12, 0.385 bore",
+  "detail": "CL-309 pawl thrust washer, printed Onyx, 0.70 OD x 0.12, 0.385 bore: loose on the rear spacer CL-306 under the pawl",
+  "thick": null,
+  "w": null,
+  "h": null,
+  "holes": [],
+  "dxf": [],
+  "pdf": "robotA_climber_revD_drawings.pdf",
+  "page": 4,
+  "steps": [
+   "Print 2 in Onyx, or PA-CF / PETG-CF on the Bambu.",
+   "Use the STL file from the package. STL files are in millimetres, with the part sitting flat on the bed.",
+   "Print one and try it against the real part it fits before printing the full set."
+  ],
+  "checks": [
+   "It fits the purchased part or shaft it was drawn around.",
+   "Holes are clear of stringing."
+  ],
+  "outline": ""
+ },
+ {
+  "mark": "CL-310",
+  "slug": "cl-310",
+  "name": "Ratchet wheel spacer",
+  "sub": "Climber",
+  "qty": "2",
+  "kind": "printed",
+  "machine": "3D printer",
+  "stock": "printed Onyx",
+  "size": "0.70 OD x 0.12, 1/2 hex bore",
+  "detail": "CL-310 ratchet wheel spacer, printed Onyx, 0.70 OD x 0.12, 1/2 hex bore: bearing inner race to the wheel",
+  "thick": null,
+  "w": null,
+  "h": null,
+  "holes": [],
+  "dxf": [],
+  "pdf": "robotA_climber_revD_drawings.pdf",
+  "page": 3,
+  "steps": [
+   "Print 2 in Onyx, or PA-CF / PETG-CF on the Bambu.",
+   "Use the STL file from the package. STL files are in millimetres, with the part sitting flat on the bed.",
+   "Print one and try it against the real part it fits before printing the full set."
+  ],
+  "checks": [
+   "It fits the purchased part or shaft it was drawn around.",
+   "Holes are clear of stringing."
+  ],
+  "outline": ""
+ },
+ {
+  "mark": "CL-311",
+  "slug": "cl-311",
+  "name": "Pawl link",
+  "sub": "Climber",
+  "qty": "2",
+  "kind": "printed",
+  "machine": "3D printer",
+  "stock": "printed Onyx, 0.22 thick",
+  "size": "2.54 long, holes 0.257 and 0.128, 2.10 apart",
+  "detail": "CL-311 pawl link, printed Onyx 0.22 thick, holes 0.257 and 0.128 2.10 apart: on the pawl tail shoulder screw, a #4-40 screw into the servo horn",
+  "thick": null,
+  "w": null,
+  "h": null,
+  "holes": [],
+  "dxf": [],
+  "pdf": "robotA_climber_revD_drawings.pdf",
+  "page": 4,
+  "steps": [
+   "Print 2 in Onyx.",
+   "Use the STL file from the package. STL files are in millimetres, with the part sitting flat on the bed.",
+   "Print one and try it against the real part it fits before printing the full set."
+  ],
+  "checks": [
+   "It fits the purchased part or shaft it was drawn around.",
+   "Holes are clear of stringing."
   ],
   "outline": ""
  },
@@ -3962,7 +3963,7 @@
   "h": null,
   "holes": [],
   "dxf": [],
-  "pdf": "robotA_drivebase_revF_drawings.pdf",
+  "pdf": "robotA_drivebase_revG_drawings.pdf",
   "page": 1,
   "steps": [
    "Print 1 in Onyx.",

@@ -1,6 +1,7 @@
 """Merge the CAD package's lists into one parts file for the site."""
 import json, re, glob, os, collections, sys
-PKG = '/mnt/user-data/uploads/RobotA_final_2026-11-23'
+PKG = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/gen/r33/pkg/1_cad_package_rev3.3'        # the unpacked CAD package
+MESH = sys.argv[2] if len(sys.argv) > 2 else '/home/claude/gen/r33/robotA_mesh_rev3.3.json'       # the mesh export, for part names and counts
 rows = json.load(open('/home/claude/gen/parts/drawing_rows.json'))
 BASE = lambda m: re.sub(r'-[LR]$', '', m)
 parts = collections.OrderedDict()
@@ -20,7 +21,7 @@ for r in rows:
 # 2. router flat patterns
 import ezdxf
 from ezdxf import bbox
-for f in sorted(glob.glob(PKG + '/1_cad_package_rev3.2/dxf/*/*.dxf')):
+for f in sorted(glob.glob(PKG + '/dxf/*/*.dxf')):
     fn = os.path.basename(f)
     m = re.match(r'^((?:[A-Z]+-)+(?:\d{3}|[A-Z]+-P)(?:-[LR])?)_(.+?)_(\d\.\d{3})(?:_(.+))?\.dxf$', fn)
     mark, nm, thick, mat = m.group(1), m.group(2).replace('_', ' '), float(m.group(3)), (m.group(4) or '').replace('_', ' ')
@@ -37,7 +38,7 @@ for f in sorted(glob.glob(PKG + '/1_cad_package_rev3.2/dxf/*/*.dxf')):
     if not p['sub']: p['sub'] = PREFIX_SUB.get(mark.split('-')[0], '')
     p['src'].append('dxf')
 # 3. printed parts list
-for line in open(PKG + '/1_cad_package_rev3.2/printed/PRINTED_PARTS_LIST.txt'):
+for line in open(PKG + '/printed/PRINTED_PARTS_LIST.txt'):
     m = re.match(r'^(\S+)\s+(\d+)\s+([\d.]+ x [\d.]+ x [\d.]+)\s{2,}(.+?)\s{2,}(.+)$', line.rstrip())
     if not m or m.group(1) == 'MARK': continue
     mark = m.group(1)
@@ -49,7 +50,7 @@ for line in open(PKG + '/1_cad_package_rev3.2/printed/PRINTED_PARTS_LIST.txt'):
     p['src'].append('printed')
 stls = {re.match(r'^((?:[A-Z]+-)+[A-Z0-9.]+?)_', os.path.basename(x)) and re.match(r'^((?:[A-Z]+-)*[A-Z0-9.]+)_', os.path.basename(x)).group(1): os.path.basename(x) for x in []}
 # 4. every marked part in the 3D model, for names and counts the tables do not give
-model = json.load(open(PKG + '/3_docs/kickoff_brief/robotA/robot.json'))
+model = json.load(open(MESH))
 cnt = collections.Counter(); lab = {}
 for q in model['parts']:
     m = re.match(r'^((?:[A-Z]{1,4}-)(?:[A-Z]+-)?\d{2,3}[A-Z]?(?:-[LR])?)\b[ ,:]*(.*)$', q['label'])

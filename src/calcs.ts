@@ -179,14 +179,14 @@ export const calcs: Record<string, CalcDef> = {
     group: 'Mechanical',
     page: 'subsystems/from-concept-to-design',
     inputs: [
-      { key: 'drive', label: 'Drivebase', unit: 'lb', value: 37.7, step: 0.1 },
-      { key: 'elev', label: 'Elevator', unit: 'lb', value: 32.2, step: 0.1 },
-      { key: 'wrist', label: 'Wrist and claw', unit: 'lb', value: 12.9, step: 0.1 },
-      { key: 'climb', label: 'Climber', unit: 'lb', value: 12.9, step: 0.1 },
-      { key: 'funnel', label: 'Funnel', unit: 'lb', value: 6.9, step: 0.1 },
-      { key: 'elec', label: 'Electronics', unit: 'lb', value: 4.0, step: 0.1 },
+      { key: 'drive', label: 'Drivebase', unit: 'lb', value: 37.69, step: 0.05 },
+      { key: 'elev', label: 'Elevator', unit: 'lb', value: 32.15, step: 0.05 },
+      { key: 'wrist', label: 'Wrist and claw', unit: 'lb', value: 12.93, step: 0.05 },
+      { key: 'climb', label: 'Climber', unit: 'lb', value: 12.88, step: 0.05 },
+      { key: 'funnel', label: 'Funnel', unit: 'lb', value: 6.85, step: 0.05 },
+      { key: 'elec', label: 'Electronics', unit: 'lb', value: 3.95, step: 0.05 },
       { key: 'wiring', label: 'Wiring (estimate)', unit: 'lb', value: 4.0, step: 0.1 },
-      { key: 'fasteners', label: 'Fasteners', unit: 'lb', value: 6.1, step: 0.1 },
+      { key: 'fasteners', label: 'Fasteners', unit: 'lb', value: 6.08, step: 0.05 },
       { key: 'limit', label: 'Weight limit', unit: 'lb', value: 115, step: 1 },
     ],
     outputs: [
@@ -197,7 +197,7 @@ export const calcs: Record<string, CalcDef> = {
       'Robot weight = the sum of every subsystem, plus wiring and fasteners.',
       'Room left = weight limit − robot weight. A negative number means the robot is over.',
     ],
-    note: 'Modelled, except wiring, which is an estimate. The rows are rounded, so they add to 116.7 lb; the model total is 116.53 lb. Battery and bumpers do not count toward the limit.',
+    note: 'Modelled, except wiring, which is an estimate. Fasteners are counted from the model, plus an allowance. Battery and bumpers do not count toward the limit.',
   },
 
   'drive-speed': {

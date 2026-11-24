@@ -23,7 +23,7 @@ from build123d import import_step, GeomType
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'public', 'robot-viewer')
 ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
-STEP = ARGS[0] if ARGS else '/mnt/user-data/uploads/RobotA_final_2026-11-23/1_cad_package_rev3.2/step/robotA_detail_fasteners.step'
+STEP = ARGS[0] if ARGS else '/mnt/user-data/uploads/RobotA_final_2026-11-23/1_cad_package_rev3.3/step/robotA_detail_fasteners.step'
 
 RIVETS = [(0.187, '97517A032'), (0.25, '97517A035'), (0.375, '97517A040'), (0.5, '97517A041')]
 

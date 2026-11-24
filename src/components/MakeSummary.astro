@@ -89,9 +89,11 @@ const names = (list: { slug: string; mark: string }[]) => list.map(link).join(',
       <li>
         <strong>The wrist sprocket needs the small cutter.</strong> The teeth of <Fragment set:html={link(parts.find((p) => p.mark === 'W-104')!)} /> have a 0.065 in radius at the root. A 1/4 in cutter cannot reach that. A 1/8 in end mill just fits.
       </li>
-      <li>
+      {steel.length > 0 && (
+        <li>
         <strong>Two steel parts are made on the mill.</strong> <Fragment set:html={names(steel)} /> are 3/16 in mild steel, which is not a router job. The ratchet wheel needs a rotary table or dividing head for its 16 teeth and its hex hole. Confirm the shop has one before starting.
-      </li>
+        </li>
+      )}
       <li>
         <strong>Bearing bores.</strong> {bores.length} parts have a 1.125 in bore for a bearing: <Fragment set:html={names(bores)} />. Cut one test bore in scrap and try a real bearing before cutting any of them.
       </li>

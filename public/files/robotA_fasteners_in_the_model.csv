@@ -15,7 +15,7 @@ Fastener,Size,Where (packages joined),Count in the model
 #10-32 screw,x 0.5,drivebase + electronics,8
 #10-32 screw,x 0.5,elevator,39
 #10-32 screw,x 0.5,elevator + wrist,2
-#10-32 screw,x 0.75,climber,4
+#10-32 screw,x 1,climber,4
 #10-32 screw,x 1.25,drivebase,9
 #10-32 screw,x 1.25,drivebase + elevator,6
 #10-32 screw,x 1.25,funnel,4
@@ -24,7 +24,6 @@ Fastener,Size,Where (packages joined),Count in the model
 #10-32 screw,x 2.5,elevator + wrist,2
 #10-32 screw + nylock nut,x 0.625,climber,4
 #10-32 screw + nylock nut,x 0.625,wrist,14
-#10-32 screw + nylock nut,x 0.75,climber,2
 #10-32 screw + nylock nut,x 0.75,elevator,2
 #10-32 screw + nylock nut,x 0.75,funnel,1
 #10-32 screw + nylock nut,x 0.875,elevator,4
@@ -40,16 +39,16 @@ Fastener,Size,Where (packages joined),Count in the model
 #10-32 screw + nylock nut,x 2.5,elevator,8
 #10-32 screw + nylock nut,x 2.75,drivebase,2
 #10-32 screw + nylock nut,x 2.75,elevator,4
-#4-40 screw,x 0.188,climber,2
 #4-40 screw,x 0.25,funnel,1
 #4-40 screw,x 0.25,wrist,4
+#4-40 screw,x 0.375,climber,2
 #4-40 screw + nylock nut,x 0.5,funnel,1
-#8-32 screw,x 1.5,climber,8
+#8-32 screw,x 1.75,climber,8
 #8-32 screw,x 2.25,funnel,3
 1/4-20 rivnut,,bumpers + drivebase,8
 1/4-20 screw,x 0.5,bumpers + drivebase,8
 5/32 blind rivet,grip 1/4 to 3/8,climber,12
-5/32 blind rivet,grip 1/4 to 3/8,drivebase + elevator,4
+5/32 blind rivet,grip 1/4 to 3/8,drivebase + elevator,8
 5/32 blind rivet,grip 1/4 to 3/8,drivebase + funnel,24
 5/32 blind rivet,grip 1/4 to 3/8,elevator,2
 5/32 blind rivet,grip 1/4 to 3/8,elevator + wrist,2
@@ -59,9 +58,9 @@ Fastener,Size,Where (packages joined),Count in the model
 5/32 blind rivet,grip 1/8 to 1/4,climber + electronics,2
 5/32 blind rivet,grip 1/8 to 1/4,drivebase,49
 5/32 blind rivet,grip 1/8 to 1/4,drivebase + electronics,4
-5/32 blind rivet,grip 1/8 to 1/4,elevator,60
+5/32 blind rivet,grip 1/8 to 1/4,elevator,64
 5/32 blind rivet,grip 1/8 to 1/4,funnel,49
 5/32 blind rivet,grip 1/8 to 1/4,wrist,24
 5/32 blind rivet,grip over 3/8,funnel,8
 5/32 blind rivet,grip to 1/8,climber + drivebase,8
-5/32 blind rivet,grip to 1/8,elevator,4
+5/32 blind rivet,grip to 1/8,elevator,8

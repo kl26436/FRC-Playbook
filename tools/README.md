@@ -6,7 +6,20 @@
 2. `build_parts.py` merges those with the flat patterns, the printed parts list and the 3D model's part names.
 3. `make_site_data.py` sorts each part by how it is made, writes its proposed steps and draws its outline.
 
-The paths at the top of each script point at where the package was unpacked when they were last run. Change them before running. Needs Python with `ezdxf`, and `pdftotext` from Poppler.
+`build_parts.py` and `make_site_data.py` take the unpacked package folder as their first argument (`build_parts.py` takes the
+mesh export as its second). The other paths at the top of each script point at where things were when they were last run.
+Needs Python with `ezdxf`, and `pdftotext` and `pdftoppm` from Poppler.
+
+After a new CAD package, also replace what the site hosts under `public/files/`: the drawing PDFs, one JPEG per sheet
+(`pdftoppm -r 100 -jpeg`, named `<pdf name>-<page>.jpg`), the DXF folders and the four list CSVs. Then update the revision
+letters on the Downloads page.
+
+## When a CAD package arrives without a new mesh export
+
+`update_mesh_from_step.py` was written for package 3.3, which changed the elevator's fixed parts, the climber and one side
+rail but came with the 3.2 mesh export. It keeps every unchanged part from the old export and re-reads the changed
+packages from their STEP files, using the mesh export script's own settings. It prints what it removed and added, so the
+swap can be checked against the package's change list. Edit the three sections at the top of it for the next change.
 
 ## Rebuilding the 3D model data
 

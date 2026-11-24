@@ -15,7 +15,7 @@ FRAME = ["D-101", "D-102", "/^MK4i/", "D-103", "D-105", "/WCP-0374/", "CL-102", 
 SETS = {}
 
 SETS["drivebase"] = dict(
-    title="Drivebase", sheets="Drivebase drawings, Rev F", base=[],
+    title="Drivebase", sheets="Drivebase drawings, Rev G", base=[],
     intro="The frame is a 28 × 28 in square of aluminium tube. Its corners are the four swerve modules. A thin belly pan is riveted underneath.",
     steps=[
         dict(t="Cut and drill the four rails", parts=["D-101", "D-102"],
@@ -104,7 +104,7 @@ SETS["electronics"] = dict(
     ])
 
 SETS["elevator"] = dict(
-    title="Elevator", sheets="Elevator drawings, Rev H", base=FRAME,
+    title="Elevator", sheets="Elevator drawings, Rev J", base=FRAME,
     intro="Four frames slide inside each other: the mast, two stages and the carriage. A chain lifts the first stage. Ropes over pulleys make the other two follow.",
     steps=[
         dict(t="Cut the tubes", parts=[],
@@ -118,12 +118,14 @@ SETS["elevator"] = dict(
                  "Bolt a bearing block to the top of each upright."],
              check="The mast's outer faces are 26.00 in apart, which is the inside width of the frame."),
         dict(t="Brace it", parts=["E-103", "E-104", "D-301", "D-302"],
-             do=["Cut the foot of the diagonal brace 22.2° off square, so it stands flat on the right rail.",
-                 "Rivet the gusset to the brace and to the inside wall of the rail.",
-                 "Clamp the top of the brace against the outer wall of the right upright. Drill its four top holes through into the upright.",
+             do=["There is a diagonal brace on each side. The two are a mirror pair, cut from the same length of tube.",
+                 "Cut the foot of each brace 22.2° off square, so it stands flat on its side rail.",
+                 "Rivet a gusset to each brace and to the inside wall of its rail.",
+                 "Clamp the top of each brace against the outer wall of its upright. Drill its four top holes through into the upright.",
                  "Rivet from inside the brace, reaching through the access holes in its outer wall. A long nosepiece helps.",
                  "Rivet the two foot angles between the rail tops and the mast, and the two tie angles between the mast base and the spine."],
-             hw=["12 × rivets for the foot angles", "8 × rivets for the tie angles"],
+             hw=["8 × rivets, braces to uprights", "12 × rivets for the foot angles", "8 × rivets for the tie angles"],
+             warn="Fit both braces. With only one, the mast twists when the robot turns hard, and the stages bind.",
              check="The mast stands square to the frame and does not rock."),
         dict(t="Rivet on the drive plates", parts=["E-502", "E-503", "E-506"],
              do=["Rivet a shaft bearing plate to the outside of each upright, low down.",
@@ -300,7 +302,7 @@ SETS["funnel"] = dict(
     ])
 
 SETS["climber"] = dict(
-    title="Climber", sheets="Climber drawings, Rev C", base=FRAME,
+    title="Climber", sheets="Climber drawings, Rev D", base=FRAME,
     intro="A tower plate stands each side of the battery. The fork turns on an axle between them. Each side has its own winch: a motor, a gearbox, a ratchet and a spool.",
     steps=[
         dict(t="Tower plates", parts=["CL-101", "CL-103"],
@@ -342,19 +344,24 @@ SETS["climber"] = dict(
              do=["Fit two bolts in each tower plate, heads inward, each with a small turned spacer.", "One stops the fork at 97°. The other catches it just past level."],
              hw=["4 × 1/4-20 × 1.00 in socket head screws and lock nuts"],
              check="Swing the fork by hand. A stop pin meets a bolt at each end."),
-        dict(t="Winches", parts=["CL-302", "/spool shaft, in the tower/", "CL-301", "CL-303", "CL-306", "/MAXPlanetary 25:1/", "/Kraken X60 \\(climber\\)/"],
-             do=["Each side: a short hex shaft runs from the gearbox, through the ratchet wheel and the spool, into a bearing in the tower plate.",
-                 "The ratchet wheel turns in the gap between the gearbox and the tower, inside the two gearbox spacers.",
-                 "Bolt the motor to its 25:1 gearbox, and the gearbox to the tower through the spacers."],
-             warn="The spool must be metal. It carries the whole climb."),
-        dict(t="Pawls and their servos", parts=["CL-304", "/Spacer 5\\/16 OD/", "/Dowel pin 1\\/8/", "/holds the pawl/", "/climber pawl release/", {"re": "Servo horn", "sub": 4}, "CL-305", "/CL-307 pawl link/"],
-             do=["Each pawl turns on a small steel spacer, held by a washer, a screw and a lock nut.",
-                 "Slip three thin shims onto the spacer under each pawl.",
-                 "Hook a spring from the post up to the pawl's tail, so the pawl is held on the wheel.",
-                 "Bolt each servo to the tower on two printed blocks. Join its horn to the pawl's tail with a link."],
-             hw=["2 × #10-32 × 3/4 in socket head screws, washers and lock nuts", "6 × 0.014 in shims (99040A614)", "8 × #8-32 × 1.50 in screws for the servos"],
+        dict(t="Winches", parts=["CL-302", "/spool shaft, in the tower/", "CL-301", "CL-310", "/^WCP-0405 ratchet wheel/", "CL-306", "CL-309", "/^WCP-0405 pawl/", "/MAXPlanetary 25:1/", "/Kraken X60 \\(climber\\)/"],
+             do=["The ratchet is bought: one WCP-0405 ratchet and pawl kit for each side. There is nothing to machine.",
+                 "Each side: a short hex shaft runs from the gearbox, through the ratchet wheel and the spool, into a bearing in the tower plate. A thin printed spacer goes between the bearing and the wheel.",
+                 "The pawl goes on now. Slip a printed thrust washer, then the pawl, onto the rear gearbox spacer. The pawl turns on that spacer.",
+                 "Bolt the motor to its 25:1 gearbox. Bolt the gearbox to the tower through the two spacers. The face of the gearbox keeps the pawl on."],
+             hw=["2 × WCP-0405 ratchet and pawl kits", "4 × #10-32 × 1.00 in socket head screws (91251A347), heads inboard"],
+             warn="The spool must be metal. It carries the whole climb.",
+             check="Each pawl swings freely on its spacer."),
+        dict(t="Pawl springs, links and servos", parts=["/^Shoulder screw 1\\/4/", "CL-311", "/^Extension spring 9654K972/", "/climber pawl release/", {"re": "Servo horn", "sub": 4}, "CL-305"],
+             do=["Put a printed link on a shoulder screw. Screw it into the tapped hole in the pawl's tail, with thread locker.",
+                 "Fit a spring post below each pawl: a long screw through the tower plate, head inboard, with a nut against the plate.",
+                 "Hook the spring from the post up to the shoulder screw, outside the link. It pulls the pawl onto the wheel.",
+                 "Tap the hole in the servo horn nearest 0.50 in from its centre, #4-40.",
+                 "Bolt each servo to the tower on two printed blocks. Screw the top of the link to the horn from the tower side, with thread locker."],
+             hw=["2 × shoulder screws, 1/4 in shoulder × 5/16, #10-32 thread (94035A532)", "2 × #10-32 × 1.25 in socket head screws, each with a hex nut and a lock nut, for the spring posts",
+                 "2 × extension springs (9654K972)", "8 × #8-32 × 1.75 in screws and lock nuts for the servos", "2 × #4-40 × 3/8 in screws and washers for the links"],
              warn="Check both sides before fitting the rope. Each wheel must lock against paying out. The right wheel is the left one flipped over.",
-             check="Each pawl swings freely with its shims in, and clicks over the teeth when the spool is wound in."),
+             check="Each pawl clicks over the teeth when the spool is wound in. With the servo horn at 141° the pawl is clear of the teeth, and at 165° it is down."),
         dict(t="Ropes", parts=["/WCP-0166 rope/"], pose=dict(psi=0, tray=90, c=1.25, th=0),
              do=["Thread each rope through the small hole just past the top of its track. Tie a stopper knot with a washer on the inside.",
                  "Lead it over the track and down to the spool."],
